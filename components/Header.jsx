@@ -2,9 +2,9 @@ import React from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Icons from "./Icons"
-import Image from 'next/image'
-import CerpaMediaLogo from '../public/CerpaMediaLogo2.png'
+// import Icons from "./Icons"
+// import Image from 'next/image'
+// import CerpaMediaLogo from '../public/CerpaMediaLogo2.png'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -26,14 +26,16 @@ function Header() {
     const classes = useStyles();
     return (
         
-    <div className={classes.root}>
-      <AppBar color="transparent">
+      <div className={classes.root}>
+        
+        <h1>CerpaMedia</h1>
+      {/* <AppBar color="transparent">
                 <Toolbar>
                 <Image src={CerpaMediaLogo} atl="CerpaMedia-Logo"></Image>
             
           </Toolbar>
   
-      </AppBar>
+      </AppBar> */}
     </div>
     
     )
