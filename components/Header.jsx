@@ -2,8 +2,8 @@ import React from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Image from 'next/image'
-import CerpaMediaLogo from '../public/CerpaMediaLogo2.png'
+// import Image from 'next/image'
+// import CerpaMediaLogo from '../public/CerpaMediaLogo2.png'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,10 +30,10 @@ function Header() {
         
       <AppBar color="transparent">
                 <Toolbar>
-            <Image
+            <img
               height={200}
               width={200}
-              src={CerpaMediaLogo}
+              src='/CerpaMediaLogo2.svg'
               atl="CerpaMedia-Logo"
               priority
             />
