@@ -1,7 +1,5 @@
-
 .container {
   min-height: 100vh;
-  padding: 0 0.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -63,7 +61,6 @@
   font-size: 1.5rem;
 }
 
-
 .grid {
   display: flex;
   align-items: center;
@@ -72,7 +69,6 @@
   max-width: 800px;
   margin-top: 3rem;
 }
-
 
 @media (max-width: 600px) {
   .grid {
