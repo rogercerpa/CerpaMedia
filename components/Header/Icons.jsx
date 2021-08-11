@@ -7,7 +7,7 @@ import GitHubIcon from '@material-ui/icons/GitHub';
 function Icons() {
     return (
         <div className={Styles.iconHeader}>
-            <p className={Styles.iconsTitle}>See Roger's Profiles</p>
+            {/* <p className={Styles.iconsTitle}>See Roger's Profiles</p> */}
             <Link href="https://www.linkedin.com/in/roger-cerpa/" target="blank">
                 <LinkedInIcon fontSize="small" className={Styles.icons}/>
             </Link>
