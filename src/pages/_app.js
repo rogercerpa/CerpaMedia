@@ -8,6 +8,7 @@ export default function App({ Component, pageProps }) {
         <Head>
          <title>CerpaMedia</title>
           <link rel="icon" href="/favicon.ico" />
+          <link rel="manifest" href="/manifest.json" />
         </Head>
         <Component {...pageProps} />
       </Theme>
