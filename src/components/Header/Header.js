@@ -18,19 +18,19 @@ const Header = () =>  (
         <Div3>
 
       <SocialIcons >
-        <a href="https://github.com/rogercerpa" target="_blank" style={{ display: "flex", alignItems: "center", flexDirection: "column", color: "white" }}>
+        <a href="https://github.com/rogercerpa" target="_blank" style={{ display: "flex", alignItems: "center", flexDirection: "column", color: "white" }} rel="noopener">
           <AiFillGithub size="3rem" />
         </a>
       </SocialIcons>
 
         <SocialIcons >
-        <a href="https://www.linkedin.com/in/roger-cerpa/" target="_blank" style={{ display: "flex", alignItems: "center", flexDirection: "column", color: "white" }}>
+        <a href="https://www.linkedin.com/in/roger-cerpa/" target="_blank" style={{ display: "flex", alignItems: "center", flexDirection: "column", color: "white" }} rel="noopener">
           <AiFillLinkedin size="3rem" />
         </a>
       </SocialIcons>
 
         <SocialIcons >
-        <a href="https://www.instagram.com/cerpamedia/" target="_blank" style={{ display: "flex", alignItems: "center", flexDirection: "column", color: "white" }}>
+        <a href="https://www.instagram.com/cerpamedia/" target="_blank" style={{ display: "flex", alignItems: "center", flexDirection: "column", color: "white" }} rel="noopener">
           <AiFillInstagram size="3rem" />
         </a>
       </SocialIcons>
