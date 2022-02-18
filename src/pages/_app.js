@@ -7,7 +7,7 @@ export default function App({ Component, pageProps }) {
       <Theme>
         <Head>
           <meta charSet="utf-8" />
-          <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+          <meta name="description" content="CerpaMedia - Roger's Web Development services" />
          <title>CerpaMedia</title>
           <link rel="icon" href="/favicon.ico" />
           <link rel="manifest" href="/manifest.json" />

@@ -7,9 +7,6 @@ import { LeftSection } from './HeroStyles';
 
 const Hero = (props) => (
   <Section>
-    <SectionTitle>Welcome to CerpaMedia!</SectionTitle>
-    <SectionText>Our mission is to bring value and take solutions to the next level. </SectionText>
-
           <Div2>
       <li>
         <Link href="/AboutUs">
