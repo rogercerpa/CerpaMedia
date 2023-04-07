@@ -1,7 +1,4 @@
-import Link from "next/link";
 import React from "react";
-
-import { TiMediaPlayOutline } from "react-icons/ti";
 
 import {
   Container,
