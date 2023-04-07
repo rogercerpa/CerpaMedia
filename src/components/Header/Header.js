@@ -1,15 +1,23 @@
 import React from "react";
+import Link from "next/link";
+import { headerInfo } from "../../constants/constants";
 
-import {
-  Container,
-  Div1,
-  Div2,
-  Div3,
-  NavLink,
-  SocialIcons,
-  Span,
-} from "./HeaderStyles";
+import { Container, OptionStyle } from "./HeaderStyles";
 
-const Header = () => <Container></Container>;
+export default function Header() {
+  const Options = headerInfo.map(({ id, option }) => {
+    return (
+      <ul key={id}>
+        <OptionStyle>{option}</OptionStyle>
+      </ul>
+    );
+  });
 
-export default Header;
+  return (
+    <Container>
+      <img src="../public/logo/android-chrome-512x512.png" />
+      <Link href="./">Cerpamedia</Link>
+      {Options}
+    </Container>
+  );
+}
