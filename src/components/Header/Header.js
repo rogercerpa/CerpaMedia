@@ -16,7 +16,9 @@ export default function Header() {
   const Options = headerInfo.map(({ id, option }) => {
     return (
       <li key={id}>
-        <OptionStyle>{option}</OptionStyle>
+        <Link href="/" passHref>
+          <OptionStyle>{option}</OptionStyle>
+        </Link>
       </li>
     );
   });
