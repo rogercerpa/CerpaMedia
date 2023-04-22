@@ -1,12 +1,13 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import logoImage from "../../../public/Logo/logo.png";
 import { headerInfo } from "../../constants/constants";
 
 import {
   Container,
   OptionStyle,
-  Logo,
+  LogoWrapper,
   BrandName,
   LogoAndBrand,
   NavList,
@@ -27,7 +28,9 @@ export default function Header() {
     <Container>
       <LogoAndBrand>
         <Link href="/" passHref>
-          <Logo src={logoImage} alt="Logo" width={48} height={48} />
+          <LogoWrapper>
+            <Image src={logoImage} alt="Logo" width={48} height={48} />
+          </LogoWrapper>
         </Link>
         <Link href="./" passHref>
           <BrandName>CerpaMedia</BrandName>
