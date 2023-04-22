@@ -1,13 +1,11 @@
-import { IoIosArrowDropdown } from "react-icons/io";
 import styled from "styled-components";
 
 export const Container = styled.div`
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: 1fr;
-  grid-column-gap: 2rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
   padding: 1rem;
-  padding-top: 2rem;
 
   @media ${(props) => props.theme.breakpoints.sm} {
     display: grid;
@@ -17,55 +15,49 @@ export const Container = styled.div`
     grid-row-gap: 0.5rem;
   }
 `;
-export const Div1 = styled.div`
-  grid-area: 1 / 1 / 2 / 2;
-  display: flex;
-  flex-direction: row;
-  align-content: center;
-  @media ${(props) => props.theme.breakpoints.sm} {
-    grid-area: 1 / 1 / 2 / 3;
-  }
-`;
-export const Div2 = styled.div`
-  grid-area: 1 / 2 / 2 / 4;
-  display: flex;
-  justify-content: space-around;
-  @media ${(props) => props.theme.breakpoints.sm} {
-    grid-area: 2 / 2 / 3 / 5;
-  }
-`;
-export const Div3 = styled.div`
-  grid-area: 1 / 5 / 2 / 6;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  @media ${(props) => props.theme.breakpoints.sm} {
-    align-items: center;
-    grid-area: 1 / 4 / 2 / 6;
+
+export const OptionStyle = styled.a`
+  font-size: 1.5rem;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  margin-right: 1rem;
+
+  &:hover {
+    color: white;
+    font-size: 2rem;
   }
 `;
 
-/// DropDown Contact
-export const OptionStyle = styled.button`
-  border: none;
+export const LogoAndBrand = styled.div`
   display: flex;
-  position: relative;
-  background: none;
-  font-size: 1.7rem;
-  line-height: 32px;
-  color: rgba(255, 255, 255, 0.75);
+  flex-direction: column;
+  align-items: center;
+`;
+
+export const Logo = styled.img`
+  width: 48px; // Adjust width as needed
+  height: auto;
+  border-radius: 5px;
+`;
+
+export const BrandName = styled.a`
+  font-size: 2rem;
+  color: white;
+  text-decoration: none;
   cursor: pointer;
-  transition: 0.3s ease;
-  &:focus {
-    outline: none;
-  }
+  margin-left: 0.5rem; // Add spacing between the logo and the brand name
+
   &:hover {
-    color: #fff;
+    color: white;
   }
-  @media ${(props) => props.theme.breakpoints.sm} {
-    padding: 0.4rem 0;
-  }
-  @media ${(props) => props.theme.breakpoints.md} {
-    padding: 0;
-  }
+`;
+
+export const NavList = styled.ul`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 `;
