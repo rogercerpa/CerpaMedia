@@ -1,6 +1,6 @@
-// Header.js
 import React from "react";
 import Link from "next/link";
+import logoImage from "../../../public/Logo/logo.png";
 import { headerInfo } from "../../constants/constants";
 
 import {
@@ -27,10 +27,10 @@ export default function Header() {
     <Container>
       <LogoAndBrand>
         <Link href="/" passHref>
-          <Logo src="/logo/android-chrome-512x512.png" alt="Logo" />
+          <Logo src={logoImage} alt="Logo" width={48} height={48} />
         </Link>
         <Link href="./" passHref>
-          <BrandName>Cerpamedia</BrandName>
+          <BrandName>CerpaMedia</BrandName>
         </Link>
       </LogoAndBrand>
       <NavList>{Options}</NavList>

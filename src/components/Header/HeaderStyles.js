@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import NextImage from "next/image";
 
 export const Container = styled.div`
   display: flex;
@@ -35,10 +36,10 @@ export const LogoAndBrand = styled.div`
   align-items: center;
 `;
 
-export const Logo = styled.img`
-  width: 48px; // Adjust width as needed
-  height: auto;
-  border-radius: 5px;
+export const Logo = styled(NextImage)`
+  width: 48px;
+  height: 48px;
+  position: relative;
 `;
 
 export const BrandName = styled.a`
