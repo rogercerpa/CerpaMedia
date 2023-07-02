@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import logoImage from "../../../public/Logo/logo.png";
 import { headerInfo } from "../../constants/constants";
-
 import {
   Container,
   OptionStyle,
@@ -14,10 +13,10 @@ import {
 } from "./HeaderStyles";
 
 export default function Header() {
-  const Options = headerInfo.map(({ id, option }) => {
+  const Options = headerInfo.map(({ id, option, href }) => {
     return (
       <li key={id}>
-        <Link href="/" passHref>
+        <Link href={href} passHref>
           <OptionStyle>{option}</OptionStyle>
         </Link>
       </li>
@@ -27,12 +26,12 @@ export default function Header() {
   return (
     <Container>
       <LogoAndBrand>
-        <Link href="/" passHref>
+        <Link to="/" passHref>
           <LogoWrapper>
             <Image src={logoImage} alt="Logo" width={48} height={48} />
           </LogoWrapper>
         </Link>
-        <Link href="./" passHref>
+        <Link to="/" passHref>
           <BrandName>CerpaMedia</BrandName>
         </Link>
       </LogoAndBrand>

@@ -14,13 +14,16 @@ export const headerInfo = [
   {
     id: 0,
     option: "Services",
+    href: "/services",
   },
   {
     id: 1,
     option: "About Us",
+    href: "/aboutus",
   },
   {
     id: 2,
     option: "Contact Us",
+    href: "/contactus",
   },
 ];
