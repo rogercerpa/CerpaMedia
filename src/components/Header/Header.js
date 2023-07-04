@@ -16,7 +16,7 @@ import Logo from "../../../public/Logo/logo.png";
 import Image from "next/image";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
-const pages = ["Portfolio", "Services", "Blog"];
+const pages = ["Portfolio", "Services", "Blog", "Contact"];
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const theme = createTheme({
