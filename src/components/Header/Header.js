@@ -15,8 +15,15 @@ import AdbIcon from "@mui/icons-material/Adb";
 import Logo from "../../../public/Logo/logo.png";
 import Image from "next/image";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Link from "next/link";
 
-const pages = ["Portfolio", "Services", "Blog", "Contact"];
+const pages = [
+  { name: "Portfolio", href: "/portfolio" },
+  { name: "Services", href: "/services" },
+  { name: "Blog", href: "/blog" },
+  { name: "Contact", href: "/contact" },
+];
+
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 const theme = createTheme({
@@ -101,8 +108,10 @@ function Header() {
                 }}
               >
                 {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page}</Typography>
+                  <MenuItem key={page.name} onClick={handleCloseNavMenu}>
+                    <Link href={page.href}>
+                      <Typography textAlign="center">{page.name}</Typography>
+                    </Link>
                   </MenuItem>
                 ))}
               </Menu>
@@ -129,11 +138,11 @@ function Header() {
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               {pages.map((page) => (
                 <Button
-                  key={page}
+                  key={page.name}
                   onClick={handleCloseNavMenu}
                   sx={{ my: 2, color: "white", display: "block" }}
                 >
-                  {page}
+                  {page.name}
                 </Button>
               ))}
             </Box>
