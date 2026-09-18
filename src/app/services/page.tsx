@@ -98,6 +98,33 @@ export default function ServicesPage() {
 
       <section className="py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-br from-[#84CC16] to-[#65a30d] rounded-lg shadow-lg hover:shadow-xl transition-shadow p-8 mb-12">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div className="flex-1">
+                <div className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 mb-3">
+                  <span className="text-xs font-semibold text-[#111827]">NEW OFFERING</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-[#111827] mb-3">
+                  Technology Strategy Call
+                </h2>
+                <p className="text-lg text-[#111827]/90 mb-2">
+                  $99 · 30–45 minutes · One-on-one guidance
+                </p>
+                <p className="text-[#111827]/80">
+                  Get expert technology advice in a focused session. Prepaid standalone consultation with written summary delivered within 24–48 hours.
+                </p>
+              </div>
+              <div className="flex-shrink-0">
+                <Link
+                  href="/consult"
+                  className="inline-block bg-[#111827] text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors text-center"
+                >
+                  Learn More
+                </Link>
+              </div>
+            </div>
+          </div>
+
           <div className="space-y-12">
             {services.map((service, index) => (
               <div
