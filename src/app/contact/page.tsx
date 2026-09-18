@@ -181,6 +181,13 @@ export default function ContactPage() {
               >
                 cerpamedia@gmail.com
               </a>
+              {" "}or call us at{" "}
+              <a
+                href="tel:+19432487410"
+                className="text-primary-600 hover:text-primary-700 font-medium"
+              >
+                (943) 248-7410
+              </a>
             </p>
           </div>
         </div>
