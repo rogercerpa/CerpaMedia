@@ -39,6 +39,12 @@ export default function Footer() {
                 cerpamedia@gmail.com
               </a>
             </p>
+            <p className="text-gray-400 mt-2">
+              Phone:{" "}
+              <a href="tel:+19432487410" className="text-primary-400 hover:text-primary-300 transition-colors">
+                (943) 248-7410
+              </a>
+            </p>
           </div>
         </div>
         
