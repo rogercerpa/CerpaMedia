@@ -53,7 +53,7 @@ export default function ContactPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Get In Touch
             </h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl text-white/90 max-w-3xl mx-auto">
               Let's discuss how we can help your business operate more efficiently
             </p>
           </div>
@@ -155,7 +155,7 @@ export default function ContactPage() {
                       ? "bg-green-50 text-green-800 border border-green-200"
                       : status.type === "error"
                       ? "bg-red-50 text-red-800 border border-red-200"
-                      : "bg-blue-50 text-blue-800 border border-blue-200"
+                      : "bg-gray-50 text-gray-800 border border-gray-200"
                   }`}
                 >
                   {status.message}

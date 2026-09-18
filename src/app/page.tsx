@@ -9,7 +9,7 @@ export default function Home() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
               Technology Services for Small Business
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
               CerpaMedia helps small businesses integrate and use technology to operate more efficiently
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

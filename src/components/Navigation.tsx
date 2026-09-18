@@ -14,12 +14,12 @@ export default function Navigation() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <Image 
-                src="/cerpamedia-logo.png" 
+                src="/Logo/logo.png" 
                 alt="CerpaMedia" 
-                width={200} 
+                width={180} 
                 height={40}
-                priority
                 className="h-8 w-auto"
+                priority
               />
             </Link>
           </div>

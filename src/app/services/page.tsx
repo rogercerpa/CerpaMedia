@@ -89,7 +89,7 @@ export default function ServicesPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Our Services
             </h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl text-white/90 max-w-3xl mx-auto">
               Comprehensive technology services designed to help small businesses operate more efficiently
             </p>
           </div>
