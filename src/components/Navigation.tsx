@@ -10,15 +10,15 @@ export default function Navigation() {
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+        <div className="flex justify-between h-20 md:h-20 lg:h-24">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
-              <Image 
-                src="/Logo/logo.png" 
-                alt="CerpaMedia" 
-                width={180} 
-                height={40}
-                className="h-8 w-auto"
+              <Image
+                src="/Logo/logo.png"
+                alt="CerpaMedia Logo"
+                width={200}
+                height={48}
+                className="h-10 md:h-12 lg:h-14 w-auto object-contain"
                 priority
               />
             </Link>
