@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 
 export default function Navigation() {
@@ -11,8 +12,15 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-2xl font-bold text-primary-600">
-              CerpaMedia
+            <Link href="/" className="flex items-center">
+              <Image 
+                src="/cerpamedia-logo.png" 
+                alt="CerpaMedia" 
+                width={200} 
+                height={40}
+                priority
+                className="h-8 w-auto"
+              />
             </Link>
           </div>
           
