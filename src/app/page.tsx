@@ -81,6 +81,63 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-br from-[#84CC16] to-[#65a30d] rounded-lg overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+              <div className="p-8 md:p-12">
+                <div className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 mb-4">
+                  <span className="text-xs font-semibold text-[#111827]">NEW OFFERING</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-[#111827] mb-4">
+                  Technology Strategy Call
+                </h2>
+                <p className="text-xl font-semibold text-[#111827] mb-4">
+                  $99 · 30–45 minutes
+                </p>
+                <p className="text-lg text-[#111827]/90 mb-6">
+                  Not sure where to start? Get focused expert guidance in a one-on-one session. Walk away with 3–5 actionable opportunities and next steps.
+                </p>
+                <Link
+                  href="/consult"
+                  className="inline-block bg-[#111827] text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
+                >
+                  Learn More
+                </Link>
+              </div>
+              <div className="bg-[#111827] p-8 md:p-12 h-full flex items-center">
+                <ul className="space-y-4 text-white">
+                  <li className="flex items-start">
+                    <svg className="w-6 h-6 text-[#84CC16] mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Zoom or Microsoft Teams video call</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="w-6 h-6 text-[#84CC16] mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Written summary within 24–48 hours</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="w-6 h-6 text-[#84CC16] mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Prepaid standalone service</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="w-6 h-6 text-[#84CC16] mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Direct access to Roger Cerpa</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="bg-gray-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">

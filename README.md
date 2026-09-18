@@ -43,12 +43,16 @@ RESEND_API_KEY=your_resend_api_key_here
 # Optional - defaults shown below
 CONTACT_TO_EMAIL=cerpamedia@gmail.com
 CONTACT_FROM_EMAIL=onboarding@resend.dev
+
+# Optional - for Technology Strategy Call payment
+NEXT_PUBLIC_STRIPE_PAYMENT_LINK=your_stripe_payment_link_here
 ```
 
 **Important**: 
 - The contact form will show an error message to users if `RESEND_API_KEY` is not configured
 - Get your Resend API key from [resend.com](https://resend.com)
 - `CONTACT_FROM_EMAIL` must be a verified domain in your Resend account or use the default `onboarding@resend.dev` for testing
+- `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` is optional. If set, the Technology Strategy Call page will show a "Pay $99" button. If not set, it will display contact information instead.
 
 ### Running Locally
 
@@ -71,7 +75,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 1. Push your code to GitHub
 2. Import the repository in [Vercel](https://vercel.com)
-3. Add environment variables in Vercel dashboard (Settings → Environment Variables)
+3. Add environment variables in Vercel dashboard (Settings → Environment Variables):
+   - `RESEND_API_KEY` - Required for contact form
+   - `CONTACT_TO_EMAIL` - Optional, defaults to cerpamedia@gmail.com
+   - `CONTACT_FROM_EMAIL` - Optional, defaults to onboarding@resend.dev
+   - `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` - Optional, enables the "Pay $99" button on the `/consult` page
 4. Deploy
 
 ### Other Platforms
@@ -92,6 +100,7 @@ Make sure to:
 
 - **Home** (`/`) - Primary offer and service overview
 - **Services** (`/services`) - Detailed service descriptions
+- **Technology Strategy Call** (`/consult`) - $99 standalone consultation offer
 - **Contact** (`/contact`) - Contact form and email
 
 ## Services Offered
