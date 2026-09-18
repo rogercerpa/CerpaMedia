@@ -1,6 +1,10 @@
 import Link from "next/link";
 
 export default function ConsultPage() {
+  const stripePaymentLink =
+    process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK ||
+    process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_URL ||
+    process.env.STRIPE_PAYMENT_LINK_URL;
   return (
     <div>
       <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16 md:py-24">
@@ -229,23 +233,49 @@ export default function ConsultPage() {
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
               Ready to Schedule Your Consultation?
             </h3>
-            <p className="text-gray-600 mb-6">
-              Booking system coming soon. Contact us to schedule your session.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/contact"
-                className="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
-              >
-                Contact Us to Book
-              </Link>
-              <a
-                href="tel:+19432487410"
-                className="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors border-2 border-primary-600"
-              >
-                Call (943) 248-7410
-              </a>
-            </div>
+            {stripePaymentLink ? (
+              <>
+                <p className="text-gray-600 mb-6">
+                  Pay now to secure your session. You'll receive an email to schedule your preferred time.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <a
+                    href={stripePaymentLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+                  >
+                    Pay $99 Now
+                  </a>
+                  <a
+                    href="tel:+19432487410"
+                    className="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors border-2 border-primary-600"
+                  >
+                    Call (943) 248-7410
+                  </a>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-gray-600 mb-6">
+                  Contact us to schedule your session.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    href="/contact"
+                    className="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+                  >
+                    Contact Us to Book
+                  </Link>
+                  <a
+                    href="tel:+19432487410"
+                    className="inline-block bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors border-2 border-primary-600"
+                  >
+                    Call (943) 248-7410
+                  </a>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>

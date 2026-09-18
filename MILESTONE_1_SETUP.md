@@ -104,11 +104,14 @@ This adds:
 
 ### Step 3: Generate Prisma Client
 
+This happens automatically during:
+- `npm install` (via postinstall hook)
+- `npm run build` (before Next.js build)
+
+Or run manually:
 ```bash
 npm run db:generate
 ```
-
-Or this happens automatically on `npm install`.
 
 ## Testing Locally
 
@@ -142,24 +145,39 @@ Then merge the PR or deploy the branch directly in Vercel.
 
 ### Step 3: Run Migrations on Production
 
+**IMPORTANT**: Migrations must be run manually. The build does NOT auto-migrate to prevent accidental destructive changes.
+
 After the first deploy, run migrations against your Neon database:
 
+**Option A: Via Vercel CLI (recommended)**
 ```bash
-# From your local machine with DATABASE_URL pointing to production
+# Pull production env vars
+vercel env pull .env.production.local
+
+# Run migrations (safe - only applies pending migrations)
 npx prisma migrate deploy
 ```
 
-Or use Vercel's CLI:
-
+**Option B: Direct connection**
 ```bash
-vercel env pull .env.production.local
-DATABASE_URL="your-production-db-url" npx prisma migrate deploy
+# Set DATABASE_URL to your production Neon connection string
+DATABASE_URL="postgresql://user:password@host:5432/db?sslmode=require" npx prisma migrate deploy
 ```
+
+**What `prisma migrate deploy` does:**
+- Applies pending migrations in order
+- Safe: never destructive, only additive
+- Idempotent: can run multiple times safely
+- Skips already-applied migrations
 
 ### Step 4: Seed Production Data
 
 ```bash
-DATABASE_URL="your-production-db-url" npm run db:seed
+# Via Vercel env (after env pull)
+npm run db:seed
+
+# Or direct connection
+DATABASE_URL="postgresql://user:password@host:5432/db?sslmode=require" npm run db:seed
 ```
 
 ## What Works vs. What's Coming
