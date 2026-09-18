@@ -1,6 +1,9 @@
 import Link from "next/link";
 
-const paymentLink = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK;
+const paymentLink =
+  process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK ||
+  process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_URL ||
+  process.env.STRIPE_PAYMENT_LINK_URL;
 
 export default function ConsultPage() {
   return (
