@@ -2,13 +2,25 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 100);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav className="bg-white border-b border-border sticky top-0 z-50">
+    <nav className={`bg-white border-b border-border sticky top-0 z-50 transition-all duration-300 ${
+      scrolled ? "backdrop-blur-md bg-white/95 shadow-sm" : ""
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -36,7 +48,7 @@ export default function Navigation() {
             </Link>
             <Link
               href="/consult"
-              className="bg-cta text-cta-text px-6 py-2 text-[15px] font-medium hover:bg-cta-hover transition-colors"
+              className="bg-cta text-cta-text px-6 py-2 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
             >
               Book $99 call
             </Link>
