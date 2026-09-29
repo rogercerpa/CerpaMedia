@@ -7,8 +7,14 @@ import Footer from "@/components/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CerpaMedia - Small Business Technology Services",
-  description: "CerpaMedia helps small businesses integrate and use technology to operate more efficiently. Expert web development, mobile apps, AI integration, and automation consulting.",
+  title: "CerpaMedia - Technology Services for Small Business",
+  description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' },
+    ],
+  },
 };
 
 export default function RootLayout({

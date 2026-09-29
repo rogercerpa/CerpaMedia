@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createMagicLinkToken, isAdminEmail } from "@/lib/auth";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+function getResendClient() {
+  return new Resend(process.env.RESEND_API_KEY || "dummy-key-for-build");
+}
+
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 export async function POST(request: NextRequest) {
@@ -34,6 +37,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    const resend = getResendClient();
     await resend.emails.send({
       from: "CerpaMedia Admin <admin@cerpamedia.com>",
       to: email,

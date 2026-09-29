@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { submitContactForm } from "@/app/actions/contact";
+import { Reveal } from "@/components/Reveal";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -47,149 +48,157 @@ export default function ContactPage() {
 
   return (
     <div>
-      <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              Get In Touch
-            </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto">
-              Let's discuss how we can help your business operate more efficiently
-            </p>
-          </div>
+      <section className="bg-bg py-24 md:py-32">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Reveal>
+            <div className="text-center">
+              <h1 className="text-5xl md:text-6xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
+                Get In Touch
+              </h1>
+              <p className="text-xl text-text-muted max-w-3xl mx-auto leading-relaxed">
+                Let's discuss how we can help your business operate more efficiently
+              </p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      <section className="py-16 md:py-20">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-lg shadow-lg p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                  Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                  Email <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
-                  Company
-                </label>
-                <input
-                  type="text"
-                  id="company"
-                  name="company"
-                  value={formData.company}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="service" className="block text-sm font-medium text-gray-700 mb-2">
-                  Service Interest
-                </label>
-                <select
-                  id="service"
-                  name="service"
-                  value={formData.service}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="">Select a service...</option>
-                  <option value="Web Development">Web Development</option>
-                  <option value="Web Applications">Web Applications</option>
-                  <option value="Mobile Apps">Mobile Apps</option>
-                  <option value="AI System Integration">AI System Integration</option>
-                  <option value="AI Consulting">AI Consulting</option>
-                  <option value="Automation Consulting">Automation Consulting</option>
-                  <option value="Business Process Improvement & Automation">
-                    Business Process Improvement & Automation
-                  </option>
-                  <option value="Other / Not Sure">Other / Not Sure</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
-                  Message <span className="text-red-500">*</span>
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={6}
-                  value={formData.message}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
-              </div>
-
-              {status.message && (
-                <div
-                  className={`p-4 rounded-lg ${
-                    status.type === "success"
-                      ? "bg-green-50 text-green-800 border border-green-200"
-                      : status.type === "error"
-                      ? "bg-red-50 text-red-800 border border-red-200"
-                      : "bg-gray-50 text-gray-800 border border-gray-200"
-                  }`}
-                >
-                  {status.message}
+      <section className="py-16 md:py-20 border-t border-border">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Reveal delay={100}>
+            <div className="border border-border p-8 md:p-10">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-text mb-2">
+                    Name <span className="text-text-muted">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-border focus:outline-none focus:border-text transition-colors text-text"
+                  />
                 </div>
-              )}
 
-              <button
-                type="submit"
-                disabled={status.type === "loading"}
-                className="w-full bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {status.type === "loading" ? "Sending..." : "Send Message"}
-              </button>
-            </form>
-          </div>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-text mb-2">
+                    Email <span className="text-text-muted">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-border focus:outline-none focus:border-text transition-colors text-text"
+                  />
+                </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-gray-600">
-              You can also reach us directly at{" "}
-              <a
-                href="mailto:cerpamedia@gmail.com"
-                className="text-primary-600 hover:text-primary-700 font-medium"
-              >
-                cerpamedia@gmail.com
-              </a>
-              {" "}or call us at{" "}
-              <a
-                href="tel:+19432487410"
-                className="text-primary-600 hover:text-primary-700 font-medium"
-              >
-                (943) 248-7410
-              </a>
-            </p>
-          </div>
+                <div>
+                  <label htmlFor="company" className="block text-sm font-medium text-text mb-2">
+                    Company
+                  </label>
+                  <input
+                    type="text"
+                    id="company"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-border focus:outline-none focus:border-text transition-colors text-text"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="service" className="block text-sm font-medium text-text mb-2">
+                    Service Interest
+                  </label>
+                  <select
+                    id="service"
+                    name="service"
+                    value={formData.service}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-border focus:outline-none focus:border-text transition-colors text-text bg-white"
+                  >
+                    <option value="">Select a service...</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Web Applications">Web Applications</option>
+                    <option value="Mobile Apps">Mobile Apps</option>
+                    <option value="AI System Integration">AI System Integration</option>
+                    <option value="AI Consulting">AI Consulting</option>
+                    <option value="Automation Consulting">Automation Consulting</option>
+                    <option value="Business Process Improvement & Automation">
+                      Business Process Improvement & Automation
+                    </option>
+                    <option value="Other / Not Sure">Other / Not Sure</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-medium text-text mb-2">
+                    Message <span className="text-text-muted">*</span>
+                  </label>
+                  <textarea
+                    id="message"
+                    name="message"
+                    required
+                    rows={6}
+                    value={formData.message}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border border-border focus:outline-none focus:border-text transition-colors text-text resize-none"
+                  />
+                </div>
+
+                {status.message && (
+                  <div
+                    className={`p-4 border ${
+                      status.type === "success"
+                        ? "bg-bg-subtle border-text text-text"
+                        : status.type === "error"
+                        ? "bg-bg-subtle border-text text-text"
+                        : "bg-bg-subtle border-border text-text-muted"
+                    }`}
+                  >
+                    {status.message}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={status.type === "loading"}
+                  className="w-full bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                  {status.type === "loading" ? "Sending..." : "Send Message"}
+                </button>
+              </form>
+            </div>
+          </Reveal>
+
+          <Reveal delay={200}>
+            <div className="mt-10 text-center">
+              <p className="text-[15px] text-text-muted mb-4">
+                Or reach us directly
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a
+                  href="mailto:cerpamedia@gmail.com"
+                  className="text-text hover:underline font-medium text-[15px]"
+                >
+                  cerpamedia@gmail.com
+                </a>
+                <span className="text-border hidden sm:inline">•</span>
+                <a
+                  href="tel:+19432487410"
+                  className="text-text hover:underline font-medium text-[15px]"
+                >
+                  (943) 248-7410
+                </a>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
     </div>
