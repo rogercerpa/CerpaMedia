@@ -1,55 +1,59 @@
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-charcoal text-white border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-xl font-bold mb-4">CerpaMedia</h3>
-            <p className="text-gray-400">
-              Helping small businesses integrate and use technology to operate more efficiently.
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+          <div className="md:col-span-5">
+            <h3 className="text-[15px] font-medium mb-2 text-white">CerpaMedia</h3>
+            <p className="text-[14px] text-gray-400 leading-relaxed">
+              Technology services for small business operations
             </p>
           </div>
           
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+          <div className="md:col-span-4">
+            <h4 className="text-[13px] font-medium mb-3 text-white uppercase tracking-wide">Contact</h4>
+            <div className="space-y-2">
+              <a 
+                href="mailto:cerpamedia@gmail.com" 
+                className="text-[14px] text-gray-400 hover:text-white transition-colors block"
+              >
+                cerpamedia@gmail.com
+              </a>
+              <a 
+                href="tel:+19432487410" 
+                className="text-[14px] text-gray-400 hover:text-white transition-colors block"
+              >
+                (943) 248-7410
+              </a>
+            </div>
+          </div>
+          
+          <div className="md:col-span-3">
+            <h4 className="text-[13px] font-medium mb-3 text-white uppercase tracking-wide">Links</h4>
             <ul className="space-y-2">
               <li>
-                <a href="/" className="text-gray-400 hover:text-white transition-colors">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a href="/services" className="text-gray-400 hover:text-white transition-colors">
+                <a href="/services" className="text-[14px] text-gray-400 hover:text-white transition-colors">
                   Services
                 </a>
               </li>
               <li>
-                <a href="/contact" className="text-gray-400 hover:text-white transition-colors">
+                <a href="/consult" className="text-[14px] text-gray-400 hover:text-white transition-colors">
+                  Strategy Call
+                </a>
+              </li>
+              <li>
+                <a href="/contact" className="text-[14px] text-gray-400 hover:text-white transition-colors">
                   Contact
                 </a>
               </li>
             </ul>
           </div>
-          
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Contact</h4>
-            <p className="text-gray-400">
-              Email:{" "}
-              <a href="mailto:cerpamedia@gmail.com" className="text-primary-400 hover:text-primary-300 transition-colors">
-                cerpamedia@gmail.com
-              </a>
-            </p>
-            <p className="text-gray-400 mt-2">
-              Phone:{" "}
-              <a href="tel:+19432487410" className="text-primary-400 hover:text-primary-300 transition-colors">
-                (943) 248-7410
-              </a>
-            </p>
-          </div>
         </div>
         
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; {new Date().getFullYear()} CerpaMedia. All rights reserved.</p>
+        <div className="border-t border-gray-800 mt-8 pt-6">
+          <p className="text-[13px] text-gray-400 text-center">
+            &copy; {new Date().getFullYear()} CerpaMedia. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

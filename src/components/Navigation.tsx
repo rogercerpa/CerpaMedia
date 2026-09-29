@@ -8,38 +8,45 @@ export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-white border-b border-border sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-20 md:h-20 lg:h-24">
+        <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <Image
-                src="/Logo/logo.png"
-                alt="CerpaMedia Logo"
-                width={200}
-                height={48}
-                className="h-10 md:h-12 lg:h-14 w-auto object-contain"
+                src="/Logo/logo.svg"
+                alt="CerpaMedia"
+                width={160}
+                height={40}
+                className="h-8 w-auto"
                 priority
               />
             </Link>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-700 hover:text-primary-600 transition-colors">
-              Home
-            </Link>
-            <Link href="/services" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <Link href="/services" className="text-text-muted hover:text-text transition-colors text-[15px]">
               Services
             </Link>
-            <Link href="/contact" className="text-gray-700 hover:text-primary-600 transition-colors">
+            <Link href="/consult" className="text-text-muted hover:text-text transition-colors text-[15px]">
+              Strategy Call
+            </Link>
+            <Link href="/contact" className="text-text-muted hover:text-text transition-colors text-[15px]">
               Contact
+            </Link>
+            <Link
+              href="/consult"
+              className="bg-cta text-cta-text px-6 py-2 text-[15px] font-medium hover:bg-cta-hover transition-colors"
+            >
+              Book $99 call
             </Link>
           </div>
 
           <div className="md:hidden flex items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-gray-700 hover:text-primary-600"
+              className="text-text-muted hover:text-text"
+              aria-label="Toggle menu"
             >
               <svg className="h-6 w-6" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
                 {mobileMenuOpen ? (
@@ -54,28 +61,35 @@ export default function Navigation() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white border-t">
-            <Link
-              href="/"
-              className="block px-3 py-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Home
-            </Link>
+        <div className="md:hidden border-t border-border">
+          <div className="px-4 py-4 space-y-3 bg-white">
             <Link
               href="/services"
-              className="block px-3 py-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md"
+              className="block px-3 py-2 text-text-muted hover:text-text rounded-md transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Services
             </Link>
             <Link
+              href="/consult"
+              className="block px-3 py-2 text-text-muted hover:text-text rounded-md transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Strategy Call
+            </Link>
+            <Link
               href="/contact"
-              className="block px-3 py-2 text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md"
+              className="block px-3 py-2 text-text-muted hover:text-text rounded-md transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact
+            </Link>
+            <Link
+              href="/consult"
+              className="block bg-cta text-cta-text px-6 py-2.5 font-medium hover:bg-cta-hover transition-colors text-center"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Book $99 call
             </Link>
           </div>
         </div>

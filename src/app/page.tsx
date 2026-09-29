@@ -3,155 +3,173 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div>
-      <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-bg py-24 md:py-32 lg:py-40">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              Technology Services for Small Business
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
+              Technology that helps your business operate
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-              CerpaMedia helps small businesses integrate and use technology to operate more efficiently
+            <p className="text-xl md:text-2xl text-text-muted max-w-3xl mx-auto mb-12 leading-relaxed">
+              Strategic web development, AI integration, and automation consulting for small businesses
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/services"
-                className="bg-white text-primary-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                href="/consult"
+                className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-colors"
               >
-                Our Services
+                Book $99 call
               </Link>
               <Link
                 href="/contact"
-                className="bg-primary-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-400 transition-colors border-2 border-white"
+                className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
               >
-                Get Started
+                Contact us
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              What We Do
+      <section className="bg-bg-subtle py-16 md:py-20 border-y border-border">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-sm uppercase tracking-wider text-text-muted font-medium mb-3">
+              How we work
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We provide practical technology solutions that help your business run smoother, work faster, and scale effectively.
-            </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">Web & Mobile Development</h3>
-              <p className="text-gray-600">
-                Custom websites, web applications, and mobile apps built to meet your specific business needs.
+            <div className="text-center">
+              <h3 className="text-[15px] font-medium text-text mb-2">Paid discovery first</h3>
+              <p className="text-[15px] text-text-muted leading-relaxed">
+                Start with a paid discovery phase, then fixed SOW for the build
               </p>
             </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">AI Integration</h3>
-              <p className="text-gray-600">
-                Integrate modern AI capabilities into your operations with practical guidance on when and how to apply AI effectively.
+            <div className="text-center">
+              <h3 className="text-[15px] font-medium text-text mb-2">You own everything</h3>
+              <p className="text-[15px] text-text-muted leading-relaxed">
+                All GitHub repos, hosting accounts, and third-party service access stay yours
               </p>
             </div>
-
-            <div className="bg-white p-8 rounded-lg shadow-md hover:shadow-xl transition-shadow">
-              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">Business Automation</h3>
-              <p className="text-gray-600">
-                Streamline repetitive tasks and improve workflows through strategic automation and process improvement.
+            <div className="text-center">
+              <h3 className="text-[15px] font-medium text-text mb-2">Practical tech, no hype</h3>
+              <p className="text-[15px] text-text-muted leading-relaxed">
+                Technology choices driven by what your business actually needs
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-[#84CC16] to-[#65a30d] rounded-lg overflow-hidden">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-              <div className="p-8 md:p-12">
-                <div className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 mb-4">
-                  <span className="text-xs font-semibold text-[#111827]">NEW OFFERING</span>
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-[#111827] mb-4">
-                  Technology Strategy Call
-                </h2>
-                <p className="text-xl font-semibold text-[#111827] mb-4">
-                  $99 · 30–45 minutes
-                </p>
-                <p className="text-lg text-[#111827]/90 mb-6">
-                  Not sure where to start? Get focused expert guidance in a one-on-one session. Walk away with 3–5 actionable opportunities and next steps.
-                </p>
-                <Link
-                  href="/consult"
-                  className="inline-block bg-[#111827] text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors"
-                >
-                  Learn More
-                </Link>
-              </div>
-              <div className="bg-[#111827] p-8 md:p-12 h-full flex items-center">
-                <ul className="space-y-4 text-white">
-                  <li className="flex items-start">
-                    <svg className="w-6 h-6 text-[#84CC16] mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Zoom or Microsoft Teams video call</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="w-6 h-6 text-[#84CC16] mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Written summary within 24–48 hours</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="w-6 h-6 text-[#84CC16] mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Prepaid standalone service</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg className="w-6 h-6 text-[#84CC16] mt-0.5 mr-3 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                    </svg>
-                    <span>Direct access to Roger Cerpa</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-gray-50 py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-              Ready to Move Forward?
+      <section className="py-24 md:py-32">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-semibold text-text mb-4 tracking-tight">
+              What we do
             </h2>
-            <p className="text-xl text-gray-600 mb-8">
-              Let's discuss how technology can help your business operate more efficiently.
+            <p className="text-lg text-text-muted max-w-2xl mx-auto leading-relaxed">
+              Technology services designed to help small businesses work more efficiently
             </p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="border border-border p-8 hover:border-text-muted transition-colors">
+              <h3 className="text-xl font-medium mb-3 text-text">Web & Mobile Applications</h3>
+              <p className="text-[15px] text-text-muted leading-relaxed">
+                Custom websites, web applications, and mobile apps built to meet your business requirements. Responsive design, modern tech stack, hosted where you want.
+              </p>
+            </div>
+
+            <div className="border border-border p-8 hover:border-text-muted transition-colors">
+              <h3 className="text-xl font-medium mb-3 text-text">AI Integration</h3>
+              <p className="text-[15px] text-text-muted leading-relaxed">
+                Practical AI implementation guidance and integration. We help you identify where AI makes sense for your operations and build solutions that deliver measurable value.
+              </p>
+            </div>
+
+            <div className="border border-border p-8 hover:border-text-muted transition-colors">
+              <h3 className="text-xl font-medium mb-3 text-text">Automation & Process</h3>
+              <p className="text-[15px] text-text-muted leading-relaxed">
+                Streamline repetitive tasks and improve workflows through strategic automation. Process analysis, tool selection, and implementation that reduces manual work.
+              </p>
+            </div>
+
+            <div className="border border-border p-8 hover:border-text-muted transition-colors">
+              <h3 className="text-xl font-medium mb-3 text-text">Strategy Consulting</h3>
+              <p className="text-[15px] text-text-muted leading-relaxed">
+                Expert guidance on technology decisions, architecture, and roadmap planning. One-on-one sessions to identify opportunities and define actionable next steps.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-charcoal py-24 md:py-32">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-block border border-white/20 px-3 py-1 mb-4">
+                <span className="text-[11px] font-medium text-white uppercase tracking-wider">New offering</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-semibold text-white mb-4 tracking-tight">
+                Technology Strategy Call
+              </h2>
+              <p className="text-xl text-white/90 mb-2">
+                $99 · 30–45 minutes
+              </p>
+              <p className="text-[15px] text-white/70 mb-8 leading-relaxed">
+                One-on-one expert guidance session via Zoom or Teams. Walk away with 3–5 actionable opportunities and a written summary within 24–48 hours.
+              </p>
+              <Link
+                href="/consult"
+                className="inline-block bg-white text-charcoal px-8 py-3.5 text-[15px] font-medium hover:bg-gray-100 transition-colors"
+              >
+                Learn more
+              </Link>
+            </div>
+            <div className="space-y-6">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-1.5 h-1.5 bg-white rounded-full mt-2"></div>
+                <p className="text-[15px] text-white/80 leading-relaxed">
+                  Prepaid standalone service, not credited toward project work
+                </p>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-1.5 h-1.5 bg-white rounded-full mt-2"></div>
+                <p className="text-[15px] text-white/80 leading-relaxed">
+                  Scheduled directly with Roger Cerpa after payment
+                </p>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0 w-1.5 h-1.5 bg-white rounded-full mt-2"></div>
+                <p className="text-[15px] text-white/80 leading-relaxed">
+                  Email summary highlighting key opportunities and recommended next steps
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-24 md:py-32">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl md:text-5xl font-semibold text-text mb-6 tracking-tight">
+            Ready to move forward?
+          </h2>
+          <p className="text-lg text-text-muted mb-10 leading-relaxed">
+            Book a strategy call or reach out to discuss your project
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/consult"
+              className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-colors"
+            >
+              Book $99 call
+            </Link>
             <Link
               href="/contact"
-              className="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+              className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
             >
-              Contact Us
+              Contact us
             </Link>
           </div>
         </div>

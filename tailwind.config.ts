@@ -9,18 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f7fee7',
-          100: '#ecfccb',
-          200: '#d9f99d',
-          300: '#bef264',
-          400: '#a3e635',
-          500: '#84cc16',
-          600: '#65a30d',
-          700: '#4d7c0f',
-          800: '#3f6212',
-          900: '#365314',
-        },
+        bg: '#FFFFFF',
+        'bg-subtle': '#F5F5F5',
+        surface: '#FFFFFF',
+        text: '#0A0A0A',
+        'text-muted': '#525252',
+        border: '#E5E5E5',
+        cta: '#0A0A0A',
+        'cta-text': '#FFFFFF',
+        'cta-hover': '#262626',
+        charcoal: '#171717',
       },
     },
   },

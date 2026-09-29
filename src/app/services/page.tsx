@@ -83,41 +83,41 @@ export default function ServicesPage() {
 
   return (
     <div>
-      <section className="bg-gradient-to-br from-primary-600 to-primary-800 text-white py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="bg-bg py-24 md:py-32">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6">
+            <h1 className="text-5xl md:text-6xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
               Our Services
             </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto">
+            <p className="text-xl text-text-muted max-w-3xl mx-auto leading-relaxed">
               Comprehensive technology services designed to help small businesses operate more efficiently
             </p>
           </div>
         </div>
       </section>
 
-      <section className="py-16 md:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-[#84CC16] to-[#65a30d] rounded-lg shadow-lg hover:shadow-xl transition-shadow p-8 mb-12">
+      <section className="py-16 md:py-20 border-t border-border">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-charcoal p-8 md:p-10 mb-16">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div className="flex-1">
-                <div className="inline-block bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 mb-3">
-                  <span className="text-xs font-semibold text-[#111827]">NEW OFFERING</span>
+                <div className="inline-block border border-white/20 px-3 py-1 mb-3">
+                  <span className="text-[11px] font-medium text-white uppercase tracking-wider">New offering</span>
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold text-[#111827] mb-3">
+                <h2 className="text-3xl md:text-4xl font-semibold text-white mb-3 tracking-tight">
                   Technology Strategy Call
                 </h2>
-                <p className="text-lg text-[#111827]/90 mb-2">
+                <p className="text-lg text-white/90 mb-2">
                   $99 · 30–45 minutes · One-on-one guidance
                 </p>
-                <p className="text-[#111827]/80">
-                  Get expert technology advice in a focused session. Prepaid standalone consultation with written summary delivered within 24–48 hours.
+                <p className="text-[15px] text-white/70 leading-relaxed">
+                  Expert technology advice in a focused session. Prepaid standalone consultation with written summary delivered within 24–48 hours.
                 </p>
               </div>
               <div className="flex-shrink-0">
                 <Link
                   href="/consult"
-                  className="inline-block bg-[#111827] text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors text-center"
+                  className="inline-block bg-white text-charcoal px-8 py-3 text-[15px] font-medium hover:bg-gray-100 transition-colors"
                 >
                   Learn More
                 </Link>
@@ -129,23 +129,21 @@ export default function ServicesPage() {
             {services.map((service, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-8"
+                className="border border-border p-8 hover:border-text-muted transition-colors"
               >
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                <h2 className="text-3xl font-semibold text-text mb-4 tracking-tight">
                   {service.title}
                 </h2>
-                <p className="text-lg text-gray-600 mb-6">
+                <p className="text-[15px] text-text-muted mb-6 leading-relaxed">
                   {service.description}
                 </p>
-                <div className="border-t border-gray-200 pt-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">What we offer:</h3>
+                <div className="border-t border-border pt-6">
+                  <h3 className="font-medium text-text mb-3 text-sm uppercase tracking-wider">What we offer</h3>
                   <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {service.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-start">
-                        <svg className="w-5 h-5 text-primary-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-gray-700">{feature}</span>
+                      <li key={featureIndex} className="flex items-start gap-3">
+                        <span className="text-text-muted text-[15px]">•</span>
+                        <span className="text-text-muted text-[15px] leading-relaxed">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -154,16 +152,16 @@ export default function ServicesPage() {
             ))}
           </div>
 
-          <div className="mt-12 bg-gray-50 rounded-lg p-8 text-center">
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          <div className="mt-16 border border-border p-10 text-center">
+            <h3 className="text-3xl font-semibold text-text mb-4 tracking-tight">
               Need Something Else?
             </h3>
-            <p className="text-lg text-gray-600 mb-6">
+            <p className="text-[15px] text-text-muted mb-8 max-w-2xl mx-auto leading-relaxed">
               We offer additional technology services beyond those listed above. If you have a specific need, let's discuss how we can help.
             </p>
             <Link
               href="/contact"
-              className="inline-block bg-primary-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
+              className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-colors"
             >
               Contact Us
             </Link>

@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #FFFFFF;
+    --bg-subtle: #F5F5F5;
+    --surface: #FFFFFF;
+    --text: #0A0A0A;
+    --text-muted: #525252;
+    --border: #E5E5E5;
+    --cta: #0A0A0A;
+    --cta-text: #FFFFFF;
+    --cta-hover: #262626;
+    --charcoal: #171717;
+  }
+}
