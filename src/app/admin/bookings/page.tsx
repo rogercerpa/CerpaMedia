@@ -16,22 +16,25 @@ export default async function AdminBookingsPage() {
   const bookings = await prisma.booking.findMany({
     where: {
       OR: [
-        {
-          status: "confirmed",
-          startTime: { gte: now },
-        },
-        {
-          status: "pending",
-          startTime: { gte: now },
-          OR: [
-            { holdExpiresAt: null },
-            { holdExpiresAt: { gt: now } },
-          ],
-        },
+        { status: "confirmed" },
+        { status: "pending" },
       ],
+      startTime: { gte: now },
     },
     orderBy: {
       startTime: "asc",
+    },
+    select: {
+      id: true,
+      startTime: true,
+      endTime: true,
+      status: true,
+      customerName: true,
+      customerEmail: true,
+      customerPhone: true,
+      customerCompany: true,
+      platformPref: true,
+      notes: true,
     },
   });
 
@@ -48,7 +51,7 @@ export default async function AdminBookingsPage() {
     });
   };
 
-  const getStatusBadge = (status: string, holdExpiresAt: Date | null) => {
+  const getStatusBadge = (status: string) => {
     if (status === "confirmed") {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -58,13 +61,6 @@ export default async function AdminBookingsPage() {
     }
     
     if (status === "pending") {
-      if (holdExpiresAt && new Date(holdExpiresAt) < now) {
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            Expired
-          </span>
-        );
-      }
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
           Pending
@@ -165,7 +161,7 @@ export default async function AdminBookingsPage() {
                 {bookings.map((booking) => (
                   <tr key={booking.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(booking.status, booking.holdExpiresAt)}
+                      {getStatusBadge(booking.status)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">

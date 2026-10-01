@@ -199,7 +199,6 @@ export async function getAvailableSlots(
   endDate: Date
 ): Promise<TimeSlot[]> {
   // Fetch all necessary data
-  const now = new Date();
   const [rules, blockedDates, bookings, settingsArray] = await Promise.all([
     prisma.availabilityRule.findMany(),
     prisma.blockedDate.findMany({
@@ -212,29 +211,20 @@ export async function getAvailableSlots(
     }),
     prisma.booking.findMany({
       where: {
-        status: {
-          not: "cancelled",
-        },
+        OR: [
+          { status: "confirmed" },
+          { status: "pending" },
+        ],
         startTime: {
           gte: startDate,
           lte: endDate,
         },
-        OR: [
-          {
-            status: "confirmed",
-          },
-          {
-            AND: [
-              { status: "pending" },
-              {
-                OR: [
-                  { holdExpiresAt: null },
-                  { holdExpiresAt: { gt: now } },
-                ],
-              },
-            ],
-          },
-        ],
+      },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        status: true,
       },
     }),
     prisma.bookingSettings.findMany(),
@@ -300,7 +290,6 @@ export async function isSlotAvailable(
   startTime: Date,
   endTime: Date
 ): Promise<boolean> {
-  const now = new Date();
   const [rules, blockedDates, bookings, settingsArray] = await Promise.all([
     prisma.availabilityRule.findMany(),
     prisma.blockedDate.findMany({
@@ -310,77 +299,42 @@ export async function isSlotAvailable(
     }),
     prisma.booking.findMany({
       where: {
-        status: {
-          not: "cancelled",
-        },
-        OR: [
+        AND: [
           {
-            AND: [
-              { startTime: { lte: startTime } },
-              { endTime: { gt: startTime } },
-              {
-                OR: [
-                  { status: "confirmed" },
-                  {
-                    AND: [
-                      { status: "pending" },
-                      {
-                        OR: [
-                          { holdExpiresAt: null },
-                          { holdExpiresAt: { gt: now } },
-                        ],
-                      },
-                    ],
-                  },
-                ],
-              },
+            OR: [
+              { status: "confirmed" },
+              { status: "pending" },
             ],
           },
           {
-            AND: [
-              { startTime: { lt: endTime } },
-              { endTime: { gte: endTime } },
+            OR: [
               {
-                OR: [
-                  { status: "confirmed" },
-                  {
-                    AND: [
-                      { status: "pending" },
-                      {
-                        OR: [
-                          { holdExpiresAt: null },
-                          { holdExpiresAt: { gt: now } },
-                        ],
-                      },
-                    ],
-                  },
+                AND: [
+                  { startTime: { lte: startTime } },
+                  { endTime: { gt: startTime } },
                 ],
               },
-            ],
-          },
-          {
-            AND: [
-              { startTime: { gte: startTime } },
-              { endTime: { lte: endTime } },
               {
-                OR: [
-                  { status: "confirmed" },
-                  {
-                    AND: [
-                      { status: "pending" },
-                      {
-                        OR: [
-                          { holdExpiresAt: null },
-                          { holdExpiresAt: { gt: now } },
-                        ],
-                      },
-                    ],
-                  },
+                AND: [
+                  { startTime: { lt: endTime } },
+                  { endTime: { gte: endTime } },
+                ],
+              },
+              {
+                AND: [
+                  { startTime: { gte: startTime } },
+                  { endTime: { lte: endTime } },
                 ],
               },
             ],
           },
         ],
+      },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        status: true,
       },
     }),
     prisma.bookingSettings.findMany(),

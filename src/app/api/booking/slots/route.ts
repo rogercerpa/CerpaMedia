@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
 
     if (!startParam) {
       return NextResponse.json(
-        { error: "Missing 'start' parameter" },
+        { error: "Missing 'start' parameter", code: "MISSING_PARAMS" },
         { status: 400 }
       );
     }
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     
     if (isNaN(startDate.getTime())) {
       return NextResponse.json(
-        { error: "Invalid 'start' date format" },
+        { error: "Invalid 'start' date format", code: "INVALID_DATE" },
         { status: 400 }
       );
     }
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       endDate = new Date(endParam);
       if (isNaN(endDate.getTime())) {
         return NextResponse.json(
-          { error: "Invalid 'end' date format" },
+          { error: "Invalid 'end' date format", code: "INVALID_DATE" },
           { status: 400 }
         );
       }
@@ -40,15 +40,17 @@ export async function GET(request: NextRequest) {
     const slots = await getAvailableSlots(startDate, endDate);
 
     return NextResponse.json({
+      count: slots.length,
       slots: slots.map(slot => ({
         start: slot.start.toISOString(),
         end: slot.end.toISOString(),
       })),
     });
   } catch (error) {
-    console.error("Error fetching available slots:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error fetching available slots:", errorMessage, error);
     return NextResponse.json(
-      { error: "Failed to fetch available slots" },
+      { error: "Failed to fetch available slots", code: "SLOTS_QUERY_FAILED" },
       { status: 500 }
     );
   }
