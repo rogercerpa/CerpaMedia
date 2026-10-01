@@ -9,6 +9,19 @@
  */
 
 import { prisma } from "./prisma";
+import { Prisma } from "@prisma/client";
+
+export class AvailabilityError extends Error {
+  constructor(
+    message: string,
+    public code: string,
+    public prismaCode?: string,
+    public hint?: string
+  ) {
+    super(message);
+    this.name = "AvailabilityError";
+  }
+}
 
 export interface AvailabilityRule {
   id: string;
@@ -198,18 +211,45 @@ export async function getAvailableSlots(
   startDate: Date,
   endDate: Date
 ): Promise<TimeSlot[]> {
-  // Fetch all necessary data
-  const [rules, blockedDates, bookings, settingsArray] = await Promise.all([
-    prisma.availabilityRule.findMany(),
-    prisma.blockedDate.findMany({
+  // Fetch all necessary data with granular error handling
+  let rules: AvailabilityRule[];
+  let blockedDates: BlockedDate[];
+  let bookings: Booking[];
+  let settingsArray: BookingSettings[];
+
+  try {
+    rules = await prisma.availabilityRule.findMany();
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    throw new AvailabilityError(
+      "Failed to fetch availability rules",
+      "SLOTS_RULES_FAILED",
+      prismaCode,
+      prismaCode ? `Prisma error ${prismaCode} - check if AvailabilityRule table exists` : "Database query failed"
+    );
+  }
+
+  try {
+    blockedDates = await prisma.blockedDate.findMany({
       where: {
         date: {
           gte: startDate,
           lte: endDate,
         },
       },
-    }),
-    prisma.booking.findMany({
+    });
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    throw new AvailabilityError(
+      "Failed to fetch blocked dates",
+      "SLOTS_BLOCKED_FAILED",
+      prismaCode,
+      prismaCode ? `Prisma error ${prismaCode} - check if BlockedDate table exists` : "Database query failed"
+    );
+  }
+
+  try {
+    bookings = await prisma.booking.findMany({
       where: {
         OR: [
           { status: "confirmed" },
@@ -226,9 +266,28 @@ export async function getAvailableSlots(
         endTime: true,
         status: true,
       },
-    }),
-    prisma.bookingSettings.findMany(),
-  ]);
+    });
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    throw new AvailabilityError(
+      "Failed to fetch bookings",
+      "SLOTS_BOOKINGS_FAILED",
+      prismaCode,
+      prismaCode ? `Prisma error ${prismaCode} - check if Booking table exists and has required columns` : "Database query failed"
+    );
+  }
+
+  try {
+    settingsArray = await prisma.bookingSettings.findMany();
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    throw new AvailabilityError(
+      "Failed to fetch booking settings",
+      "SLOTS_SETTINGS_FAILED",
+      prismaCode,
+      prismaCode ? `Prisma error ${prismaCode} - check if BookingSettings table exists` : "Database query failed"
+    );
+  }
 
   const settings: BookingSettings = settingsArray.length > 0
     ? {
@@ -290,14 +349,42 @@ export async function isSlotAvailable(
   startTime: Date,
   endTime: Date
 ): Promise<boolean> {
-  const [rules, blockedDates, bookings, settingsArray] = await Promise.all([
-    prisma.availabilityRule.findMany(),
-    prisma.blockedDate.findMany({
+  // Fetch all necessary data with granular error handling
+  let rules: AvailabilityRule[];
+  let blockedDates: BlockedDate[];
+  let bookings: Booking[];
+  let settingsArray: BookingSettings[];
+
+  try {
+    rules = await prisma.availabilityRule.findMany();
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    throw new AvailabilityError(
+      "Failed to fetch availability rules",
+      "SLOTS_RULES_FAILED",
+      prismaCode,
+      prismaCode ? `Prisma error ${prismaCode} - check if AvailabilityRule table exists` : "Database query failed"
+    );
+  }
+
+  try {
+    blockedDates = await prisma.blockedDate.findMany({
       where: {
         date: startTime,
       },
-    }),
-    prisma.booking.findMany({
+    });
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    throw new AvailabilityError(
+      "Failed to fetch blocked dates",
+      "SLOTS_BLOCKED_FAILED",
+      prismaCode,
+      prismaCode ? `Prisma error ${prismaCode} - check if BlockedDate table exists` : "Database query failed"
+    );
+  }
+
+  try {
+    bookings = await prisma.booking.findMany({
       where: {
         AND: [
           {
@@ -336,9 +423,28 @@ export async function isSlotAvailable(
         endTime: true,
         status: true,
       },
-    }),
-    prisma.bookingSettings.findMany(),
-  ]);
+    });
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    throw new AvailabilityError(
+      "Failed to fetch bookings",
+      "SLOTS_BOOKINGS_FAILED",
+      prismaCode,
+      prismaCode ? `Prisma error ${prismaCode} - check if Booking table exists and has required columns` : "Database query failed"
+    );
+  }
+
+  try {
+    settingsArray = await prisma.bookingSettings.findMany();
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    throw new AvailabilityError(
+      "Failed to fetch booking settings",
+      "SLOTS_SETTINGS_FAILED",
+      prismaCode,
+      prismaCode ? `Prisma error ${prismaCode} - check if BookingSettings table exists` : "Database query failed"
+    );
+  }
 
   const settings: BookingSettings = settingsArray.length > 0
     ? {

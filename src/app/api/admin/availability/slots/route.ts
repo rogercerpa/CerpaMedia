@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth";
-import { getAvailableSlots } from "@/lib/availability";
+import { getAvailableSlots, AvailabilityError } from "@/lib/availability";
 
 export async function GET(request: NextRequest) {
   const email = await getAdminSession();
@@ -41,10 +41,31 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
+    if (error instanceof AvailabilityError) {
+      console.error(`[${error.code}] ${error.message}`, {
+        code: error.code,
+        prismaCode: error.prismaCode,
+        hint: error.hint,
+      });
+      return NextResponse.json(
+        {
+          error: error.message,
+          code: error.code,
+          prismaCode: error.prismaCode,
+          hint: error.hint,
+        },
+        { status: 500 }
+      );
+    }
+
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error getting available slots:", errorMessage, error);
     return NextResponse.json(
-      { error: "Failed to get available slots", code: "SLOTS_QUERY_FAILED" },
+      {
+        error: "Failed to get available slots",
+        code: "SLOTS_QUERY_FAILED",
+        hint: "Unexpected error - check server logs",
+      },
       { status: 500 }
     );
   }
