@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
           customerCompany: hold.customerCompany,
           serviceInterest: hold.serviceInterest,
           platformPref: hold.platformPref,
-          intakeAnswers: hold.intakeAnswers,
+          intakeAnswers: hold.intakeAnswers as any,
           notes: hold.notes,
           stripeSessionId: session.id,
         },
