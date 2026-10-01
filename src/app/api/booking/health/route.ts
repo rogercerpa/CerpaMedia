@@ -14,6 +14,7 @@ export async function GET() {
     dateAvailability: false,
     booking: false,
     bookingSettings: false,
+    checkoutHold: false,
   };
 
   const dbHost = getDatabaseHost();
@@ -57,6 +58,14 @@ export async function GET() {
     tables.bookingSettings = true;
   } catch (error) {
     tables.bookingSettings = false;
+  }
+
+  // Check CheckoutHold table
+  try {
+    await prisma.checkoutHold.findMany({ take: 1 });
+    tables.checkoutHold = true;
+  } catch (error) {
+    tables.checkoutHold = false;
   }
 
   const allTablesExist = Object.values(tables).every((exists) => exists);

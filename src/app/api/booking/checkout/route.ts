@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { isSlotAvailable } from "@/lib/availability";
 import Stripe from "stripe";
 
@@ -73,21 +74,43 @@ export async function POST(request: NextRequest) {
 
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
-    const hold = await prisma.checkoutHold.create({
-      data: {
-        startTime: start,
-        endTime: end,
-        customerName,
-        customerEmail,
-        customerPhone,
-        customerCompany,
-        serviceInterest,
-        platformPref,
-        notes: notes.trim(),
-        intakeAnswers: intakeAnswers || {},
-        expiresAt,
-      },
-    });
+    // Step 1: Create CheckoutHold
+    let hold;
+    try {
+      hold = await prisma.checkoutHold.create({
+        data: {
+          startTime: start,
+          endTime: end,
+          customerName,
+          customerEmail,
+          customerPhone,
+          customerCompany,
+          serviceInterest,
+          platformPref,
+          notes: notes.trim(),
+          intakeAnswers: intakeAnswers || {},
+          expiresAt,
+        },
+      });
+    } catch (error) {
+      const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+      console.error("[CHECKOUT_HOLD_CREATE_FAILED]", {
+        code: "CHECKOUT_HOLD_CREATE_FAILED",
+        prismaCode,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return NextResponse.json(
+        {
+          error: "Failed to create checkout hold",
+          code: "CHECKOUT_HOLD_CREATE_FAILED",
+          prismaCode,
+          hint: prismaCode === "P2021" 
+            ? "CheckoutHold table does not exist - run 'prisma db push' to sync schema"
+            : "Database error while creating hold",
+        },
+        { status: 500 }
+      );
+    }
 
     const priceId = process.env.STRIPE_PRICE_ID;
     
@@ -134,22 +157,72 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    const stripe = getStripeClient();
-    const session = await stripe.checkout.sessions.create(sessionParams);
+    // Step 2: Create Stripe session
+    let session;
+    try {
+      const stripe = getStripeClient();
+      session = await stripe.checkout.sessions.create(sessionParams);
+    } catch (error) {
+      console.error("[CHECKOUT_STRIPE_FAILED]", {
+        code: "CHECKOUT_STRIPE_FAILED",
+        holdId: hold.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return NextResponse.json(
+        {
+          error: "Failed to create Stripe checkout session",
+          code: "CHECKOUT_STRIPE_FAILED",
+          hint: error instanceof Error && error.message.includes("API key")
+            ? "Stripe API key not configured or invalid"
+            : error instanceof Error && error.message.includes("price")
+            ? "Stripe price configuration error"
+            : "Stripe API error - check configuration",
+        },
+        { status: 500 }
+      );
+    }
 
-    await prisma.checkoutHold.update({
-      where: { id: hold.id },
-      data: { stripeSessionId: session.id },
-    });
+    // Step 3: Update CheckoutHold with Stripe session ID
+    try {
+      await prisma.checkoutHold.update({
+        where: { id: hold.id },
+        data: { stripeSessionId: session.id },
+      });
+    } catch (error) {
+      const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+      console.error("[CHECKOUT_HOLD_UPDATE_FAILED]", {
+        code: "CHECKOUT_HOLD_UPDATE_FAILED",
+        prismaCode,
+        holdId: hold.id,
+        sessionId: session.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+      return NextResponse.json(
+        {
+          error: "Failed to update checkout hold with session ID",
+          code: "CHECKOUT_HOLD_UPDATE_FAILED",
+          prismaCode,
+          hint: "Hold created and Stripe session created, but failed to link them",
+        },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       sessionId: session.id,
       url: session.url,
     });
   } catch (error) {
-    console.error("Error creating checkout session:", error);
+    console.error("[CHECKOUT_FAILED]", {
+      code: "CHECKOUT_FAILED",
+      error: error instanceof Error ? error.message : String(error),
+    });
     return NextResponse.json(
-      { error: "Failed to create checkout session" },
+      {
+        error: "Failed to create checkout session",
+        code: "CHECKOUT_FAILED",
+        hint: "Unexpected error - check server logs",
+      },
       { status: 500 }
     );
   }
