@@ -1,10 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
-
-const paymentLink =
-  process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK ||
-  process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_URL ||
-  process.env.STRIPE_PAYMENT_LINK_URL;
+import { BookingFlow } from "@/components/BookingFlow";
 
 export default function ConsultPage() {
   return (
@@ -25,47 +21,14 @@ export default function ConsultPage() {
               <p className="text-lg text-text-muted mb-12 max-w-2xl mx-auto leading-relaxed">
                 Expert technology guidance tailored to your business needs. One focused session to identify opportunities and next steps.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                {paymentLink ? (
-                  <a
-                    href={paymentLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
-                  >
-                    Pay $99 to Get Started
-                  </a>
-                ) : (
-                  <div className="border border-border p-6 text-left">
-                    <p className="text-text font-medium mb-2">Payment link coming soon</p>
-                    <p className="text-sm text-text-muted mb-3">
-                      Contact us to inquire about the Technology Strategy Call
-                    </p>
-                    <div className="flex flex-col gap-2">
-                      <a
-                        href="mailto:cerpamedia@gmail.com"
-                        className="text-text hover:underline font-medium"
-                      >
-                        cerpamedia@gmail.com
-                      </a>
-                      <a
-                        href="tel:+19432487410"
-                        className="text-text hover:underline font-medium"
-                      >
-                        (943) 248-7410
-                      </a>
-                    </div>
-                  </div>
-                )}
-                <Link
-                  href="/contact"
-                  className="text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
-                >
-                  Have Questions?
-                </Link>
-              </div>
             </div>
           </Reveal>
+        </div>
+      </section>
+
+      <section className="py-20 md:py-24 border-t border-border bg-bg-subtle">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <BookingFlow />
         </div>
       </section>
 
@@ -139,7 +102,7 @@ export default function ConsultPage() {
         </div>
       </section>
 
-      <section className="bg-bg-subtle py-20 md:py-24 border-y border-border">
+      <section className="bg-bg py-20 md:py-24 border-t border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal delay={100}>
             <div className="text-center mb-16">
@@ -158,9 +121,9 @@ export default function ConsultPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium mb-2 text-text">Pay $99</h3>
+                  <h3 className="text-lg font-medium mb-2 text-text">Pick Your Time</h3>
                   <p className="text-[15px] text-text-muted leading-relaxed">
-                    Complete payment through our secure Stripe checkout. Your session is prepaid before scheduling.
+                    Choose from available slots that work with your schedule. All times shown in Eastern Time.
                   </p>
                 </div>
               </div>
@@ -172,9 +135,9 @@ export default function ConsultPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium mb-2 text-text">We Schedule Your Call</h3>
+                  <h3 className="text-lg font-medium mb-2 text-text">Share Your Info</h3>
                   <p className="text-[15px] text-text-muted leading-relaxed">
-                    After payment, Roger will contact you directly to find a convenient time for your Zoom or Microsoft Teams session.
+                    Provide your contact details, platform preference (Zoom or Microsoft Teams), and a brief note about what you'd like to discuss.
                   </p>
                 </div>
               </div>
@@ -186,9 +149,9 @@ export default function ConsultPage() {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium mb-2 text-text">30–45 Minute Strategy Session</h3>
+                  <h3 className="text-lg font-medium mb-2 text-text">Pay $99 Securely</h3>
                   <p className="text-[15px] text-text-muted leading-relaxed">
-                    Join the call to discuss your technology challenges, opportunities, and goals. Come prepared with questions and context about your business.
+                    Complete payment through Stripe's secure checkout. Your booking is confirmed immediately upon payment.
                   </p>
                 </div>
               </div>
@@ -200,9 +163,23 @@ export default function ConsultPage() {
                   </div>
                 </div>
                 <div>
+                  <h3 className="text-lg font-medium mb-2 text-text">Join Your Call</h3>
+                  <p className="text-[15px] text-text-muted leading-relaxed">
+                    Roger will send you the meeting link shortly before your scheduled session. Come prepared with questions about your technology challenges and goals.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-6">
+                <div className="flex-shrink-0">
+                  <div className="w-10 h-10 border-2 border-text flex items-center justify-center text-text font-medium text-sm">
+                    5
+                  </div>
+                </div>
+                <div>
                   <h3 className="text-lg font-medium mb-2 text-text">Receive Your Summary</h3>
                   <p className="text-[15px] text-text-muted leading-relaxed">
-                    Within 24–48 hours, you'll receive a short email summary highlighting 3–5 key opportunities and recommended next steps for your business.
+                    Within 24–48 hours after your call, you'll receive an email summary highlighting 3–5 key opportunities and recommended next steps for your business.
                   </p>
                 </div>
               </div>
@@ -211,53 +188,6 @@ export default function ConsultPage() {
         </div>
       </section>
 
-      <section className="py-20 md:py-24">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal delay={100}>
-            <div className="bg-charcoal p-12 md:p-16 text-center">
-              <h2 className="text-4xl md:text-5xl font-semibold text-white mb-4 tracking-tight">
-                Ready to Get Started?
-              </h2>
-              <p className="text-lg text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-                Take the first step toward better technology decisions for your business. Book your Technology Strategy Call today.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                {paymentLink ? (
-                  <a
-                    href={paymentLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-white text-charcoal px-8 py-3.5 text-[15px] font-medium hover:bg-gray-100 transition-all duration-200 hover:-translate-y-0.5"
-                  >
-                    Pay $99 Now
-                  </a>
-                ) : (
-                  <div className="bg-white border border-border p-6 text-left">
-                    <p className="text-text font-medium mb-2">Payment link coming soon</p>
-                    <p className="text-sm text-text-muted mb-3">
-                      Contact us to inquire
-                    </p>
-                    <div className="flex flex-col gap-2">
-                      <a
-                        href="mailto:cerpamedia@gmail.com"
-                        className="text-text hover:underline font-medium"
-                      >
-                        cerpamedia@gmail.com
-                      </a>
-                      <a
-                        href="tel:+19432487410"
-                        className="text-text hover:underline font-medium"
-                      >
-                        (943) 248-7410
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
 
       <section className="bg-bg-subtle py-16 border-t border-border">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

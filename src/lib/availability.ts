@@ -199,6 +199,7 @@ export async function getAvailableSlots(
   endDate: Date
 ): Promise<TimeSlot[]> {
   // Fetch all necessary data
+  const now = new Date();
   const [rules, blockedDates, bookings, settingsArray] = await Promise.all([
     prisma.availabilityRule.findMany(),
     prisma.blockedDate.findMany({
@@ -218,6 +219,22 @@ export async function getAvailableSlots(
           gte: startDate,
           lte: endDate,
         },
+        OR: [
+          {
+            status: "confirmed",
+          },
+          {
+            AND: [
+              { status: "pending" },
+              {
+                OR: [
+                  { holdExpiresAt: null },
+                  { holdExpiresAt: { gt: now } },
+                ],
+              },
+            ],
+          },
+        ],
       },
     }),
     prisma.bookingSettings.findMany(),
@@ -283,6 +300,7 @@ export async function isSlotAvailable(
   startTime: Date,
   endTime: Date
 ): Promise<boolean> {
+  const now = new Date();
   const [rules, blockedDates, bookings, settingsArray] = await Promise.all([
     prisma.availabilityRule.findMany(),
     prisma.blockedDate.findMany({
@@ -300,18 +318,66 @@ export async function isSlotAvailable(
             AND: [
               { startTime: { lte: startTime } },
               { endTime: { gt: startTime } },
+              {
+                OR: [
+                  { status: "confirmed" },
+                  {
+                    AND: [
+                      { status: "pending" },
+                      {
+                        OR: [
+                          { holdExpiresAt: null },
+                          { holdExpiresAt: { gt: now } },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
             ],
           },
           {
             AND: [
               { startTime: { lt: endTime } },
               { endTime: { gte: endTime } },
+              {
+                OR: [
+                  { status: "confirmed" },
+                  {
+                    AND: [
+                      { status: "pending" },
+                      {
+                        OR: [
+                          { holdExpiresAt: null },
+                          { holdExpiresAt: { gt: now } },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
             ],
           },
           {
             AND: [
               { startTime: { gte: startTime } },
               { endTime: { lte: endTime } },
+              {
+                OR: [
+                  { status: "confirmed" },
+                  {
+                    AND: [
+                      { status: "pending" },
+                      {
+                        OR: [
+                          { holdExpiresAt: null },
+                          { holdExpiresAt: { gt: now } },
+                        ],
+                      },
+                    ],
+                  },
+                ],
+              },
             ],
           },
         ],

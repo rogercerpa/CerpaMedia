@@ -45,22 +45,24 @@ model BlockedDate {
 }
 
 model Booking {
-  id               String   @id @default(cuid())
+  id               String    @id @default(cuid())
   startTime        DateTime
   endTime          DateTime
-  status           String   @default("pending")
+  status           String    @default("pending")
   customerName     String
   customerEmail    String
   customerPhone    String?
   customerCompany  String?
   platformPref     String?
   stripeSessionId  String?
-  notes            String?  @db.Text
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  holdExpiresAt    DateTime?
+  notes            String?   @db.Text
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@index([status, startTime])
   @@index([customerEmail])
+  @@index([holdExpiresAt])
 }
 
 model MagicLinkToken {
