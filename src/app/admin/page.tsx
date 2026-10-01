@@ -124,9 +124,6 @@ export default async function AdminDashboard() {
             <p className="text-gray-600 text-sm">
               View and manage consultation bookings
             </p>
-            <span className="inline-block mt-2 text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded">
-              Coming in M3–M4
-            </span>
           </Link>
         </div>
       </div>

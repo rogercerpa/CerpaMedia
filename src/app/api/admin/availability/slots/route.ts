@@ -41,9 +41,10 @@ export async function GET(request: NextRequest) {
       })),
     });
   } catch (error) {
-    console.error("Error getting available slots:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error getting available slots:", errorMessage, error);
     return NextResponse.json(
-      { error: "Failed to get available slots" },
+      { error: "Failed to get available slots", code: "SLOTS_QUERY_FAILED" },
       { status: 500 }
     );
   }
