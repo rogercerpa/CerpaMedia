@@ -15,10 +15,7 @@ export default async function AdminBookingsPage() {
   
   const bookings = await prisma.booking.findMany({
     where: {
-      OR: [
-        { status: "confirmed" },
-        { status: "pending" },
-      ],
+      status: "confirmed",
       startTime: { gte: now },
     },
     orderBy: {
@@ -52,25 +49,9 @@ export default async function AdminBookingsPage() {
   };
 
   const getStatusBadge = (status: string) => {
-    if (status === "confirmed") {
-      return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          Confirmed
-        </span>
-      );
-    }
-    
-    if (status === "pending") {
-      return (
-        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-          Pending
-        </span>
-      );
-    }
-
     return (
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-        {status}
+      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        Confirmed
       </span>
     );
   };

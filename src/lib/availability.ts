@@ -72,6 +72,13 @@ export interface Booking {
   status: string;
 }
 
+export interface CheckoutHold {
+  id: string;
+  startTime: Date;
+  endTime: Date;
+  expiresAt: Date;
+}
+
 export interface BookingSettings {
   slotLengthMin: number;
   bufferMin: number;
@@ -154,6 +161,25 @@ function overlapsWithBooking(
 }
 
 /**
+ * Check if a slot overlaps with any unexpired checkout hold
+ */
+function overlapsWithHold(
+  slotStart: Date,
+  slotEnd: Date,
+  holds: CheckoutHold[],
+  currentTime: Date
+): boolean {
+  return holds.some((hold) => {
+    // Only consider holds that haven't expired yet
+    if (hold.expiresAt <= currentTime) {
+      return false;
+    }
+    // A slot overlaps if it starts before the hold ends AND ends after the hold starts
+    return slotStart < hold.endTime && slotEnd > hold.startTime;
+  });
+}
+
+/**
  * Generate time slots for a single day based on start/end times
  */
 function generateDaySlots(
@@ -205,7 +231,9 @@ export async function getAvailableSlots(
   let dateAvailabilities: DateAvailability[];
   let blockedDates: BlockedDate[];
   let bookings: Booking[];
+  let holds: CheckoutHold[];
   let settingsArray: BookingSettings[];
+  const now = new Date();
 
   try {
     rules = await prisma.availabilityRule.findMany();
@@ -264,10 +292,7 @@ export async function getAvailableSlots(
   try {
     bookings = await prisma.booking.findMany({
       where: {
-        OR: [
-          { status: "confirmed" },
-          { status: "pending" },
-        ],
+        status: "confirmed",
         startTime: {
           gte: startDate,
           lte: endDate,
@@ -288,6 +313,38 @@ export async function getAvailableSlots(
       prismaCode,
       prismaCode ? `Prisma error ${prismaCode} - check if Booking table exists and has required columns` : "Database query failed"
     );
+  }
+
+  try {
+    holds = await prisma.checkoutHold.findMany({
+      where: {
+        expiresAt: {
+          gt: now,
+        },
+        startTime: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        expiresAt: true,
+      },
+    });
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    if (prismaCode === "P2021") {
+      holds = [];
+    } else {
+      throw new AvailabilityError(
+        "Failed to fetch checkout holds",
+        "SLOTS_HOLDS_FAILED",
+        prismaCode,
+        prismaCode ? `Prisma error ${prismaCode} - run 'prisma db push' to sync schema` : "Database query failed"
+      );
+    }
   }
 
   try {
@@ -360,7 +417,8 @@ export async function getAvailableSlots(
           const availableSlots = daySlots.filter(
             (slot) =>
               slot.start >= minStartTime &&
-              !overlapsWithBooking(slot.start, slot.end, bookings)
+              !overlapsWithBooking(slot.start, slot.end, bookings) &&
+              !overlapsWithHold(slot.start, slot.end, holds, now)
           );
           
           allSlots.push(...availableSlots);
@@ -381,7 +439,8 @@ export async function getAvailableSlots(
           const availableSlots = daySlots.filter(
             (slot) =>
               slot.start >= minStartTime &&
-              !overlapsWithBooking(slot.start, slot.end, bookings)
+              !overlapsWithBooking(slot.start, slot.end, bookings) &&
+              !overlapsWithHold(slot.start, slot.end, holds, now)
           );
           
           allSlots.push(...availableSlots);
@@ -406,7 +465,9 @@ export async function isSlotAvailable(
   let dateAvailabilities: DateAvailability[];
   let blockedDates: BlockedDate[];
   let bookings: Booking[];
+  let holds: CheckoutHold[];
   let settingsArray: BookingSettings[];
+  const now = new Date();
 
   try {
     rules = await prisma.availabilityRule.findMany();
@@ -462,10 +523,7 @@ export async function isSlotAvailable(
       where: {
         AND: [
           {
-            OR: [
-              { status: "confirmed" },
-              { status: "pending" },
-            ],
+            status: "confirmed",
           },
           {
             OR: [
@@ -506,6 +564,60 @@ export async function isSlotAvailable(
       prismaCode,
       prismaCode ? `Prisma error ${prismaCode} - check if Booking table exists and has required columns` : "Database query failed"
     );
+  }
+
+  try {
+    holds = await prisma.checkoutHold.findMany({
+      where: {
+        AND: [
+          {
+            expiresAt: {
+              gt: now,
+            },
+          },
+          {
+            OR: [
+              {
+                AND: [
+                  { startTime: { lte: startTime } },
+                  { endTime: { gt: startTime } },
+                ],
+              },
+              {
+                AND: [
+                  { startTime: { lt: endTime } },
+                  { endTime: { gte: endTime } },
+                ],
+              },
+              {
+                AND: [
+                  { startTime: { gte: startTime } },
+                  { endTime: { lte: endTime } },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        expiresAt: true,
+      },
+    });
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    if (prismaCode === "P2021") {
+      holds = [];
+    } else {
+      throw new AvailabilityError(
+        "Failed to fetch checkout holds",
+        "SLOTS_HOLDS_FAILED",
+        prismaCode,
+        prismaCode ? `Prisma error ${prismaCode} - run 'prisma db push' to sync schema` : "Database query failed"
+      );
+    }
   }
 
   try {
@@ -555,6 +667,10 @@ export async function isSlotAvailable(
   }
 
   if (overlapsWithBooking(startTime, endTime, bookings)) {
+    return false;
+  }
+
+  if (overlapsWithHold(startTime, endTime, holds, now)) {
     return false;
   }
 

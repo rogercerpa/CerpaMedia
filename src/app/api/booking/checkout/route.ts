@@ -54,20 +54,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const holdExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
-    const booking = await prisma.booking.create({
+    const hold = await prisma.checkoutHold.create({
       data: {
         startTime: start,
         endTime: end,
-        status: "pending",
         customerName,
         customerEmail,
         customerPhone: customerPhone || null,
         customerCompany: customerCompany || null,
         platformPref,
         notes: notes || null,
-        holdExpiresAt,
+        expiresAt,
       },
     });
 
@@ -88,7 +87,7 @@ export async function POST(request: NextRequest) {
         cancel_url: `${BASE_URL}/consult/cancel`,
         customer_email: customerEmail,
         metadata: {
-          bookingId: booking.id,
+          holdId: hold.id,
         },
       };
     } else {
@@ -111,7 +110,7 @@ export async function POST(request: NextRequest) {
         cancel_url: `${BASE_URL}/consult/cancel`,
         customer_email: customerEmail,
         metadata: {
-          bookingId: booking.id,
+          holdId: hold.id,
         },
       };
     }
@@ -119,8 +118,8 @@ export async function POST(request: NextRequest) {
     const stripe = getStripeClient();
     const session = await stripe.checkout.sessions.create(sessionParams);
 
-    await prisma.booking.update({
-      where: { id: booking.id },
+    await prisma.checkoutHold.update({
+      where: { id: hold.id },
       data: { stripeSessionId: session.id },
     });
 
