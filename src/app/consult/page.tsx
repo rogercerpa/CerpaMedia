@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
-import { BookingFlow } from "@/components/BookingFlow";
+import { CalendarBookingFlow } from "@/components/CalendarBookingFlow";
 
 export default function ConsultPage() {
   return (
@@ -28,7 +28,7 @@ export default function ConsultPage() {
 
       <section className="py-20 md:py-24 border-t border-border bg-bg-subtle">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <BookingFlow />
+          <CalendarBookingFlow />
         </div>
       </section>
 

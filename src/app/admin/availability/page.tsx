@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import Link from "next/link";
-import AvailabilityManager from "@/components/AvailabilityManager";
+import DateAvailabilityManager from "@/components/DateAvailabilityManager";
 
 export default async function AdminAvailabilityPage() {
   const email = await getAdminSession();
@@ -40,11 +40,11 @@ export default async function AdminAvailabilityPage() {
             Availability Management
           </h2>
           <p className="text-gray-600">
-            Set your weekly schedule, blocked dates, and booking settings
+            Set specific dates and hours when you're available for consultations (America/New_York timezone)
           </p>
         </div>
 
-        <AvailabilityManager />
+        <DateAvailabilityManager />
       </div>
     </div>
   );
