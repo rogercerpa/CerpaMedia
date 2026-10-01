@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { parseCalendarDate, formatCalendarDate } from "@/lib/calendar-date";
 
 export async function GET() {
   const email = await getAdminSession();
@@ -14,9 +15,27 @@ export async function GET() {
       orderBy: [{ date: "asc" }, { startTime: "asc" }],
     });
 
-    return NextResponse.json(dates);
-  } catch (error) {
+    // Format dates correctly for UI (avoid timezone shift)
+    const formattedDates = dates.map((d) => ({
+      ...d,
+      date: formatCalendarDate(d.date),
+    }));
+
+    return NextResponse.json(formattedDates);
+  } catch (error: any) {
     console.error("Error fetching date availabilities:", error);
+    
+    if (error.code === "P2021") {
+      return NextResponse.json(
+        { 
+          error: "DateAvailability table does not exist. Please run: npx prisma db push",
+          code: "TABLE_MISSING",
+          details: "The database schema needs to be updated to include the DateAvailability table."
+        },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to fetch date availabilities" },
       { status: 500 }
@@ -52,16 +71,41 @@ export async function POST(request: NextRequest) {
 
     const dateAvail = await prisma.dateAvailability.create({
       data: {
-        date: new Date(date),
+        date: parseCalendarDate(date),
         startTime,
         endTime,
         timezone: timezone || "America/New_York",
       },
     });
 
-    return NextResponse.json(dateAvail, { status: 201 });
-  } catch (error) {
+    // Format date correctly for UI response
+    const formattedDateAvail = {
+      ...dateAvail,
+      date: formatCalendarDate(dateAvail.date),
+    };
+
+    return NextResponse.json(formattedDateAvail, { status: 201 });
+  } catch (error: any) {
     console.error("Error creating date availability:", error);
+    
+    if (error.code === "P2021") {
+      return NextResponse.json(
+        { 
+          error: "DateAvailability table does not exist. Please run: npx prisma db push",
+          code: "TABLE_MISSING",
+          details: "The database schema needs to be updated to include the DateAvailability table."
+        },
+        { status: 503 }
+      );
+    }
+
+    if (error.code === "P2002") {
+      return NextResponse.json(
+        { error: "A date availability entry with this date and time already exists" },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to create date availability" },
       { status: 500 }

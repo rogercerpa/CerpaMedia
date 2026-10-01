@@ -11,6 +11,7 @@ export async function GET() {
   const tables = {
     availabilityRule: false,
     blockedDate: false,
+    dateAvailability: false,
     booking: false,
     bookingSettings: false,
   };
@@ -32,6 +33,14 @@ export async function GET() {
     tables.blockedDate = true;
   } catch (error) {
     tables.blockedDate = false;
+  }
+
+  // Check DateAvailability table
+  try {
+    await prisma.dateAvailability.findMany({ take: 1 });
+    tables.dateAvailability = true;
+  } catch (error) {
+    tables.dateAvailability = false;
   }
 
   // Check Booking table
