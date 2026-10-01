@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { parseCalendarDate, formatCalendarDate } from "@/lib/calendar-date";
 
 export async function GET() {
   const email = await getAdminSession();
@@ -14,7 +15,13 @@ export async function GET() {
       orderBy: [{ date: "asc" }, { startTime: "asc" }],
     });
 
-    return NextResponse.json(dates);
+    // Format dates correctly for UI (avoid timezone shift)
+    const formattedDates = dates.map((d) => ({
+      ...d,
+      date: formatCalendarDate(d.date),
+    }));
+
+    return NextResponse.json(formattedDates);
   } catch (error: any) {
     console.error("Error fetching date availabilities:", error);
     
@@ -64,14 +71,20 @@ export async function POST(request: NextRequest) {
 
     const dateAvail = await prisma.dateAvailability.create({
       data: {
-        date: new Date(date),
+        date: parseCalendarDate(date),
         startTime,
         endTime,
         timezone: timezone || "America/New_York",
       },
     });
 
-    return NextResponse.json(dateAvail, { status: 201 });
+    // Format date correctly for UI response
+    const formattedDateAvail = {
+      ...dateAvail,
+      date: formatCalendarDate(dateAvail.date),
+    };
+
+    return NextResponse.json(formattedDateAvail, { status: 201 });
   } catch (error: any) {
     console.error("Error creating date availability:", error);
     

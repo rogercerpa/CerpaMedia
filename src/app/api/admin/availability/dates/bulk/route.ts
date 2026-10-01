@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { addDays, eachDayOfInterval, isWeekend, parseISO } from "date-fns";
+import { parseCalendarDate, parseCalendarDates } from "@/lib/calendar-date";
 
 export async function POST(request: NextRequest) {
   const email = await getAdminSession();
@@ -39,7 +40,7 @@ export async function POST(request: NextRequest) {
             { status: 400 }
           );
         }
-        datesToCreate = dates.map((d) => new Date(d));
+        datesToCreate = parseCalendarDates(dates);
         break;
 
       case "date_range":
@@ -50,8 +51,9 @@ export async function POST(request: NextRequest) {
           );
         }
         
-        const start = parseISO(startDate);
-        const end = parseISO(endDate);
+        // Parse as calendar dates (noon UTC) to avoid timezone shift
+        const start = parseCalendarDate(startDate);
+        const end = parseCalendarDate(endDate);
         
         if (start > end) {
           return NextResponse.json(
@@ -169,8 +171,9 @@ export async function DELETE(request: NextRequest) {
     }
 
     if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
+      // Parse as calendar dates to avoid timezone shift
+      const start = parseCalendarDate(startDate);
+      const end = parseCalendarDate(endDate);
 
       if (start > end) {
         return NextResponse.json(

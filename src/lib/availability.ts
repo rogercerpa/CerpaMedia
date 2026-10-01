@@ -13,6 +13,7 @@ import { prisma } from "./prisma";
 import { Prisma } from "@prisma/client";
 import { fromZonedTime, toZonedTime, format } from "date-fns-tz";
 import { parseISO, addMinutes, startOfDay } from "date-fns";
+import { formatCalendarDate } from "./calendar-date";
 
 /**
  * Safely extract database hostname from DATABASE_URL
@@ -128,11 +129,12 @@ function createDateAtTime(
 
 /**
  * Check if a date is blocked
+ * Uses UTC calendar date comparison (noon UTC dates)
  */
 function isDateBlocked(date: Date, blockedDates: BlockedDate[]): boolean {
-  const dateStr = date.toISOString().split("T")[0];
+  const dateStr = formatCalendarDate(date);
   return blockedDates.some((blocked) => {
-    const blockedStr = blocked.date.toISOString().split("T")[0];
+    const blockedStr = formatCalendarDate(blocked.date);
     return blockedStr === dateStr;
   });
 }

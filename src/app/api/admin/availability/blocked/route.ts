@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { parseCalendarDate, formatCalendarDate } from "@/lib/calendar-date";
 
 export async function GET() {
   const email = await getAdminSession();
@@ -14,7 +15,13 @@ export async function GET() {
       orderBy: { date: "asc" },
     });
 
-    return NextResponse.json(blockedDates);
+    // Format dates correctly for UI (avoid timezone shift)
+    const formattedDates = blockedDates.map((d) => ({
+      ...d,
+      date: formatCalendarDate(d.date),
+    }));
+
+    return NextResponse.json(formattedDates);
   } catch (error) {
     console.error("Error fetching blocked dates:", error);
     return NextResponse.json(
@@ -53,12 +60,18 @@ export async function POST(request: NextRequest) {
 
     const blockedDate = await prisma.blockedDate.create({
       data: {
-        date: new Date(date),
+        date: parseCalendarDate(date),
         reason: reason || null,
       },
     });
 
-    return NextResponse.json(blockedDate, { status: 201 });
+    // Format date correctly for UI response
+    const formattedBlockedDate = {
+      ...blockedDate,
+      date: formatCalendarDate(blockedDate.date),
+    };
+
+    return NextResponse.json(formattedBlockedDate, { status: 201 });
   } catch (error) {
     console.error("Error creating blocked date:", error);
     return NextResponse.json(

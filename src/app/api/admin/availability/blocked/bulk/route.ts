@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getUSHolidays, getUSFederalHolidays } from "@/lib/holidays";
+import { formatCalendarDate, parseCalendarDate } from "@/lib/calendar-date";
 
 export async function POST(request: NextRequest) {
   const email = await getAdminSession();
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     if (customDates && Array.isArray(customDates)) {
       const customBlocks = customDates.map((d: { date: string; reason?: string }) => ({
-        date: new Date(d.date),
+        date: parseCalendarDate(d.date), // Parse string dates to Date objects at noon UTC
         reason: d.reason || "Custom block",
       }));
       datesToBlock = [...datesToBlock, ...customBlocks];
@@ -66,7 +67,10 @@ export async function POST(request: NextRequest) {
 
     const createPromises = datesToBlock.map(({ date, reason }) =>
       prisma.blockedDate.create({
-        data: { date, reason },
+        data: { 
+          date, // Already a Date object at noon UTC
+          reason 
+        },
       })
     );
 
@@ -82,7 +86,7 @@ export async function POST(request: NextRequest) {
       total: datesToBlock.length,
       message: `Blocked ${succeeded} dates${failed > 0 ? ` (${failed} failed, possibly duplicates)` : ""}`,
       dates: datesToBlock.map(d => ({
-        date: d.date.toISOString().split('T')[0],
+        date: formatCalendarDate(d.date),
         reason: d.reason
       }))
     });
@@ -129,7 +133,7 @@ export async function GET(request: NextRequest) {
       year,
       federalOnly,
       holidays: holidays.map((h) => ({
-        date: h.date.toISOString().split("T")[0],
+        date: formatCalendarDate(h.date),
         name: h.name,
         federal: h.federal,
       })),
