@@ -11,6 +11,22 @@
 import { prisma } from "./prisma";
 import { Prisma } from "@prisma/client";
 
+/**
+ * Safely extract database hostname from DATABASE_URL
+ * Returns only the hostname (no credentials, port, or query params)
+ */
+export function getDatabaseHost(): string | null {
+  try {
+    const dbUrl = process.env.DATABASE_URL;
+    if (!dbUrl) return null;
+    
+    const url = new URL(dbUrl);
+    return url.hostname;
+  } catch {
+    return null;
+  }
+}
+
 export class AvailabilityError extends Error {
   constructor(
     message: string,
@@ -281,12 +297,25 @@ export async function getAvailableSlots(
     settingsArray = await prisma.bookingSettings.findMany();
   } catch (error) {
     const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
-    throw new AvailabilityError(
-      "Failed to fetch booking settings",
-      "SLOTS_SETTINGS_FAILED",
-      prismaCode,
-      prismaCode ? `Prisma error ${prismaCode} - check if BookingSettings table exists` : "Database query failed"
-    );
+    
+    // If BookingSettings table is missing (P2021), fall back to defaults with a warning
+    if (prismaCode === "P2021") {
+      console.warn("[SLOTS_SETTINGS_MISSING_FALLBACK] BookingSettings table not found, using defaults", {
+        code: "SLOTS_SETTINGS_MISSING_FALLBACK",
+        prismaCode,
+        defaults: { slotLengthMin: 60, bufferMin: 15, minLeadTimeHrs: 24 },
+        dbHost: getDatabaseHost(),
+      });
+      settingsArray = [];
+    } else {
+      // Other database errors are still hard failures
+      throw new AvailabilityError(
+        "Failed to fetch booking settings",
+        "SLOTS_SETTINGS_FAILED",
+        prismaCode,
+        prismaCode ? `Prisma error ${prismaCode} - unexpected database error` : "Database query failed"
+      );
+    }
   }
 
   const settings: BookingSettings = settingsArray.length > 0
@@ -438,12 +467,25 @@ export async function isSlotAvailable(
     settingsArray = await prisma.bookingSettings.findMany();
   } catch (error) {
     const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
-    throw new AvailabilityError(
-      "Failed to fetch booking settings",
-      "SLOTS_SETTINGS_FAILED",
-      prismaCode,
-      prismaCode ? `Prisma error ${prismaCode} - check if BookingSettings table exists` : "Database query failed"
-    );
+    
+    // If BookingSettings table is missing (P2021), fall back to defaults with a warning
+    if (prismaCode === "P2021") {
+      console.warn("[SLOTS_SETTINGS_MISSING_FALLBACK] BookingSettings table not found, using defaults", {
+        code: "SLOTS_SETTINGS_MISSING_FALLBACK",
+        prismaCode,
+        defaults: { slotLengthMin: 60, bufferMin: 15, minLeadTimeHrs: 24 },
+        dbHost: getDatabaseHost(),
+      });
+      settingsArray = [];
+    } else {
+      // Other database errors are still hard failures
+      throw new AvailabilityError(
+        "Failed to fetch booking settings",
+        "SLOTS_SETTINGS_FAILED",
+        prismaCode,
+        prismaCode ? `Prisma error ${prismaCode} - unexpected database error` : "Database query failed"
+      );
+    }
   }
 
   const settings: BookingSettings = settingsArray.length > 0
