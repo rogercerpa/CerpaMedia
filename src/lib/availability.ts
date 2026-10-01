@@ -11,7 +11,7 @@
 
 import { prisma } from "./prisma";
 import { Prisma } from "@prisma/client";
-import { zonedTimeToUtc, utcToZonedTime, format } from "date-fns-tz";
+import { fromZonedTime, toZonedTime, format } from "date-fns-tz";
 import { parseISO, addMinutes, startOfDay } from "date-fns";
 
 export class AvailabilityError extends Error {
@@ -88,7 +88,7 @@ function formatTime(minutes: number): string {
  * 0 = Sunday, 1 = Monday, ..., 6 = Saturday
  */
 function getWeekdayInTimezone(date: Date, timezone: string): number {
-  const zonedDate = utcToZonedTime(date, timezone);
+  const zonedDate = toZonedTime(date, timezone);
   return zonedDate.getDay();
 }
 
@@ -103,11 +103,11 @@ function createDateAtTime(
 ): Date {
   const [hours, minutes] = timeStr.split(":").map(Number);
   
-  const zonedDate = utcToZonedTime(date, timezone);
+  const zonedDate = toZonedTime(date, timezone);
   const dateString = format(zonedDate, "yyyy-MM-dd", { timeZone: timezone });
   const isoString = `${dateString}T${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:00`;
   
-  return zonedTimeToUtc(isoString, timezone);
+  return fromZonedTime(isoString, timezone);
 }
 
 /**
@@ -303,7 +303,7 @@ export async function getAvailableSlots(
 
   const dateAvailMap = new Map<string, DateAvailability[]>();
   for (const avail of dateAvailabilities) {
-    const dateStr = format(utcToZonedTime(avail.date, timezone), "yyyy-MM-dd", { timeZone: timezone });
+    const dateStr = format(toZonedTime(avail.date, timezone), "yyyy-MM-dd", { timeZone: timezone });
     if (!dateAvailMap.has(dateStr)) {
       dateAvailMap.set(dateStr, []);
     }
@@ -313,7 +313,7 @@ export async function getAvailableSlots(
   const currentDate = new Date(startDate);
   while (currentDate <= endDate) {
     if (!isDateBlocked(currentDate, blockedDates)) {
-      const dateStr = format(utcToZonedTime(currentDate, timezone), "yyyy-MM-dd", { timeZone: timezone });
+      const dateStr = format(toZonedTime(currentDate, timezone), "yyyy-MM-dd", { timeZone: timezone });
       const dateAvails = dateAvailMap.get(dateStr);
       
       if (dateAvails && dateAvails.length > 0) {
@@ -517,8 +517,8 @@ export async function isSlotAvailable(
   const timezone = dateAvailabilities[0]?.timezone || rules[0]?.timezone || "America/New_York";
   
   if (dateAvailabilities.length > 0) {
-    const startTimeStr = format(utcToZonedTime(startTime, timezone), "HH:mm", { timeZone: timezone });
-    const endTimeStr = format(utcToZonedTime(endTime, timezone), "HH:mm", { timeZone: timezone });
+    const startTimeStr = format(toZonedTime(startTime, timezone), "HH:mm", { timeZone: timezone });
+    const endTimeStr = format(toZonedTime(endTime, timezone), "HH:mm", { timeZone: timezone });
     
     const startMinutes = parseTime(startTimeStr);
     const endMinutes = parseTime(endTimeStr);
@@ -537,8 +537,8 @@ export async function isSlotAvailable(
     return false;
   }
 
-  const startTimeStr = format(utcToZonedTime(startTime, timezone), "HH:mm", { timeZone: timezone });
-  const endTimeStr = format(utcToZonedTime(endTime, timezone), "HH:mm", { timeZone: timezone });
+  const startTimeStr = format(toZonedTime(startTime, timezone), "HH:mm", { timeZone: timezone });
+  const endTimeStr = format(toZonedTime(endTime, timezone), "HH:mm", { timeZone: timezone });
 
   const startMinutes = parseTime(startTimeStr);
   const endMinutes = parseTime(endTimeStr);
