@@ -39,9 +39,11 @@ model CheckoutHold {
   endTime         DateTime
   customerName    String
   customerEmail   String
-  customerPhone   String?
-  customerCompany String?
+  customerPhone   String
+  customerCompany String
+  serviceInterest String
   platformPref    String
+  intakeAnswers   Json?
   notes           String?  @db.Text
   stripeSessionId String?  @unique
   expiresAt       DateTime  // 15 minutes from creation
@@ -54,9 +56,10 @@ model CheckoutHold {
 ```
 
 ### Updated Table: `Booking`
-- **Removed**: `holdExpiresAt` field (no longer needed)
+- **Removed**: `holdExpiresAt` field (no longer needed with CheckoutHold)
 - **Changed**: `status` default from `"pending"` → `"confirmed"`
 - **Added**: `@unique` constraint on `stripeSessionId` (prevents duplicate bookings from webhook replays)
+- **Restored from main**: All intake fields are now **required** (customerPhone, customerCompany, serviceInterest, platformPref) + intakeAnswers (Json?)
 
 ---
 
@@ -171,11 +174,12 @@ Test these scenarios on the preview deployment:
 
 | File | Changes |
 |------|---------|
-| `prisma/schema.prisma` | Added CheckoutHold model, updated Booking schema |
+| `prisma/schema.prisma` | Added CheckoutHold model with all intake fields; updated Booking (removed holdExpiresAt, made intake fields required, added stripeSessionId unique) |
 | `src/lib/availability.ts` | Added hold checking logic to slot availability |
-| `src/app/api/booking/checkout/route.ts` | Changed to create CheckoutHold instead of Booking |
-| `src/app/api/webhooks/stripe/route.ts` | Create confirmed Booking from hold after payment |
-| `src/app/admin/bookings/page.tsx` | Show only confirmed bookings |
+| `src/lib/consult-brief.ts` | Restored from main (toConsultBrief + formatConsultBriefForAdmin) |
+| `src/app/api/booking/checkout/route.ts` | Changed to create CheckoutHold with intake validation instead of Booking |
+| `src/app/api/webhooks/stripe/route.ts` | Create confirmed Booking from hold after payment + call consult-brief hooks |
+| `src/app/admin/bookings/page.tsx` | Show only confirmed bookings with intake fields displayed |
 
 ---
 
