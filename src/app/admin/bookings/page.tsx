@@ -33,8 +33,10 @@ export default async function AdminBookingsPage() {
       customerEmail: true,
       customerPhone: true,
       customerCompany: true,
+      serviceInterest: true,
       platformPref: true,
       notes: true,
+      intakeAnswers: true,
     },
   });
 
@@ -73,6 +75,15 @@ export default async function AdminBookingsPage() {
         {status}
       </span>
     );
+  };
+
+  const serviceLabels: Record<string, string> = {
+    general: "Technology Strategy Call (general)",
+    web_mobile: "Web & mobile applications",
+    ai: "AI integration / AI consulting",
+    automation: "Automation & process improvement",
+    strategy: "Strategy / architecture / roadmap",
+    not_sure: "Not sure yet",
   };
 
   return (
@@ -133,85 +144,91 @@ export default async function AdminBookingsPage() {
             </p>
           </div>
         ) : (
-          <div className="bg-white shadow rounded-lg overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date & Time
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Contact
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Platform
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Notes
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {bookings.map((booking) => (
-                  <tr key={booking.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(booking.status)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+          <div className="space-y-6">
+            {bookings.map((booking) => (
+              <div key={booking.id} className="bg-white shadow rounded-lg overflow-hidden">
+                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        {getStatusBadge(booking.status)}
+                        <span className="text-sm text-gray-500">ID: {booking.id}</span>
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900">{booking.customerName}</h3>
+                      <p className="text-sm text-gray-600">{booking.customerCompany}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-gray-900">
                         {formatDateTime(booking.startTime)}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">
-                        {booking.customerName}
-                      </div>
-                      {booking.customerCompany && (
-                        <div className="text-sm text-gray-500">
-                          {booking.customerCompany}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900">
-                        <a
-                          href={`mailto:${booking.customerEmail}`}
-                          className="text-blue-600 hover:underline"
-                        >
-                          {booking.customerEmail}
-                        </a>
-                      </div>
-                      {booking.customerPhone && (
-                        <div className="text-sm text-gray-500">
+                      </p>
+                      <p className="text-sm text-gray-500">{booking.platformPref || "Not specified"}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="px-6 py-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                        Contact Information
+                      </h4>
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-900">
+                          <a
+                            href={`mailto:${booking.customerEmail}`}
+                            className="text-blue-600 hover:underline"
+                          >
+                            {booking.customerEmail}
+                          </a>
+                        </p>
+                        <p className="text-sm text-gray-900">
                           <a
                             href={`tel:${booking.customerPhone}`}
-                            className="hover:underline"
+                            className="text-blue-600 hover:underline"
                           >
                             {booking.customerPhone}
                           </a>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {booking.platformPref || "Not specified"}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 max-w-xs truncate">
-                        {booking.notes || (
-                          <span className="text-gray-400 italic">No notes</span>
-                        )}
+                        </p>
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </div>
+
+                    <div>
+                      <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                        Service Interest
+                      </h4>
+                      <p className="text-sm text-gray-900">
+                        {serviceLabels[booking.serviceInterest] || booking.serviceInterest}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                      Challenge / Problem Statement
+                    </h4>
+                    <p className="text-sm text-gray-900 whitespace-pre-wrap">
+                      {booking.notes || <span className="text-gray-400 italic">No notes</span>}
+                    </p>
+                  </div>
+
+                  {booking.intakeAnswers && typeof booking.intakeAnswers === 'object' && Object.keys(booking.intakeAnswers).length > 0 && (
+                    <div className="mt-6">
+                      <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+                        Additional Context
+                      </h4>
+                      <div className="bg-gray-50 rounded p-4 space-y-2">
+                        {Object.entries(booking.intakeAnswers as Record<string, any>).filter(([_, value]) => value).map(([key, value]) => (
+                          <div key={key} className="text-sm">
+                            <span className="font-medium text-gray-700">{key.replace(/_/g, ' ')}:</span>{" "}
+                            <span className="text-gray-900">{String(value)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>

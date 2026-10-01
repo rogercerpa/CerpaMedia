@@ -51,9 +51,11 @@ model Booking {
   status           String    @default("pending")
   customerName     String
   customerEmail    String
-  customerPhone    String?
-  customerCompany  String?
-  platformPref     String?
+  customerPhone    String
+  customerCompany  String
+  serviceInterest  String
+  platformPref     String
+  intakeAnswers    Json?
   stripeSessionId  String?
   holdExpiresAt    DateTime?
   notes            String?   @db.Text
@@ -63,6 +65,7 @@ model Booking {
   @@index([status, startTime])
   @@index([customerEmail])
   @@index([holdExpiresAt])
+  @@index([serviceInterest])
 }
 
 model MagicLinkToken {

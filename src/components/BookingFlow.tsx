@@ -12,20 +12,43 @@ interface SlotsByDay {
   [date: string]: TimeSlot[];
 }
 
+type ServiceInterest =
+  | "general"
+  | "web_mobile"
+  | "ai"
+  | "automation"
+  | "strategy"
+  | "not_sure";
+
+interface IntakeAnswers {
+  [key: string]: string;
+}
+
 export function BookingFlow() {
   const [step, setStep] = useState<"slots" | "intake" | "loading">("slots");
   const [slots, setSlots] = useState<SlotsByDay>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: string;
+  }>({});
   
   const [formData, setFormData] = useState({
     customerName: "",
     customerEmail: "",
     customerPhone: "",
     customerCompany: "",
-    platformPref: "Zoom",
+    serviceInterest: "" as ServiceInterest | "",
     notes: "",
+    platformPref: "Zoom",
+  });
+
+  const [intakeAnswers, setIntakeAnswers] = useState<IntakeAnswers>({});
+  const [optionalExtras, setOptionalExtras] = useState({
+    roleTitle: "",
+    website: "",
+    urgency: "",
   });
 
   useEffect(() => {
@@ -73,15 +96,59 @@ export function BookingFlow() {
     setStep("intake");
   };
 
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+
+    if (!formData.customerName.trim()) {
+      errors.customerName = "Full name is required";
+    }
+    if (!formData.customerEmail.trim()) {
+      errors.customerEmail = "Email is required";
+    }
+    if (!formData.customerPhone.trim()) {
+      errors.customerPhone = "Phone number is required";
+    }
+    if (!formData.customerCompany.trim()) {
+      errors.customerCompany = "Company name is required";
+    }
+    if (!formData.serviceInterest) {
+      errors.serviceInterest = "Please select a service interest";
+    }
+    if (!formData.notes.trim()) {
+      errors.notes = "Please describe your challenge";
+    } else if (formData.notes.trim().length < 40) {
+      errors.notes = "Please provide at least 40 characters";
+    } else if (formData.notes.trim().length > 500) {
+      errors.notes = "Please keep your challenge under 500 characters";
+    }
+    if (!formData.platformPref) {
+      errors.platformPref = "Please select a platform";
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!selectedSlot) return;
 
+    if (!validateForm()) {
+      return;
+    }
+
     setStep("loading");
     setError(null);
 
     try {
+      const combinedIntakeAnswers = {
+        ...intakeAnswers,
+        ...Object.fromEntries(
+          Object.entries(optionalExtras).filter(([_, value]) => value)
+        ),
+      };
+
       const response = await fetch("/api/booking/checkout", {
         method: "POST",
         headers: {
@@ -90,7 +157,14 @@ export function BookingFlow() {
         body: JSON.stringify({
           startTime: selectedSlot.start,
           endTime: selectedSlot.end,
-          ...formData,
+          customerName: formData.customerName,
+          customerEmail: formData.customerEmail,
+          customerPhone: formData.customerPhone,
+          customerCompany: formData.customerCompany,
+          serviceInterest: formData.serviceInterest,
+          notes: formData.notes,
+          platformPref: formData.platformPref,
+          intakeAnswers: combinedIntakeAnswers,
         }),
       });
 
@@ -213,6 +287,54 @@ export function BookingFlow() {
         })
       : "";
 
+    const serviceOptions = [
+      { value: "general", label: "Technology Strategy Call (general)" },
+      { value: "web_mobile", label: "Web & mobile applications" },
+      { value: "ai", label: "AI integration / AI consulting" },
+      { value: "automation", label: "Automation & process improvement" },
+      { value: "strategy", label: "Strategy / architecture / roadmap" },
+      { value: "not_sure", label: "Not sure yet" },
+    ];
+
+    const getBranchQuestions = () => {
+      if (!formData.serviceInterest) return null;
+
+      const questions: { [key in ServiceInterest]?: Array<{ id: string; label: string; placeholder?: string }> } = {
+        web_mobile: [
+          { id: "web_mobile_type", label: "Are you building something new, rebuilding, or extending existing?" },
+          { id: "web_mobile_goal", label: "Primary goal (leads / operations / e-commerce / other)" },
+          { id: "web_mobile_deadline", label: "Do you have a hard deadline?" },
+        ],
+        ai: [
+          { id: "ai_workflow", label: "What's the first workflow you'd like to improve?" },
+          { id: "ai_tools", label: "What tools/systems do you use today?" },
+          { id: "ai_privacy", label: "Data/privacy concerns? (Yes / No / Unsure)" },
+        ],
+        automation: [
+          { id: "automation_process", label: "What's your most painful repetitive process?" },
+          { id: "automation_frequency", label: "How often does it happen?" },
+          { id: "automation_tools", label: "What tools do you currently use?" },
+        ],
+        strategy: [
+          { id: "strategy_decision", label: "What's your biggest technology decision right now?" },
+          { id: "strategy_timeline", label: "What's your decision timeline?" },
+          { id: "strategy_attendees", label: "Who else will be on the call?" },
+        ],
+        general: [
+          { id: "general_win", label: "What would make this call a win for you?" },
+          { id: "general_timeline", label: "What's your timeline for next steps?" },
+        ],
+        not_sure: [
+          { id: "not_sure_win", label: "What would make this call a win for you?" },
+          { id: "not_sure_timeline", label: "What's your timeline for next steps?" },
+        ],
+      };
+
+      return questions[formData.serviceInterest as ServiceInterest];
+    };
+
+    const branchQuestions = getBranchQuestions();
+
     return (
       <div>
         <Reveal>
@@ -220,6 +342,7 @@ export function BookingFlow() {
             <h2 className="text-3xl md:text-4xl font-semibold text-text mb-4">
               Almost There
             </h2>
+            <p className="text-text-muted text-sm mb-4">~2 minutes — helps Roger prep</p>
             <div className="border border-border inline-block px-6 py-3 mb-6">
               <p className="text-text font-medium">Selected Time:</p>
               <p className="text-text-muted text-[15px]">{selectedSlotFormatted}</p>
@@ -253,57 +376,163 @@ export function BookingFlow() {
                 id="customerName"
                 required
                 value={formData.customerName}
-                onChange={(e) =>
-                  setFormData({ ...formData, customerName: e.target.value })
-                }
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
+                onChange={(e) => {
+                  setFormData({ ...formData, customerName: e.target.value });
+                  setValidationErrors({ ...validationErrors, customerName: "" });
+                }}
+                className={`w-full border ${validationErrors.customerName ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
               />
+              {validationErrors.customerName && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.customerName}</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="customerEmail" className="block text-text font-medium mb-2">
-                Email Address *
+                Work Email *
               </label>
               <input
                 type="email"
                 id="customerEmail"
                 required
                 value={formData.customerEmail}
-                onChange={(e) =>
-                  setFormData({ ...formData, customerEmail: e.target.value })
-                }
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
+                onChange={(e) => {
+                  setFormData({ ...formData, customerEmail: e.target.value });
+                  setValidationErrors({ ...validationErrors, customerEmail: "" });
+                }}
+                className={`w-full border ${validationErrors.customerEmail ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
               />
+              {validationErrors.customerEmail && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.customerEmail}</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="customerPhone" className="block text-text font-medium mb-2">
-                Phone Number (optional)
+                Phone Number *
               </label>
               <input
                 type="tel"
                 id="customerPhone"
+                required
                 value={formData.customerPhone}
-                onChange={(e) =>
-                  setFormData({ ...formData, customerPhone: e.target.value })
-                }
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
+                onChange={(e) => {
+                  setFormData({ ...formData, customerPhone: e.target.value });
+                  setValidationErrors({ ...validationErrors, customerPhone: "" });
+                }}
+                placeholder="(555) 123-4567"
+                className={`w-full border ${validationErrors.customerPhone ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
               />
+              {validationErrors.customerPhone && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.customerPhone}</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="customerCompany" className="block text-text font-medium mb-2">
-                Company (optional)
+                Company *
               </label>
               <input
                 type="text"
                 id="customerCompany"
+                required
                 value={formData.customerCompany}
-                onChange={(e) =>
-                  setFormData({ ...formData, customerCompany: e.target.value })
-                }
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
+                onChange={(e) => {
+                  setFormData({ ...formData, customerCompany: e.target.value });
+                  setValidationErrors({ ...validationErrors, customerCompany: "" });
+                }}
+                className={`w-full border ${validationErrors.customerCompany ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
               />
+              {validationErrors.customerCompany && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.customerCompany}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="serviceInterest" className="block text-text font-medium mb-2">
+                Service Interest *
+              </label>
+              <select
+                id="serviceInterest"
+                required
+                value={formData.serviceInterest}
+                onChange={(e) => {
+                  setFormData({ ...formData, serviceInterest: e.target.value as ServiceInterest });
+                  setValidationErrors({ ...validationErrors, serviceInterest: "" });
+                  setIntakeAnswers({});
+                }}
+                className={`w-full border ${validationErrors.serviceInterest ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
+              >
+                <option value="">Select a service...</option>
+                {serviceOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {validationErrors.serviceInterest && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.serviceInterest}</p>
+              )}
+            </div>
+
+            {branchQuestions && (
+              <div className="border border-border p-6 bg-bg-subtle">
+                <h3 className="text-text font-medium mb-4 text-sm uppercase tracking-wider">
+                  Help us understand your needs (optional)
+                </h3>
+                <div className="space-y-4">
+                  {branchQuestions.map((question) => (
+                    <div key={question.id}>
+                      <label htmlFor={question.id} className="block text-text text-sm mb-2">
+                        {question.label}
+                      </label>
+                      <input
+                        type="text"
+                        id={question.id}
+                        value={intakeAnswers[question.id] || ""}
+                        onChange={(e) =>
+                          setIntakeAnswers({
+                            ...intakeAnswers,
+                            [question.id]: e.target.value,
+                          })
+                        }
+                        placeholder={question.placeholder}
+                        className="w-full border border-border px-3 py-2 text-text text-sm focus:outline-none focus:border-text-muted bg-transparent"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="notes" className="block text-text font-medium mb-2">
+                What's the #1 problem or decision you want help with on this call? *
+              </label>
+              <p className="text-text-muted text-sm mb-2">
+                (40-500 characters)
+              </p>
+              <textarea
+                id="notes"
+                rows={4}
+                required
+                value={formData.notes}
+                onChange={(e) => {
+                  setFormData({ ...formData, notes: e.target.value });
+                  setValidationErrors({ ...validationErrors, notes: "" });
+                }}
+                placeholder="Example: We're growing fast and our current tools don't talk to each other. Need help deciding whether to integrate or rebuild..."
+                className={`w-full border ${validationErrors.notes ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent resize-none`}
+              />
+              <div className="flex justify-between items-center mt-1">
+                {validationErrors.notes ? (
+                  <p className="text-red-500 text-sm">{validationErrors.notes}</p>
+                ) : (
+                  <p className="text-text-muted text-sm">
+                    {formData.notes.length} characters
+                  </p>
+                )}
+              </div>
             </div>
 
             <div>
@@ -314,30 +543,75 @@ export function BookingFlow() {
                 id="platformPref"
                 required
                 value={formData.platformPref}
-                onChange={(e) =>
-                  setFormData({ ...formData, platformPref: e.target.value })
-                }
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
+                onChange={(e) => {
+                  setFormData({ ...formData, platformPref: e.target.value });
+                  setValidationErrors({ ...validationErrors, platformPref: "" });
+                }}
+                className={`w-full border ${validationErrors.platformPref ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
               >
                 <option value="Zoom">Zoom</option>
                 <option value="Microsoft Teams">Microsoft Teams</option>
               </select>
+              {validationErrors.platformPref && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.platformPref}</p>
+              )}
             </div>
 
-            <div>
-              <label htmlFor="notes" className="block text-text font-medium mb-2">
-                What's the challenge? (optional)
-              </label>
-              <textarea
-                id="notes"
-                rows={4}
-                value={formData.notes}
-                onChange={(e) =>
-                  setFormData({ ...formData, notes: e.target.value })
-                }
-                placeholder="Brief description of what you'd like to discuss..."
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent resize-none"
-              />
+            <div className="border-t border-border pt-6">
+              <h3 className="text-text font-medium mb-4 text-sm uppercase tracking-wider">
+                Optional Information
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="roleTitle" className="block text-text text-sm mb-2">
+                    Your Role/Title
+                  </label>
+                  <input
+                    type="text"
+                    id="roleTitle"
+                    value={optionalExtras.roleTitle}
+                    onChange={(e) =>
+                      setOptionalExtras({ ...optionalExtras, roleTitle: e.target.value })
+                    }
+                    placeholder="e.g. CEO, CTO, Operations Manager"
+                    className="w-full border border-border px-3 py-2 text-text text-sm focus:outline-none focus:border-text-muted bg-transparent"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="website" className="block text-text text-sm mb-2">
+                    Website/Link
+                  </label>
+                  <input
+                    type="url"
+                    id="website"
+                    value={optionalExtras.website}
+                    onChange={(e) =>
+                      setOptionalExtras({ ...optionalExtras, website: e.target.value })
+                    }
+                    placeholder="https://yourcompany.com"
+                    className="w-full border border-border px-3 py-2 text-text text-sm focus:outline-none focus:border-text-muted bg-transparent"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="urgency" className="block text-text text-sm mb-2">
+                    Urgency
+                  </label>
+                  <select
+                    id="urgency"
+                    value={optionalExtras.urgency}
+                    onChange={(e) =>
+                      setOptionalExtras({ ...optionalExtras, urgency: e.target.value })
+                    }
+                    className="w-full border border-border px-3 py-2 text-text text-sm focus:outline-none focus:border-text-muted bg-transparent"
+                  >
+                    <option value="">Select urgency...</option>
+                    <option value="critical">Critical (immediate need)</option>
+                    <option value="90days">Within 90 days</option>
+                    <option value="planning">Planning phase</option>
+                    <option value="exploring">Just exploring</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             <div className="pt-4">
