@@ -38,8 +38,10 @@ export async function POST(request: NextRequest) {
     }
 
     const resend = getResendClient();
-    await resend.emails.send({
-      from: "CerpaMedia Admin <admin@cerpamedia.com>",
+    const fromEmail = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
+    
+    const { data, error } = await resend.emails.send({
+      from: fromEmail,
       to: email,
       subject: "Your CerpaMedia Admin Login Link",
       html: `
@@ -61,6 +63,14 @@ export async function POST(request: NextRequest) {
         </div>
       `,
     });
+
+    if (error) {
+      console.error("Resend API error:", error);
+      return NextResponse.json(
+        { error: "Failed to send magic link email" },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json({
       message: "Magic link sent to your email",
