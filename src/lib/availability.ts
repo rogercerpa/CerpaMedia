@@ -2,7 +2,8 @@
  * Availability Engine for CerpaMedia Booking System
  * 
  * Calculates available time slots based on:
- * - Weekly availability rules (weekday + time ranges)
+ * - Date-specific availability (preferred)
+ * - Weekly availability rules (weekday + time ranges, fallback)
  * - Blocked dates
  * - Existing bookings
  * - Slot settings (length, buffer, min lead time)
@@ -10,6 +11,8 @@
 
 import { prisma } from "./prisma";
 import { Prisma } from "@prisma/client";
+import { zonedTimeToUtc, utcToZonedTime, format } from "date-fns-tz";
+import { parseISO, addMinutes, startOfDay } from "date-fns";
 
 export class AvailabilityError extends Error {
   constructor(
@@ -26,6 +29,14 @@ export class AvailabilityError extends Error {
 export interface AvailabilityRule {
   id: string;
   weekday: number;
+  startTime: string;
+  endTime: string;
+  timezone: string;
+}
+
+export interface DateAvailability {
+  id: string;
+  date: Date;
   startTime: string;
   endTime: string;
   timezone: string;
@@ -73,30 +84,17 @@ function formatTime(minutes: number): string {
 }
 
 /**
- * Get the weekday number (0-6) for a date in a specific timezone
+ * Get the weekday number (0-6) for a date in a specific timezone using date-fns-tz
  * 0 = Sunday, 1 = Monday, ..., 6 = Saturday
  */
 function getWeekdayInTimezone(date: Date, timezone: string): number {
-  const dateStr = date.toLocaleDateString("en-US", { 
-    timeZone: timezone,
-    weekday: "long" 
-  });
-  
-  const weekdayMap: { [key: string]: number } = {
-    "Sunday": 0,
-    "Monday": 1,
-    "Tuesday": 2,
-    "Wednesday": 3,
-    "Thursday": 4,
-    "Friday": 5,
-    "Saturday": 6,
-  };
-  
-  return weekdayMap[dateStr] || 0;
+  const zonedDate = utcToZonedTime(date, timezone);
+  return zonedDate.getDay();
 }
 
 /**
- * Create a date at a specific time in a timezone
+ * Create a date at a specific time in a timezone using date-fns-tz
+ * Properly handles timezone conversions and DST transitions
  */
 function createDateAtTime(
   date: Date,
@@ -105,37 +103,11 @@ function createDateAtTime(
 ): Date {
   const [hours, minutes] = timeStr.split(":").map(Number);
   
-  // Get the date string in the target timezone
-  const dateStr = date.toLocaleDateString("en-US", {
-    timeZone: timezone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  const zonedDate = utcToZonedTime(date, timezone);
+  const dateString = format(zonedDate, "yyyy-MM-dd", { timeZone: timezone });
+  const isoString = `${dateString}T${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:00`;
   
-  // Parse it back to get year, month, day in the target timezone
-  const [month, day, year] = dateStr.split("/").map(Number);
-  
-  // Create ISO string in the target timezone
-  const isoStr = `${year}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}T${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:00`;
-  
-  // Parse as if it's in the target timezone
-  // This is a simplified approach; for production, consider using a library like date-fns-tz
-  const localDate = new Date(isoStr);
-  const tzOffset = getTimezoneOffset(timezone);
-  
-  return new Date(localDate.getTime() - tzOffset);
-}
-
-/**
- * Get timezone offset in milliseconds
- * Simplified implementation - for production, use a proper timezone library
- */
-function getTimezoneOffset(timezone: string): number {
-  const now = new Date();
-  const utcDate = new Date(now.toLocaleString("en-US", { timeZone: "UTC" }));
-  const tzDate = new Date(now.toLocaleString("en-US", { timeZone: timezone }));
-  return utcDate.getTime() - tzDate.getTime();
+  return zonedTimeToUtc(isoString, timezone);
 }
 
 /**
@@ -164,18 +136,19 @@ function overlapsWithBooking(
 }
 
 /**
- * Generate time slots for a single day based on availability rule
+ * Generate time slots for a single day based on start/end times
  */
 function generateDaySlots(
   date: Date,
-  rule: AvailabilityRule,
+  startTime: string,
+  endTime: string,
   settings: BookingSettings,
   timezone: string
 ): TimeSlot[] {
   const slots: TimeSlot[] = [];
   
-  const startMinutes = parseTime(rule.startTime);
-  const endMinutes = parseTime(rule.endTime);
+  const startMinutes = parseTime(startTime);
+  const endMinutes = parseTime(endTime);
   
   let currentMinutes = startMinutes;
   
@@ -193,7 +166,6 @@ function generateDaySlots(
     
     slots.push({ start: slotStart, end: slotEnd });
     
-    // Move to next slot (slot length + buffer)
     currentMinutes += settings.slotLengthMin + settings.bufferMin;
   }
   
@@ -211,8 +183,8 @@ export async function getAvailableSlots(
   startDate: Date,
   endDate: Date
 ): Promise<TimeSlot[]> {
-  // Fetch all necessary data with granular error handling
   let rules: AvailabilityRule[];
+  let dateAvailabilities: DateAvailability[];
   let blockedDates: BlockedDate[];
   let bookings: Booking[];
   let settingsArray: BookingSettings[];
@@ -227,6 +199,29 @@ export async function getAvailableSlots(
       prismaCode,
       prismaCode ? `Prisma error ${prismaCode} - check if AvailabilityRule table exists` : "Database query failed"
     );
+  }
+
+  try {
+    dateAvailabilities = await prisma.dateAvailability.findMany({
+      where: {
+        date: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    });
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    if (prismaCode === "P2021") {
+      dateAvailabilities = [];
+    } else {
+      throw new AvailabilityError(
+        "Failed to fetch date availabilities",
+        "SLOTS_DATE_AVAIL_FAILED",
+        prismaCode,
+        prismaCode ? `Prisma error ${prismaCode} - run 'prisma db push' to sync schema` : "Database query failed"
+      );
+    }
   }
 
   try {
@@ -302,40 +297,67 @@ export async function getAvailableSlots(
       };
 
   const allSlots: TimeSlot[] = [];
-  const timezone = rules[0]?.timezone || "America/New_York";
+  const timezone = dateAvailabilities[0]?.timezone || rules[0]?.timezone || "America/New_York";
   
-  // Calculate the earliest allowed booking time
   const minStartTime = new Date(Date.now() + settings.minLeadTimeHrs * 60 * 60 * 1000);
 
-  // Iterate through each day in the range
+  const dateAvailMap = new Map<string, DateAvailability[]>();
+  for (const avail of dateAvailabilities) {
+    const dateStr = format(utcToZonedTime(avail.date, timezone), "yyyy-MM-dd", { timeZone: timezone });
+    if (!dateAvailMap.has(dateStr)) {
+      dateAvailMap.set(dateStr, []);
+    }
+    dateAvailMap.get(dateStr)!.push(avail);
+  }
+
   const currentDate = new Date(startDate);
   while (currentDate <= endDate) {
-    // Skip if date is blocked
     if (!isDateBlocked(currentDate, blockedDates)) {
-      // Get the weekday for this date
-      const weekday = getWeekdayInTimezone(currentDate, timezone);
+      const dateStr = format(utcToZonedTime(currentDate, timezone), "yyyy-MM-dd", { timeZone: timezone });
+      const dateAvails = dateAvailMap.get(dateStr);
       
-      // Find availability rules for this weekday
-      const dayRules = rules.filter((r) => r.weekday === weekday);
-      
-      // Generate slots for each rule
-      for (const rule of dayRules) {
-        const daySlots = generateDaySlots(currentDate, rule, settings, timezone);
+      if (dateAvails && dateAvails.length > 0) {
+        for (const avail of dateAvails) {
+          const daySlots = generateDaySlots(
+            currentDate,
+            avail.startTime,
+            avail.endTime,
+            settings,
+            avail.timezone
+          );
+          
+          const availableSlots = daySlots.filter(
+            (slot) =>
+              slot.start >= minStartTime &&
+              !overlapsWithBooking(slot.start, slot.end, bookings)
+          );
+          
+          allSlots.push(...availableSlots);
+        }
+      } else if (rules.length > 0) {
+        const weekday = getWeekdayInTimezone(currentDate, timezone);
+        const dayRules = rules.filter((r) => r.weekday === weekday);
         
-        // Filter out slots that:
-        // 1. Are in the past or within min lead time
-        // 2. Overlap with existing bookings
-        const availableSlots = daySlots.filter(
-          (slot) =>
-            slot.start >= minStartTime &&
-            !overlapsWithBooking(slot.start, slot.end, bookings)
-        );
-        
-        allSlots.push(...availableSlots);
+        for (const rule of dayRules) {
+          const daySlots = generateDaySlots(
+            currentDate,
+            rule.startTime,
+            rule.endTime,
+            settings,
+            rule.timezone
+          );
+          
+          const availableSlots = daySlots.filter(
+            (slot) =>
+              slot.start >= minStartTime &&
+              !overlapsWithBooking(slot.start, slot.end, bookings)
+          );
+          
+          allSlots.push(...availableSlots);
+        }
       }
     }
     
-    // Move to next day
     currentDate.setDate(currentDate.getDate() + 1);
   }
 
@@ -349,8 +371,8 @@ export async function isSlotAvailable(
   startTime: Date,
   endTime: Date
 ): Promise<boolean> {
-  // Fetch all necessary data with granular error handling
   let rules: AvailabilityRule[];
+  let dateAvailabilities: DateAvailability[];
   let blockedDates: BlockedDate[];
   let bookings: Booking[];
   let settingsArray: BookingSettings[];
@@ -368,9 +390,30 @@ export async function isSlotAvailable(
   }
 
   try {
+    const dateStart = startOfDay(startTime);
+    dateAvailabilities = await prisma.dateAvailability.findMany({
+      where: {
+        date: dateStart,
+      },
+    });
+  } catch (error) {
+    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
+    if (prismaCode === "P2021") {
+      dateAvailabilities = [];
+    } else {
+      throw new AvailabilityError(
+        "Failed to fetch date availabilities",
+        "SLOTS_DATE_AVAIL_FAILED",
+        prismaCode,
+        prismaCode ? `Prisma error ${prismaCode} - run 'prisma db push' to sync schema` : "Database query failed"
+      );
+    }
+  }
+
+  try {
     blockedDates = await prisma.blockedDate.findMany({
       where: {
-        date: startTime,
+        date: startOfDay(startTime),
       },
     });
   } catch (error) {
@@ -458,24 +501,35 @@ export async function isSlotAvailable(
         minLeadTimeHrs: 24,
       };
 
-  // Check min lead time
   const minStartTime = new Date(Date.now() + settings.minLeadTimeHrs * 60 * 60 * 1000);
   if (startTime < minStartTime) {
     return false;
   }
 
-  // Check if date is blocked
   if (isDateBlocked(startTime, blockedDates)) {
     return false;
   }
 
-  // Check if overlaps with existing bookings
   if (overlapsWithBooking(startTime, endTime, bookings)) {
     return false;
   }
 
-  // Check if within availability rules
-  const timezone = rules[0]?.timezone || "America/New_York";
+  const timezone = dateAvailabilities[0]?.timezone || rules[0]?.timezone || "America/New_York";
+  
+  if (dateAvailabilities.length > 0) {
+    const startTimeStr = format(utcToZonedTime(startTime, timezone), "HH:mm", { timeZone: timezone });
+    const endTimeStr = format(utcToZonedTime(endTime, timezone), "HH:mm", { timeZone: timezone });
+    
+    const startMinutes = parseTime(startTimeStr);
+    const endMinutes = parseTime(endTimeStr);
+
+    return dateAvailabilities.some((avail) => {
+      const availStart = parseTime(avail.startTime);
+      const availEnd = parseTime(avail.endTime);
+      return startMinutes >= availStart && endMinutes <= availEnd;
+    });
+  }
+
   const weekday = getWeekdayInTimezone(startTime, timezone);
   const dayRules = rules.filter((r) => r.weekday === weekday);
 
@@ -483,24 +537,12 @@ export async function isSlotAvailable(
     return false;
   }
 
-  // Extract time from startTime and endTime
-  const startTimeStr = startTime.toLocaleTimeString("en-US", {
-    timeZone: timezone,
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  const endTimeStr = endTime.toLocaleTimeString("en-US", {
-    timeZone: timezone,
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const startTimeStr = format(utcToZonedTime(startTime, timezone), "HH:mm", { timeZone: timezone });
+  const endTimeStr = format(utcToZonedTime(endTime, timezone), "HH:mm", { timeZone: timezone });
 
   const startMinutes = parseTime(startTimeStr);
   const endMinutes = parseTime(endTimeStr);
 
-  // Check if the slot fits within any availability rule
   return dayRules.some((rule) => {
     const ruleStart = parseTime(rule.startTime);
     const ruleEnd = parseTime(rule.endTime);
