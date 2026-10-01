@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import { Resend } from "resend";
+import { toConsultBrief, formatConsultBriefForAdmin } from "@/lib/consult-brief";
 
 function getStripeClient() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -116,7 +117,9 @@ export async function POST(request: NextRequest) {
           customerEmail: hold.customerEmail,
           customerPhone: hold.customerPhone,
           customerCompany: hold.customerCompany,
+          serviceInterest: hold.serviceInterest,
           platformPref: hold.platformPref,
+          intakeAnswers: hold.intakeAnswers,
           notes: hold.notes,
           stripeSessionId: session.id,
         },
@@ -125,6 +128,10 @@ export async function POST(request: NextRequest) {
       await prisma.checkoutHold.delete({
         where: { id: holdId },
       });
+
+      const consultBrief = toConsultBrief(booking, "confirmed");
+      
+      console.log("[Consult Secretary Hook] Booking confirmed:", JSON.stringify(consultBrief, null, 2));
 
       await sendConfirmationEmails(booking);
     } catch (error) {
@@ -160,6 +167,17 @@ async function sendConfirmationEmails(booking: any) {
     minute: "2-digit",
     timeZoneName: "short",
   });
+
+  const consultBrief = toConsultBrief(booking, "confirmed");
+  const serviceLabels: Record<string, string> = {
+    general: "Technology Strategy Call (general)",
+    web_mobile: "Web & mobile applications",
+    ai: "AI integration / AI consulting",
+    automation: "Automation & process improvement",
+    strategy: "Strategy / architecture / roadmap",
+    not_sure: "Not sure yet",
+  };
+  const serviceLabel = serviceLabels[booking.serviceInterest] || booking.serviceInterest;
 
   try {
     await resend.emails.send({
@@ -212,8 +230,8 @@ async function sendConfirmationEmails(booking: any) {
             <h2 style="margin-top: 0;">Customer Information</h2>
             <p><strong>Name:</strong> ${booking.customerName}</p>
             <p><strong>Email:</strong> ${booking.customerEmail}</p>
-            ${booking.customerPhone ? `<p><strong>Phone:</strong> ${booking.customerPhone}</p>` : ""}
-            ${booking.customerCompany ? `<p><strong>Company:</strong> ${booking.customerCompany}</p>` : ""}
+            <p><strong>Phone:</strong> ${booking.customerPhone}</p>
+            <p><strong>Company:</strong> ${booking.customerCompany}</p>
           </div>
 
           <div style="background-color: #f5f5f5; padding: 20px; margin: 20px 0;">
@@ -221,15 +239,28 @@ async function sendConfirmationEmails(booking: any) {
             <p><strong>Date & Time:</strong> ${formattedStartTime}</p>
             <p><strong>Duration:</strong> 30-45 minutes</p>
             <p><strong>Platform Preference:</strong> ${booking.platformPref}</p>
+            <p><strong>Service Interest:</strong> ${serviceLabel}</p>
             <p><strong>Booking ID:</strong> ${booking.id}</p>
           </div>
 
-          ${booking.notes ? `
+          <div style="background-color: #f5f5f5; padding: 20px; margin: 20px 0;">
+            <h2 style="margin-top: 0;">Challenge / Problem Statement</h2>
+            <p>${booking.notes.replace(/\n/g, "<br>")}</p>
+          </div>
+
+          ${booking.intakeAnswers && Object.keys(booking.intakeAnswers).length > 0 ? `
             <div style="background-color: #f5f5f5; padding: 20px; margin: 20px 0;">
-              <h2 style="margin-top: 0;">Customer Notes</h2>
-              <p>${booking.notes.replace(/\n/g, "<br>")}</p>
+              <h2 style="margin-top: 0;">Additional Context</h2>
+              ${Object.entries(booking.intakeAnswers).filter(([_, value]) => value).map(([key, value]) => 
+                `<p><strong>${key.replace(/_/g, ' ')}:</strong> ${value}</p>`
+              ).join('')}
             </div>
           ` : ""}
+
+          <div style="background-color: #fff3cd; padding: 20px; margin: 20px 0; border-left: 4px solid #ffc107;">
+            <h3 style="margin-top: 0;">For Consult Secretary Bot</h3>
+            <pre style="background-color: #f8f9fa; padding: 15px; overflow-x: auto; font-size: 12px; border: 1px solid #dee2e6;">${formatConsultBriefForAdmin(consultBrief)}</pre>
+          </div>
 
           <p style="margin-top: 30px;"><strong>Action Required:</strong> Send ${booking.platformPref} meeting link to the customer before the scheduled time.</p>
         </div>

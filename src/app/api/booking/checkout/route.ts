@@ -25,13 +25,30 @@ export async function POST(request: NextRequest) {
       customerEmail,
       customerPhone,
       customerCompany,
-      platformPref,
+      serviceInterest,
       notes,
+      platformPref,
+      intakeAnswers,
     } = body;
 
-    if (!startTime || !endTime || !customerName || !customerEmail || !platformPref) {
+    if (!startTime || !endTime || !customerName || !customerEmail || !customerPhone || !customerCompany || !serviceInterest || !platformPref) {
       return NextResponse.json(
         { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    if (!notes || notes.trim().length < 40 || notes.trim().length > 500) {
+      return NextResponse.json(
+        { error: "Challenge description must be between 40 and 500 characters" },
+        { status: 400 }
+      );
+    }
+
+    const validServiceInterests = ["general", "web_mobile", "ai", "automation", "strategy", "not_sure"];
+    if (!validServiceInterests.includes(serviceInterest)) {
+      return NextResponse.json(
+        { error: "Invalid service interest" },
         { status: 400 }
       );
     }
@@ -62,10 +79,12 @@ export async function POST(request: NextRequest) {
         endTime: end,
         customerName,
         customerEmail,
-        customerPhone: customerPhone || null,
-        customerCompany: customerCompany || null,
+        customerPhone,
+        customerCompany,
+        serviceInterest,
         platformPref,
-        notes: notes || null,
+        notes: notes.trim(),
+        intakeAnswers: intakeAnswers || {},
         expiresAt,
       },
     });

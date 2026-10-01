@@ -51,9 +51,11 @@ model Booking {
   status           String    @default("confirmed")
   customerName     String
   customerEmail    String
-  customerPhone    String?
-  customerCompany  String?
-  platformPref     String?
+  customerPhone    String
+  customerCompany  String
+  serviceInterest  String
+  platformPref     String
+  intakeAnswers    Json?
   stripeSessionId  String?   @unique
   notes            String?   @db.Text
   createdAt        DateTime  @default(now())
@@ -61,6 +63,7 @@ model Booking {
 
   @@index([status, startTime])
   @@index([customerEmail])
+  @@index([serviceInterest])
 }
 
 model CheckoutHold {
@@ -69,9 +72,11 @@ model CheckoutHold {
   endTime         DateTime
   customerName    String
   customerEmail   String
-  customerPhone   String?
-  customerCompany String?
+  customerPhone   String
+  customerCompany String
+  serviceInterest String
   platformPref    String
+  intakeAnswers   Json?
   notes           String?  @db.Text
   stripeSessionId String?  @unique
   expiresAt       DateTime
