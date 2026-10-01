@@ -48,7 +48,7 @@ model Booking {
   id               String    @id @default(cuid())
   startTime        DateTime
   endTime          DateTime
-  status           String    @default("pending")
+  status           String    @default("confirmed")
   customerName     String
   customerEmail    String
   customerPhone    String
@@ -56,16 +56,35 @@ model Booking {
   serviceInterest  String
   platformPref     String
   intakeAnswers    Json?
-  stripeSessionId  String?
-  holdExpiresAt    DateTime?
+  stripeSessionId  String?   @unique
   notes            String?   @db.Text
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
   @@index([status, startTime])
   @@index([customerEmail])
-  @@index([holdExpiresAt])
   @@index([serviceInterest])
+}
+
+model CheckoutHold {
+  id              String   @id @default(cuid())
+  startTime       DateTime
+  endTime         DateTime
+  customerName    String
+  customerEmail   String
+  customerPhone   String
+  customerCompany String
+  serviceInterest String
+  platformPref    String
+  intakeAnswers   Json?
+  notes           String?  @db.Text
+  stripeSessionId String?  @unique
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+
+  @@index([startTime, endTime])
+  @@index([expiresAt])
+  @@index([stripeSessionId])
 }
 
 model MagicLinkToken {

@@ -49,30 +49,84 @@ export async function POST(request: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const bookingId = session.metadata?.bookingId;
+    const holdId = session.metadata?.holdId;
 
-    if (!bookingId) {
-      console.error("No bookingId in session metadata");
+    if (!holdId) {
+      console.error("No holdId in session metadata");
       return NextResponse.json({ received: true });
     }
 
     try {
-      const booking = await prisma.booking.findUnique({
-        where: { id: bookingId },
+      const existingBooking = await prisma.booking.findUnique({
+        where: { stripeSessionId: session.id },
       });
 
-      if (!booking) {
-        console.error("Booking not found:", bookingId);
+      if (existingBooking) {
         return NextResponse.json({ received: true });
       }
 
-      if (booking.status === "confirmed") {
+      const hold = await prisma.checkoutHold.findUnique({
+        where: { id: holdId },
+      });
+
+      if (!hold) {
+        console.error("Hold not found:", holdId);
         return NextResponse.json({ received: true });
       }
 
-      await prisma.booking.update({
-        where: { id: bookingId },
-        data: { status: "confirmed" },
+      const overlappingBooking = await prisma.booking.findFirst({
+        where: {
+          status: "confirmed",
+          OR: [
+            {
+              AND: [
+                { startTime: { lte: hold.startTime } },
+                { endTime: { gt: hold.startTime } },
+              ],
+            },
+            {
+              AND: [
+                { startTime: { lt: hold.endTime } },
+                { endTime: { gte: hold.endTime } },
+              ],
+            },
+            {
+              AND: [
+                { startTime: { gte: hold.startTime } },
+                { endTime: { lte: hold.endTime } },
+              ],
+            },
+          ],
+        },
+      });
+
+      if (overlappingBooking) {
+        console.error("Slot already booked:", holdId, overlappingBooking.id);
+        await prisma.checkoutHold.delete({
+          where: { id: holdId },
+        });
+        return NextResponse.json({ received: true });
+      }
+
+      const booking = await prisma.booking.create({
+        data: {
+          startTime: hold.startTime,
+          endTime: hold.endTime,
+          status: "confirmed",
+          customerName: hold.customerName,
+          customerEmail: hold.customerEmail,
+          customerPhone: hold.customerPhone,
+          customerCompany: hold.customerCompany,
+          serviceInterest: hold.serviceInterest,
+          platformPref: hold.platformPref,
+          intakeAnswers: hold.intakeAnswers as any,
+          notes: hold.notes,
+          stripeSessionId: session.id,
+        },
+      });
+
+      await prisma.checkoutHold.delete({
+        where: { id: holdId },
       });
 
       const consultBrief = toConsultBrief(booking, "confirmed");
