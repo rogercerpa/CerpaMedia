@@ -95,9 +95,6 @@ export default async function AdminDashboard() {
             <p className="text-gray-600 text-sm">
               Set your weekly schedule and blocked dates
             </p>
-            <span className="inline-block mt-2 text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded">
-              Coming in M2
-            </span>
           </Link>
 
           <Link

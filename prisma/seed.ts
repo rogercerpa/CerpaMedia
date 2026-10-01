@@ -5,6 +5,43 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Seeding database...");
 
+  // Seed booking settings
+  await prisma.bookingSettings.upsert({
+    where: { id: "default" },
+    update: {},
+    create: {
+      id: "default",
+      slotLengthMin: 60,
+      bufferMin: 15,
+      minLeadTimeHrs: 24,
+    },
+  });
+  console.log("✓ Created/updated booking settings");
+
+  // Seed default availability rules (Mon-Fri, 10am-4pm ET)
+  const defaultRules = [
+    { weekday: 1, startTime: "10:00", endTime: "16:00" }, // Monday
+    { weekday: 2, startTime: "10:00", endTime: "16:00" }, // Tuesday
+    { weekday: 3, startTime: "10:00", endTime: "16:00" }, // Wednesday
+    { weekday: 4, startTime: "10:00", endTime: "16:00" }, // Thursday
+    { weekday: 5, startTime: "10:00", endTime: "16:00" }, // Friday
+  ];
+
+  for (const rule of defaultRules) {
+    await prisma.availabilityRule.upsert({
+      where: {
+        id: `default-${rule.weekday}`,
+      },
+      update: rule,
+      create: {
+        id: `default-${rule.weekday}`,
+        ...rule,
+        timezone: "America/New_York",
+      },
+    });
+  }
+  console.log("✓ Created/updated default availability rules");
+
   const services = [
     {
       title: "Web Development",

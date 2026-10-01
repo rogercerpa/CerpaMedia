@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import Link from "next/link";
+import AvailabilityManager from "@/components/AvailabilityManager";
 
 export default async function AdminAvailabilityPage() {
   const email = await getAdminSession();
@@ -39,37 +40,11 @@ export default async function AdminAvailabilityPage() {
             Availability Management
           </h2>
           <p className="text-gray-600">
-            Set your weekly schedule and blocked dates
+            Set your weekly schedule, blocked dates, and booking settings
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-lg p-12 text-center">
-          <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-primary-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            Coming in Milestone 2
-          </h3>
-          <p className="text-gray-600 mb-4">
-            Availability management will allow you to set your weekly schedule,
-            define time slots, and mark blocked dates.
-          </p>
-          <div className="inline-block bg-primary-100 text-primary-700 px-4 py-2 rounded-lg text-sm">
-            Database schema is ready • Implementation pending
-          </div>
-        </div>
+        <AvailabilityManager />
       </div>
     </div>
   );

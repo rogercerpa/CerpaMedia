@@ -86,3 +86,12 @@ model AdminSession {
   @@index([token])
   @@index([email, expiresAt])
 }
+
+model BookingSettings {
+  id             String   @id @default(cuid())
+  slotLengthMin  Int      @default(60)
+  bufferMin      Int      @default(15)
+  minLeadTimeHrs Int      @default(24)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
