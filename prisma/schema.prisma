@@ -131,3 +131,19 @@ model DateAvailability {
 
   @@index([date])
 }
+
+model InsightPost {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  summary     String    @db.Text
+  body        String    @db.Text
+  publishedAt DateTime?
+  tags        String[]
+  status      String    @default("draft")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([slug])
+}
