@@ -150,6 +150,47 @@ async function main() {
     console.log(`✓ Created/updated service: ${service.title}`);
   }
 
+  // Seed sample insight post
+  await prisma.insightPost.upsert({
+    where: { slug: "ai-automation-for-small-businesses-2026" },
+    update: {},
+    create: {
+      title: "AI Automation for Small Businesses: What's Actually Working in 2026",
+      slug: "ai-automation-for-small-businesses-2026",
+      summary:
+        "Practical insights on AI tools that small businesses are using today to save time and reduce costs — without the hype.",
+      body: `# AI Automation for Small Businesses: What's Actually Working in 2026
+
+Small businesses are finding real value in AI automation — but not where most people think. Instead of futuristic chatbots and prediction engines, the wins are coming from automating repetitive tasks that drain team productivity.
+
+## What's Working
+
+**Document Processing:** Tools like optical character recognition (OCR) paired with AI can extract data from invoices, receipts, and forms automatically. This eliminates manual data entry and reduces errors.
+
+**Email Triage:** AI assistants can categorize incoming emails, flag urgent messages, and even draft responses for common inquiries. This saves hours per week for customer-facing teams.
+
+**Scheduling and Booking:** Smart scheduling systems can handle appointment bookings, send reminders, and manage cancellations without human intervention.
+
+## Where CerpaMedia Helps
+
+We help small businesses identify where automation makes sense and implement practical solutions that deliver ROI. Our approach:
+
+- **Discovery first:** We analyze your operations to find high-impact automation opportunities
+- **Practical tech:** We recommend tools that work with your existing systems
+- **Implementation support:** We handle the setup and integration so your team can focus on what they do best
+
+## The Bottom Line
+
+AI automation isn't about replacing your team — it's about freeing them from tedious tasks so they can focus on higher-value work. The technology is mature, affordable, and ready for small businesses that want to work smarter.
+
+**Ready to explore automation for your business?** [Book a $99 strategy call](/consult) to discuss opportunities specific to your operations.`,
+      tags: ["AI", "automation", "SMB", "productivity", "technology"],
+      status: "published",
+      publishedAt: new Date("2026-10-01T12:00:00Z"),
+    },
+  });
+  console.log("✓ Created/updated sample insight post");
+
   console.log("Seeding completed!");
 }
 

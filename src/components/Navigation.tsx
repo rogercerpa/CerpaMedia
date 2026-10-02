@@ -40,6 +40,9 @@ export default function Navigation() {
             <Link href="/services" className="text-text-muted hover:text-text transition-colors text-[15px]">
               Services
             </Link>
+            <Link href="/insights" className="text-text-muted hover:text-text transition-colors text-[15px]">
+              Insights
+            </Link>
             <Link href="/consult" className="text-text-muted hover:text-text transition-colors text-[15px]">
               Strategy Call
             </Link>
@@ -81,6 +84,13 @@ export default function Navigation() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Services
+            </Link>
+            <Link
+              href="/insights"
+              className="block px-3 py-2 text-text-muted hover:text-text rounded-md transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Insights
             </Link>
             <Link
               href="/consult"

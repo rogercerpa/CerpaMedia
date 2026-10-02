@@ -37,6 +37,11 @@ export default function Footer() {
                 </a>
               </li>
               <li>
+                <a href="/insights" className="text-[14px] text-gray-400 hover:text-white transition-colors">
+                  Insights
+                </a>
+              </li>
+              <li>
                 <a href="/consult" className="text-[14px] text-gray-400 hover:text-white transition-colors">
                   Strategy Call
                 </a>
