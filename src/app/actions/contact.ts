@@ -7,6 +7,8 @@ import {
   validateTextInput,
   validateEmail,
   checkHoneypot,
+  looksLikeSpam,
+  emailLooksGenerated,
 } from "@/lib/security";
 
 interface ContactFormData {
@@ -25,6 +27,27 @@ export async function submitContactForm(formData: ContactFormData) {
     return {
       success: false,
       error: "Please try again.",
+    };
+  }
+
+  if (looksLikeSpam(name)) {
+    return {
+      success: false,
+      error: "Please enter a valid name.",
+    };
+  }
+
+  if (emailLooksGenerated(email)) {
+    return {
+      success: false,
+      error: "Please enter a valid email address.",
+    };
+  }
+
+  if (looksLikeSpam(message)) {
+    return {
+      success: false,
+      error: "Please enter a clear message about what you need.",
     };
   }
 

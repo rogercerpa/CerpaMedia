@@ -8,6 +8,8 @@ import {
   validateEmail,
   validatePhone,
   checkHoneypot,
+  looksLikeSpam,
+  emailLooksGenerated,
 } from "@/lib/security";
 
 function getStripeClient() {
@@ -46,6 +48,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!startTime || !endTime || !customerName || !customerEmail || !customerPhone || !customerCompany || !serviceInterest || !platformPref) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 }
+      );
+    }
+
+    if (looksLikeSpam(customerName)) {
+      return NextResponse.json(
+        { error: "Please enter a valid name" },
+        { status: 400 }
+      );
+    }
+
+    if (emailLooksGenerated(customerEmail)) {
+      return NextResponse.json(
+        { error: "Please enter a valid email address" },
+        { status: 400 }
+      );
+    }
+
+    if (notes && looksLikeSpam(notes)) {
+      return NextResponse.json(
+        { error: "Please enter a clear description of your challenge" },
+        { status: 400 }
+      );
+    }
+
     const forwardedFor = request.headers.get("x-forwarded-for");
     const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "unknown";
 
@@ -59,13 +89,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Too many booking attempts. Please try again later." },
         { status: 429 }
-      );
-    }
-
-    if (!startTime || !endTime || !customerName || !customerEmail || !customerPhone || !customerCompany || !serviceInterest || !platformPref) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
       );
     }
 
