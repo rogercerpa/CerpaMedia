@@ -36,6 +36,7 @@ export function CalendarBookingFlow() {
     customerCompany: "",
     platformPref: "Zoom",
     notes: "",
+    website: "",
   });
 
   useEffect(() => {
@@ -420,11 +421,12 @@ export function CalendarBookingFlow() {
 
             <div>
               <label htmlFor="customerPhone" className="block text-text font-medium mb-2">
-                Phone Number (optional)
+                Phone Number *
               </label>
               <input
                 type="tel"
                 id="customerPhone"
+                required
                 value={formData.customerPhone}
                 onChange={(e) =>
                   setFormData({ ...formData, customerPhone: e.target.value })
@@ -435,11 +437,12 @@ export function CalendarBookingFlow() {
 
             <div>
               <label htmlFor="customerCompany" className="block text-text font-medium mb-2">
-                Company (optional)
+                Company *
               </label>
               <input
                 type="text"
                 id="customerCompany"
+                required
                 value={formData.customerCompany}
                 onChange={(e) =>
                   setFormData({ ...formData, customerCompany: e.target.value })
@@ -468,17 +471,38 @@ export function CalendarBookingFlow() {
 
             <div>
               <label htmlFor="notes" className="block text-text font-medium mb-2">
-                What's the challenge? (optional)
+                What's the main challenge you'd like to discuss? *
               </label>
               <textarea
                 id="notes"
                 rows={4}
+                required
+                minLength={40}
+                maxLength={500}
                 value={formData.notes}
                 onChange={(e) =>
                   setFormData({ ...formData, notes: e.target.value })
                 }
-                placeholder="Brief description of what you'd like to discuss..."
+                placeholder="Brief description of what you'd like to discuss (40-500 characters)..."
                 className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent resize-none"
+              />
+              <p className="text-sm text-text-muted mt-1">
+                {formData.notes.length}/500 characters (minimum 40)
+              </p>
+            </div>
+
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="website">Website (leave blank)</label>
+              <input
+                type="text"
+                id="website"
+                name="website"
+                value={formData.website}
+                onChange={(e) =>
+                  setFormData({ ...formData, website: e.target.value })
+                }
+                tabIndex={-1}
+                autoComplete="off"
               />
             </div>
 
