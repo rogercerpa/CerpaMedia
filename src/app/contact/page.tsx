@@ -11,6 +11,7 @@ export default function ContactPage() {
     company: "",
     service: "",
     message: "",
+    website: "",
   });
   const [status, setStatus] = useState<{
     type: "idle" | "loading" | "success" | "error";
@@ -31,6 +32,7 @@ export default function ContactPage() {
         company: "",
         service: "",
         message: "",
+        website: "",
       });
     } else {
       setStatus({ type: "error", message: result.error || "" });
@@ -149,6 +151,19 @@ export default function ContactPage() {
                     value={formData.message}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-border focus:outline-none focus:border-text transition-colors text-text resize-none"
+                  />
+                </div>
+
+                <div className="hidden" aria-hidden="true">
+                  <label htmlFor="website">Website (leave blank)</label>
+                  <input
+                    type="text"
+                    id="website"
+                    name="website"
+                    value={formData.website}
+                    onChange={handleChange}
+                    tabIndex={-1}
+                    autoComplete="off"
                   />
                 </div>
 

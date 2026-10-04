@@ -2,6 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isSlotAvailable } from "@/lib/availability";
 import Stripe from "stripe";
+import {
+  checkRateLimit,
+  validateTextInput,
+  validateEmail,
+  validatePhone,
+  checkHoneypot,
+} from "@/lib/security";
 
 function getStripeClient() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -29,7 +36,31 @@ export async function POST(request: NextRequest) {
       notes,
       platformPref,
       intakeAnswers,
+      website,
     } = body;
+
+    if (!checkHoneypot(website)) {
+      return NextResponse.json(
+        { error: "Invalid request" },
+        { status: 400 }
+      );
+    }
+
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "unknown";
+
+    const rateLimit = checkRateLimit({
+      identifier: `booking:${ip}`,
+      maxRequests: 5,
+      windowMs: 60 * 60 * 1000,
+    });
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many booking attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
 
     if (!startTime || !endTime || !customerName || !customerEmail || !customerPhone || !customerCompany || !serviceInterest || !platformPref) {
       return NextResponse.json(
@@ -38,9 +69,61 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!notes || notes.trim().length < 40 || notes.trim().length > 500) {
+    const nameValidation = validateTextInput({
+      value: customerName,
+      minLength: 2,
+      maxLength: 100,
+      fieldName: "Name",
+      required: true,
+    });
+
+    if (!nameValidation.valid) {
       return NextResponse.json(
-        { error: "Challenge description must be between 40 and 500 characters" },
+        { error: nameValidation.error },
+        { status: 400 }
+      );
+    }
+
+    if (!validateEmail(customerEmail)) {
+      return NextResponse.json(
+        { error: "Please enter a valid email address" },
+        { status: 400 }
+      );
+    }
+
+    if (!validatePhone(customerPhone)) {
+      return NextResponse.json(
+        { error: "Please enter a valid phone number" },
+        { status: 400 }
+      );
+    }
+
+    const companyValidation = validateTextInput({
+      value: customerCompany,
+      minLength: 1,
+      maxLength: 200,
+      fieldName: "Company",
+      required: true,
+    });
+
+    if (!companyValidation.valid) {
+      return NextResponse.json(
+        { error: companyValidation.error },
+        { status: 400 }
+      );
+    }
+
+    const notesValidation = validateTextInput({
+      value: notes,
+      minLength: 40,
+      maxLength: 500,
+      fieldName: "Challenge description",
+      required: true,
+    });
+
+    if (!notesValidation.valid) {
+      return NextResponse.json(
+        { error: notesValidation.error },
         { status: 400 }
       );
     }
@@ -49,6 +132,14 @@ export async function POST(request: NextRequest) {
     if (!validServiceInterests.includes(serviceInterest)) {
       return NextResponse.json(
         { error: "Invalid service interest" },
+        { status: 400 }
+      );
+    }
+
+    const validPlatforms = ["Zoom", "Microsoft Teams"];
+    if (!validPlatforms.includes(platformPref)) {
+      return NextResponse.json(
+        { error: "Invalid platform preference" },
         { status: 400 }
       );
     }
@@ -73,18 +164,35 @@ export async function POST(request: NextRequest) {
 
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
+    const sanitizedIntakeAnswers: Record<string, string> = {};
+    if (intakeAnswers && typeof intakeAnswers === "object") {
+      for (const [key, value] of Object.entries(intakeAnswers)) {
+        if (typeof value === "string" && key.length <= 100) {
+          const validation = validateTextInput({
+            value,
+            maxLength: 500,
+            fieldName: key,
+            required: false,
+          });
+          if (validation.valid && validation.sanitized) {
+            sanitizedIntakeAnswers[key] = validation.sanitized;
+          }
+        }
+      }
+    }
+
     const hold = await prisma.checkoutHold.create({
       data: {
         startTime: start,
         endTime: end,
-        customerName,
-        customerEmail,
-        customerPhone,
-        customerCompany,
+        customerName: nameValidation.sanitized,
+        customerEmail: customerEmail.trim().slice(0, 254),
+        customerPhone: customerPhone.trim().slice(0, 20),
+        customerCompany: companyValidation.sanitized,
         serviceInterest,
         platformPref,
-        notes: notes.trim(),
-        intakeAnswers: intakeAnswers || {},
+        notes: notesValidation.sanitized,
+        intakeAnswers: sanitizedIntakeAnswers,
         expiresAt,
       },
     });

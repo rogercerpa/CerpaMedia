@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createMagicLinkToken, isAdminEmail } from "@/lib/auth";
 import { Resend } from "resend";
+import { checkRateLimit, validateEmail } from "@/lib/security";
 
 function getResendClient() {
   return new Resend(process.env.RESEND_API_KEY || "dummy-key-for-build");
@@ -16,6 +17,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Email is required" },
         { status: 400 }
+      );
+    }
+
+    if (!validateEmail(email)) {
+      return NextResponse.json(
+        { error: "Invalid email format" },
+        { status: 400 }
+      );
+    }
+
+    const forwardedFor = request.headers.get("x-forwarded-for");
+    const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "unknown";
+
+    const rateLimit = checkRateLimit({
+      identifier: `admin-login:${ip}`,
+      maxRequests: 5,
+      windowMs: 60 * 60 * 1000,
+    });
+
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please try again later." },
+        { status: 429 }
       );
     }
 

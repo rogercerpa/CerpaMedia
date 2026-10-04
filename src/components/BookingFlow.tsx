@@ -42,12 +42,13 @@ export function BookingFlow() {
     serviceInterest: "" as ServiceInterest | "",
     notes: "",
     platformPref: "Zoom",
+    website: "",
   });
 
   const [intakeAnswers, setIntakeAnswers] = useState<IntakeAnswers>({});
   const [optionalExtras, setOptionalExtras] = useState({
     roleTitle: "",
-    website: "",
+    companyWebsite: "",
     urgency: "",
   });
 
@@ -165,6 +166,7 @@ export function BookingFlow() {
           notes: formData.notes,
           platformPref: formData.platformPref,
           intakeAnswers: combinedIntakeAnswers,
+          website: formData.website,
         }),
       });
 
@@ -578,15 +580,15 @@ export function BookingFlow() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="website" className="block text-text text-sm mb-2">
-                    Website/Link
+                  <label htmlFor="companyWebsite" className="block text-text text-sm mb-2">
+                    Company Website
                   </label>
                   <input
                     type="url"
-                    id="website"
-                    value={optionalExtras.website}
+                    id="companyWebsite"
+                    value={optionalExtras.companyWebsite}
                     onChange={(e) =>
-                      setOptionalExtras({ ...optionalExtras, website: e.target.value })
+                      setOptionalExtras({ ...optionalExtras, companyWebsite: e.target.value })
                     }
                     placeholder="https://yourcompany.com"
                     className="w-full border border-border px-3 py-2 text-text text-sm focus:outline-none focus:border-text-muted bg-transparent"
@@ -612,6 +614,21 @@ export function BookingFlow() {
                   </select>
                 </div>
               </div>
+            </div>
+
+            <div className="hidden" aria-hidden="true">
+              <label htmlFor="website">Website (leave blank)</label>
+              <input
+                type="text"
+                id="website"
+                name="website"
+                value={formData.website}
+                onChange={(e) =>
+                  setFormData({ ...formData, website: e.target.value })
+                }
+                tabIndex={-1}
+                autoComplete="off"
+              />
             </div>
 
             <div className="pt-4">
