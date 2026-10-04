@@ -140,3 +140,142 @@ export function validateTextInput(validation: InputValidation): {
 
   return { valid: true, sanitized };
 }
+
+function hasLongConsonantRun(text: string): boolean {
+  const consonantRun = /[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ]{5,}/;
+  return consonantRun.test(text);
+}
+
+function hasLowVowelRatio(word: string): boolean {
+  if (word.length < 5) return false;
+  
+  const vowels = word.match(/[aeiouAEIOU]/g);
+  const vowelCount = vowels ? vowels.length : 0;
+  const vowelRatio = vowelCount / word.length;
+  
+  return vowelRatio < 0.2;
+}
+
+function hasNoSpacesInLongText(text: string): boolean {
+  const cleanText = text.trim();
+  return cleanText.length >= 20 && !cleanText.includes(" ");
+}
+
+function hasMixedCaseRandomPattern(text: string): boolean {
+  if (text.length < 8) return false;
+  
+  let upperCount = 0;
+  let lowerCount = 0;
+  let transitions = 0;
+  let lastWasUpper = false;
+  
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (/[A-Z]/.test(char)) {
+      upperCount++;
+      if (i > 0 && !lastWasUpper) transitions++;
+      lastWasUpper = true;
+    } else if (/[a-z]/.test(char)) {
+      lowerCount++;
+      if (i > 0 && lastWasUpper) transitions++;
+      lastWasUpper = false;
+    }
+  }
+  
+  const totalLetters = upperCount + lowerCount;
+  if (totalLetters < 8) return false;
+  
+  const hasMultipleTransitions = transitions >= 3;
+  const hasReasonableCase = upperCount > 0 && lowerCount > 0;
+  
+  return hasMultipleTransitions && hasReasonableCase;
+}
+
+export function looksLikeSpam(text: string): boolean {
+  if (!text || text.trim().length === 0) return false;
+  
+  const trimmed = text.trim();
+  
+  if (hasLongConsonantRun(trimmed)) {
+    return true;
+  }
+  
+  if (hasNoSpacesInLongText(trimmed)) {
+    return true;
+  }
+  
+  const words = trimmed.split(/\s+/);
+  const longWords = words.filter(w => w.length >= 5);
+  
+  if (longWords.length > 0) {
+    const lowVowelWords = longWords.filter(w => hasLowVowelRatio(w));
+    const lowVowelRatio = lowVowelWords.length / longWords.length;
+    
+    if (lowVowelRatio > 0.5) {
+      return true;
+    }
+  }
+  
+  if (trimmed.length >= 10 && hasMixedCaseRandomPattern(trimmed) && hasLowVowelRatio(trimmed.replace(/\s/g, ""))) {
+    return true;
+  }
+  
+  return false;
+}
+
+function countSingleLetterSegments(email: string): number {
+  const localPart = email.split("@")[0];
+  if (!localPart) return 0;
+  
+  const segments = localPart.split(".");
+  return segments.filter(seg => seg.length === 1).length;
+}
+
+function countShortSegments(email: string): number {
+  const localPart = email.split("@")[0];
+  if (!localPart) return 0;
+  
+  const segments = localPart.split(".");
+  return segments.filter(seg => seg.length <= 2).length;
+}
+
+function localPartLooksRandom(localPart: string): boolean {
+  if (localPart.length < 8) return false;
+  
+  const withoutDots = localPart.replace(/\./g, "");
+  
+  if (hasLongConsonantRun(withoutDots)) {
+    return true;
+  }
+  
+  if (hasLowVowelRatio(withoutDots) && withoutDots.length >= 10) {
+    return true;
+  }
+  
+  return false;
+}
+
+export function emailLooksGenerated(email: string): boolean {
+  if (!email || !email.includes("@")) return false;
+  
+  const singleLetterSegments = countSingleLetterSegments(email);
+  if (singleLetterSegments >= 3) {
+    return true;
+  }
+  
+  const localPart = email.split("@")[0];
+  const segments = localPart.split(".");
+  
+  if (segments.length >= 5) {
+    const shortSegments = countShortSegments(email);
+    if (shortSegments >= 4) {
+      return true;
+    }
+  }
+  
+  if (localPartLooksRandom(localPart)) {
+    return true;
+  }
+  
+  return false;
+}
