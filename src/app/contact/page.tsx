@@ -181,6 +181,16 @@ export default function ContactPage() {
                   </div>
                 )}
 
+                <div className="p-4 bg-bg-subtle border border-border text-sm text-text-muted leading-relaxed">
+                  <p>
+                    By submitting this form, you agree that we may use your information to respond to your inquiry, as described in our{" "}
+                    <a href="/privacy" className="text-text hover:underline font-medium">
+                      Privacy Policy
+                    </a>
+                    . We don't sell your data or add you to a mailing list.
+                  </p>
+                </div>
+
                 <button
                   type="submit"
                   disabled={status.type === "loading"}

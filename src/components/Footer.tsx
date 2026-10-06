@@ -3,14 +3,18 @@ export default function Footer() {
     <footer className="bg-charcoal text-white border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          <div className="md:col-span-5">
+          <div className="md:col-span-4">
             <h3 className="text-[15px] font-medium mb-2 text-white">CerpaMedia</h3>
-            <p className="text-[14px] text-gray-400 leading-relaxed">
+            <p className="text-[14px] text-gray-400 leading-relaxed mb-3">
               Technology services for small business operations
+            </p>
+            <p className="text-[13px] text-gray-400 leading-relaxed">
+              518 Ridge View Xing<br />
+              Woodstock, GA 30188
             </p>
           </div>
           
-          <div className="md:col-span-4">
+          <div className="md:col-span-3">
             <h4 className="text-[13px] font-medium mb-3 text-white uppercase tracking-wide">Contact</h4>
             <div className="space-y-2">
               <a 
@@ -28,7 +32,7 @@ export default function Footer() {
             </div>
           </div>
           
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <h4 className="text-[13px] font-medium mb-3 text-white uppercase tracking-wide">Links</h4>
             <ul className="space-y-2">
               <li>
@@ -53,11 +57,32 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+
+          <div className="md:col-span-3">
+            <h4 className="text-[13px] font-medium mb-3 text-white uppercase tracking-wide">Legal</h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="/privacy" className="text-[14px] text-gray-400 hover:text-white transition-colors">
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a href="/terms" className="text-[14px] text-gray-400 hover:text-white transition-colors">
+                  Terms of Service
+                </a>
+              </li>
+              <li>
+                <a href="/strategy-call-policy" className="text-[14px] text-gray-400 hover:text-white transition-colors">
+                  Strategy Call Policy
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
         
         <div className="border-t border-gray-800 mt-8 pt-6">
           <p className="text-[13px] text-gray-400 text-center">
-            &copy; {new Date().getFullYear()} CerpaMedia. All rights reserved.
+            &copy; {new Date().getFullYear()} CerpaMedia LLC d/b/a CerpaMedia. All rights reserved.
           </p>
         </div>
       </div>
