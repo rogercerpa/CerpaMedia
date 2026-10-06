@@ -20,6 +20,18 @@ interface DayInfo {
   hasSlots: boolean;
 }
 
+type ServiceInterest =
+  | "general"
+  | "web_mobile"
+  | "ai"
+  | "automation"
+  | "strategy"
+  | "not_sure";
+
+interface IntakeAnswers {
+  [key: string]: string;
+}
+
 export function CalendarBookingFlow() {
   const [step, setStep] = useState<"calendar" | "slots" | "intake" | "loading">("calendar");
   const [slots, setSlots] = useState<SlotsByDay>({});
@@ -28,15 +40,26 @@ export function CalendarBookingFlow() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [validationErrors, setValidationErrors] = useState<{
+    [key: string]: string;
+  }>({});
   
   const [formData, setFormData] = useState({
     customerName: "",
     customerEmail: "",
     customerPhone: "",
     customerCompany: "",
-    platformPref: "Zoom",
+    serviceInterest: "" as ServiceInterest | "",
     notes: "",
+    platformPref: "Zoom",
     website: "",
+  });
+
+  const [intakeAnswers, setIntakeAnswers] = useState<IntakeAnswers>({});
+  const [optionalExtras, setOptionalExtras] = useState({
+    roleTitle: "",
+    companyWebsite: "",
+    urgency: "",
   });
 
   useEffect(() => {
@@ -84,15 +107,68 @@ export function CalendarBookingFlow() {
     setStep("intake");
   };
 
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+
+    if (!formData.customerName.trim()) {
+      errors.customerName = "Full name is required";
+    }
+    if (!formData.customerEmail.trim()) {
+      errors.customerEmail = "Email is required";
+    }
+    if (!formData.customerCompany.trim()) {
+      errors.customerCompany = "Company name is required";
+    }
+    if (!formData.serviceInterest) {
+      errors.serviceInterest = "Please select a service interest";
+    }
+    if (!formData.notes.trim()) {
+      errors.notes = "Please describe your challenge";
+    } else if (formData.notes.trim().length < 40) {
+      errors.notes = "Please provide at least 40 characters";
+    } else if (formData.notes.trim().length > 500) {
+      errors.notes = "Please keep your challenge under 500 characters";
+    }
+    if (!formData.platformPref) {
+      errors.platformPref = "Please select a platform";
+    }
+
+    // Validate branch questions are filled for the selected service
+    if (formData.serviceInterest) {
+      const branchQuestions = getBranchQuestions();
+      if (branchQuestions) {
+        for (const question of branchQuestions) {
+          if (!intakeAnswers[question.id] || !intakeAnswers[question.id].trim()) {
+            errors[question.id] = "This field is required for your selected service";
+          }
+        }
+      }
+    }
+
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!selectedSlot) return;
 
+    if (!validateForm()) {
+      return;
+    }
+
     setStep("loading");
     setError(null);
 
     try {
+      const combinedIntakeAnswers = {
+        ...intakeAnswers,
+        ...Object.fromEntries(
+          Object.entries(optionalExtras).filter(([_, value]) => value)
+        ),
+      };
+
       const response = await fetch("/api/booking/checkout", {
         method: "POST",
         headers: {
@@ -101,7 +177,15 @@ export function CalendarBookingFlow() {
         body: JSON.stringify({
           startTime: selectedSlot.start,
           endTime: selectedSlot.end,
-          ...formData,
+          customerName: formData.customerName,
+          customerEmail: formData.customerEmail,
+          customerPhone: formData.customerPhone || "",
+          customerCompany: formData.customerCompany,
+          serviceInterest: formData.serviceInterest,
+          notes: formData.notes,
+          platformPref: formData.platformPref,
+          intakeAnswers: combinedIntakeAnswers,
+          website: formData.website,
         }),
       });
 
@@ -129,6 +213,43 @@ export function CalendarBookingFlow() {
       hour: "numeric",
       minute: "2-digit",
     });
+  };
+
+  const getBranchQuestions = () => {
+    if (!formData.serviceInterest) return null;
+
+    const questions: { [key in ServiceInterest]?: Array<{ id: string; label: string; placeholder?: string }> } = {
+      web_mobile: [
+        { id: "web_mobile_type", label: "Are you building something new, rebuilding, or extending existing?" },
+        { id: "web_mobile_goal", label: "Primary goal (leads / operations / e-commerce / other)" },
+        { id: "web_mobile_deadline", label: "Do you have a hard deadline?" },
+      ],
+      ai: [
+        { id: "ai_workflow", label: "What's the first workflow you'd like to improve?" },
+        { id: "ai_tools", label: "What tools/systems do you use today?" },
+        { id: "ai_privacy", label: "Data/privacy concerns? (Yes / No / Unsure)" },
+      ],
+      automation: [
+        { id: "automation_process", label: "What's your most painful repetitive process?" },
+        { id: "automation_frequency", label: "How often does it happen?" },
+        { id: "automation_tools", label: "What tools do you currently use?" },
+      ],
+      strategy: [
+        { id: "strategy_decision", label: "What's your biggest technology decision right now?" },
+        { id: "strategy_timeline", label: "What's your decision timeline?" },
+        { id: "strategy_attendees", label: "Who else will be on the call?" },
+      ],
+      general: [
+        { id: "general_win", label: "What would make this call a win for you?" },
+        { id: "general_timeline", label: "What's your timeline for next steps?" },
+      ],
+      not_sure: [
+        { id: "not_sure_win", label: "What would make this call a win for you?" },
+        { id: "not_sure_timeline", label: "What's your timeline for next steps?" },
+      ],
+    };
+
+    return questions[formData.serviceInterest as ServiceInterest];
   };
 
   const getCalendarDays = (): DayInfo[] => {
@@ -355,6 +476,17 @@ export function CalendarBookingFlow() {
         })
       : "";
 
+    const serviceOptions = [
+      { value: "general", label: "Technology Strategy Call (general)" },
+      { value: "web_mobile", label: "Web & mobile applications" },
+      { value: "ai", label: "AI integration / AI consulting" },
+      { value: "automation", label: "Automation & process improvement" },
+      { value: "strategy", label: "Strategy / architecture / roadmap" },
+      { value: "not_sure", label: "Not sure yet" },
+    ];
+
+    const branchQuestions = getBranchQuestions();
+
     return (
       <div>
         <Reveal>
@@ -362,6 +494,7 @@ export function CalendarBookingFlow() {
             <h2 className="text-3xl md:text-4xl font-semibold text-text mb-4">
               Almost There
             </h2>
+            <p className="text-text-muted text-sm mb-4">~2 minutes — helps Roger prep</p>
             <div className="border border-border inline-block px-6 py-3 mb-6">
               <p className="text-text font-medium">Selected Time:</p>
               <p className="text-text-muted text-[15px]">{selectedSlotFormatted}</p>
@@ -396,45 +529,35 @@ export function CalendarBookingFlow() {
                 id="customerName"
                 required
                 value={formData.customerName}
-                onChange={(e) =>
-                  setFormData({ ...formData, customerName: e.target.value })
-                }
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
+                onChange={(e) => {
+                  setFormData({ ...formData, customerName: e.target.value });
+                  setValidationErrors({ ...validationErrors, customerName: "" });
+                }}
+                className={`w-full border ${validationErrors.customerName ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
               />
+              {validationErrors.customerName && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.customerName}</p>
+              )}
             </div>
 
             <div>
               <label htmlFor="customerEmail" className="block text-text font-medium mb-2">
-                Email Address *
+                Work Email *
               </label>
               <input
                 type="email"
                 id="customerEmail"
                 required
                 value={formData.customerEmail}
-                onChange={(e) =>
-                  setFormData({ ...formData, customerEmail: e.target.value })
-                }
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
+                onChange={(e) => {
+                  setFormData({ ...formData, customerEmail: e.target.value });
+                  setValidationErrors({ ...validationErrors, customerEmail: "" });
+                }}
+                className={`w-full border ${validationErrors.customerEmail ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
               />
-            </div>
-
-            <div>
-              <label htmlFor="customerPhone" className="block text-text font-medium mb-2">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="customerPhone"
-                value={formData.customerPhone}
-                onChange={(e) =>
-                  setFormData({ ...formData, customerPhone: e.target.value })
-                }
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
-              />
-              <p className="text-sm text-text-muted mt-1">
-                Optional — only if you'd like us to call you about scheduling. We email or call; we don't text.
-              </p>
+              {validationErrors.customerEmail && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.customerEmail}</p>
+              )}
             </div>
 
             <div>
@@ -446,11 +569,107 @@ export function CalendarBookingFlow() {
                 id="customerCompany"
                 required
                 value={formData.customerCompany}
-                onChange={(e) =>
-                  setFormData({ ...formData, customerCompany: e.target.value })
-                }
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
+                onChange={(e) => {
+                  setFormData({ ...formData, customerCompany: e.target.value });
+                  setValidationErrors({ ...validationErrors, customerCompany: "" });
+                }}
+                className={`w-full border ${validationErrors.customerCompany ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
               />
+              {validationErrors.customerCompany && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.customerCompany}</p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="serviceInterest" className="block text-text font-medium mb-2">
+                Service Interest *
+              </label>
+              <select
+                id="serviceInterest"
+                required
+                value={formData.serviceInterest}
+                onChange={(e) => {
+                  setFormData({ ...formData, serviceInterest: e.target.value as ServiceInterest });
+                  setValidationErrors({ ...validationErrors, serviceInterest: "" });
+                  setIntakeAnswers({});
+                }}
+                className={`w-full border ${validationErrors.serviceInterest ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
+              >
+                <option value="">Select a service...</option>
+                {serviceOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {validationErrors.serviceInterest && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.serviceInterest}</p>
+              )}
+            </div>
+
+            {branchQuestions && (
+              <div className="border border-border p-6 bg-bg-subtle">
+                <h3 className="text-text font-medium mb-4 text-sm uppercase tracking-wider">
+                  Service-Specific Questions (Required)
+                </h3>
+                <div className="space-y-4">
+                  {branchQuestions.map((question) => (
+                    <div key={question.id}>
+                      <label htmlFor={question.id} className="block text-text text-sm mb-2">
+                        {question.label} *
+                      </label>
+                      <input
+                        type="text"
+                        id={question.id}
+                        required
+                        value={intakeAnswers[question.id] || ""}
+                        onChange={(e) => {
+                          setIntakeAnswers({
+                            ...intakeAnswers,
+                            [question.id]: e.target.value,
+                          });
+                          setValidationErrors({ ...validationErrors, [question.id]: "" });
+                        }}
+                        placeholder={question.placeholder}
+                        className={`w-full border ${validationErrors[question.id] ? "border-red-500" : "border-border"} px-3 py-2 text-text text-sm focus:outline-none focus:border-text-muted bg-transparent`}
+                      />
+                      {validationErrors[question.id] && (
+                        <p className="text-red-500 text-xs mt-1">{validationErrors[question.id]}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div>
+              <label htmlFor="notes" className="block text-text font-medium mb-2">
+                What's the #1 problem or decision you want help with on this call? *
+              </label>
+              <p className="text-text-muted text-sm mb-2">
+                (40-500 characters)
+              </p>
+              <textarea
+                id="notes"
+                rows={4}
+                required
+                value={formData.notes}
+                onChange={(e) => {
+                  setFormData({ ...formData, notes: e.target.value });
+                  setValidationErrors({ ...validationErrors, notes: "" });
+                }}
+                placeholder="Example: We're growing fast and our current tools don't talk to each other. Need help deciding whether to integrate or rebuild..."
+                className={`w-full border ${validationErrors.notes ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent resize-none`}
+              />
+              <div className="flex justify-between items-center mt-1">
+                {validationErrors.notes ? (
+                  <p className="text-red-500 text-sm">{validationErrors.notes}</p>
+                ) : (
+                  <p className="text-text-muted text-sm">
+                    {formData.notes.length} characters
+                  </p>
+                )}
+              </div>
             </div>
 
             <div>
@@ -461,36 +680,91 @@ export function CalendarBookingFlow() {
                 id="platformPref"
                 required
                 value={formData.platformPref}
-                onChange={(e) =>
-                  setFormData({ ...formData, platformPref: e.target.value })
-                }
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
+                onChange={(e) => {
+                  setFormData({ ...formData, platformPref: e.target.value });
+                  setValidationErrors({ ...validationErrors, platformPref: "" });
+                }}
+                className={`w-full border ${validationErrors.platformPref ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
               >
                 <option value="Zoom">Zoom</option>
                 <option value="Microsoft Teams">Microsoft Teams</option>
               </select>
+              {validationErrors.platformPref && (
+                <p className="text-red-500 text-sm mt-1">{validationErrors.platformPref}</p>
+              )}
             </div>
 
-            <div>
-              <label htmlFor="notes" className="block text-text font-medium mb-2">
-                What's the main challenge you'd like to discuss? *
-              </label>
-              <textarea
-                id="notes"
-                rows={4}
-                required
-                minLength={40}
-                maxLength={500}
-                value={formData.notes}
-                onChange={(e) =>
-                  setFormData({ ...formData, notes: e.target.value })
-                }
-                placeholder="Brief description of what you'd like to discuss (40-500 characters)..."
-                className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent resize-none"
-              />
-              <p className="text-sm text-text-muted mt-1">
-                {formData.notes.length}/500 characters (minimum 40)
-              </p>
+            <div className="border-t border-border pt-6">
+              <h3 className="text-text font-medium mb-4 text-sm uppercase tracking-wider">
+                Optional Information
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="customerPhone" className="block text-text text-sm mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    id="customerPhone"
+                    value={formData.customerPhone}
+                    onChange={(e) =>
+                      setFormData({ ...formData, customerPhone: e.target.value })
+                    }
+                    placeholder="(555) 123-4567"
+                    className="w-full border border-border px-3 py-2 text-text text-sm focus:outline-none focus:border-text-muted bg-transparent"
+                  />
+                  <p className="text-text-muted text-xs mt-1">Optional — for scheduling calls only. We email or call; we don't text.</p>
+                </div>
+                <div>
+                  <label htmlFor="roleTitle" className="block text-text text-sm mb-2">
+                    Your Role/Title
+                  </label>
+                  <input
+                    type="text"
+                    id="roleTitle"
+                    value={optionalExtras.roleTitle}
+                    onChange={(e) =>
+                      setOptionalExtras({ ...optionalExtras, roleTitle: e.target.value })
+                    }
+                    placeholder="e.g. CEO, CTO, Operations Manager"
+                    className="w-full border border-border px-3 py-2 text-text text-sm focus:outline-none focus:border-text-muted bg-transparent"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="companyWebsite" className="block text-text text-sm mb-2">
+                    Company Website
+                  </label>
+                  <input
+                    type="url"
+                    id="companyWebsite"
+                    value={optionalExtras.companyWebsite}
+                    onChange={(e) =>
+                      setOptionalExtras({ ...optionalExtras, companyWebsite: e.target.value })
+                    }
+                    placeholder="https://yourcompany.com"
+                    className="w-full border border-border px-3 py-2 text-text text-sm focus:outline-none focus:border-text-muted bg-transparent"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="urgency" className="block text-text text-sm mb-2">
+                    Urgency
+                  </label>
+                  <select
+                    id="urgency"
+                    value={optionalExtras.urgency}
+                    onChange={(e) =>
+                      setOptionalExtras({ ...optionalExtras, urgency: e.target.value })
+                    }
+                    className="w-full border border-border px-3 py-2 text-text text-sm focus:outline-none focus:border-text-muted bg-transparent"
+                  >
+                    <option value="">Select urgency...</option>
+                    <option value="critical">Critical (immediate need)</option>
+                    <option value="90days">Within 90 days</option>
+                    <option value="planning">Planning phase</option>
+                    <option value="exploring">Just exploring</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             <div className="hidden" aria-hidden="true">
