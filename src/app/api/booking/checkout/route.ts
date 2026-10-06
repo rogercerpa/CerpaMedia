@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!startTime || !endTime || !customerName || !customerEmail || !customerPhone || !customerCompany || !serviceInterest || !platformPref) {
+    if (!startTime || !endTime || !customerName || !customerEmail || !customerCompany || !serviceInterest || !platformPref) {
       return NextResponse.json(
         { error: "Missing required fields" },
         { status: 400 }
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!validatePhone(customerPhone)) {
+    if (customerPhone && !validatePhone(customerPhone)) {
       return NextResponse.json(
         { error: "Please enter a valid phone number" },
         { status: 400 }
@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
         endTime: end,
         customerName: nameValidation.sanitized,
         customerEmail: customerEmail.trim().slice(0, 254),
-        customerPhone: customerPhone.trim().slice(0, 20),
+        customerPhone: customerPhone ? customerPhone.trim().slice(0, 20) : "",
         customerCompany: companyValidation.sanitized,
         serviceInterest,
         platformPref,
