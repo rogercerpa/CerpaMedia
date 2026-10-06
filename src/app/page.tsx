@@ -9,24 +9,24 @@ export default function Home() {
           <Reveal>
             <div className="text-center">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
-                Technology that helps your business operate
+                Stop losing hours to tools that don't talk to each other.
               </h1>
               <p className="text-xl md:text-2xl text-text-muted max-w-3xl mx-auto mb-12 leading-relaxed">
-                Strategic web development, AI integration, and automation consulting for small businesses
+                CerpaMedia helps small businesses get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and <strong className="text-text">you own the accounts and code.</strong>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/consult"
                   className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
                 >
-                  Book $99 call
+                  Book the $99 Strategy Call
                 </Link>
-                <Link
-                  href="/contact"
+                <a
+                  href="mailto:cerpamedia@gmail.com"
                   className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
                 >
-                  Contact us
-                </Link>
+                  Or email Roger
+                </a>
               </div>
             </div>
           </Reveal>
@@ -45,21 +45,21 @@ export default function Home() {
           <Reveal stagger staggerDelay={60}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
-                <h3 className="text-[15px] font-medium text-text mb-2">Paid discovery first</h3>
+                <h3 className="text-[15px] font-medium text-text mb-2">Clarity before code</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Start with a paid discovery phase, then fixed SOW for the build
+                  Paid discovery maps what to build (and what not to). Then a fixed statement of work with milestones — so you're not buying an open-ended project.
                 </p>
               </div>
               <div className="text-center">
-                <h3 className="text-[15px] font-medium text-text mb-2">You own everything</h3>
+                <h3 className="text-[15px] font-medium text-text mb-2">You own the system</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  All GitHub repos, hosting accounts, and third-party service access stay yours
+                  GitHub, hosting, domain, database, and third-party accounts stay in <em>your</em> name. We're a collaborator, not a landlord.
                 </p>
               </div>
               <div className="text-center">
-                <h3 className="text-[15px] font-medium text-text mb-2">Practical tech, no hype</h3>
+                <h3 className="text-[15px] font-medium text-text mb-2">Practical over trendy</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Technology choices driven by what your business actually needs
+                  We recommend what your business will actually use next quarter — not a slide deck of buzzwords.
                 </p>
               </div>
             </div>
@@ -72,10 +72,10 @@ export default function Home() {
           <Reveal delay={100}>
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-semibold text-text mb-4 tracking-tight">
-                What we do
+                What changes for your business
               </h2>
               <p className="text-lg text-text-muted max-w-2xl mx-auto leading-relaxed">
-                Technology services designed to help small businesses work more efficiently
+                Practical tech for small businesses that need less friction — not more software
               </p>
             </div>
           </Reveal>
@@ -83,30 +83,30 @@ export default function Home() {
           <Reveal stagger staggerDelay={80}>
             <div className="space-y-6">
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
-                <h3 className="text-xl font-medium mb-3 text-text">Web & Mobile Applications</h3>
+                <h3 className="text-xl font-medium mb-3 text-text">Apps that run the business</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Custom websites, web applications, and mobile apps built to meet your business requirements. Responsive design, modern tech stack, hosted where you want.
+                  Customer portals, intake, scheduling, and ops tools built around how you actually work — not a brochure site that sits still.
                 </p>
               </div>
 
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
-                <h3 className="text-xl font-medium mb-3 text-text">AI Integration</h3>
+                <h3 className="text-xl font-medium mb-3 text-text">AI that earns its keep</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Practical AI implementation guidance and integration. We help you identify where AI makes sense for your operations and build solutions that deliver measurable value.
+                  We find where AI saves real time (or money) in <em>your</em> workflow — then integrate only what pays off. No science projects.
                 </p>
               </div>
 
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
-                <h3 className="text-xl font-medium mb-3 text-text">Automation & Process</h3>
+                <h3 className="text-xl font-medium mb-3 text-text">Fewer manual loops</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Streamline repetitive tasks and improve workflows through strategic automation. Process analysis, tool selection, and implementation that reduces manual work.
+                  Cut copy-paste, reminders, and handoffs. Process first, tools second — so automation sticks.
                 </p>
               </div>
 
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
-                <h3 className="text-xl font-medium mb-3 text-text">Strategy Consulting</h3>
+                <h3 className="text-xl font-medium mb-3 text-text">A plan before you spend</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Expert guidance on technology decisions, architecture, and roadmap planning. One-on-one sessions to identify opportunities and define actionable next steps.
+                  One focused call: what's broken, what's worth fixing, and what to do next — written up within 24–48 hours.
                 </p>
               </div>
             </div>
@@ -117,44 +117,63 @@ export default function Home() {
       <section className="bg-charcoal py-24 md:py-32">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal delay={100}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
               <div>
-                <div className="inline-block border border-white/20 px-3 py-1 mb-4">
-                  <span className="text-[11px] font-medium text-white uppercase tracking-wider">New offering</span>
-                </div>
-                <h2 className="text-4xl md:text-5xl font-semibold text-white mb-4 tracking-tight">
-                  Technology Strategy Call
+                <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight">
+                  Get clear in one call — not another endless tech chat
                 </h2>
-                <p className="text-xl text-white/90 mb-2">
-                  $99 · 30–45 minutes
-                </p>
-                <p className="text-[15px] text-white/70 mb-8 leading-relaxed">
-                  One-on-one expert guidance session via Zoom or Teams. Walk away with 3–5 actionable opportunities and a written summary within 24–48 hours.
+                <p className="text-[15px] text-white/90 mb-8 leading-relaxed">
+                  For $99 you get a 30–45 minute Zoom or Teams session with Roger Cerpa, focused on <em>your</em> bottlenecks. Within 24–48 hours you receive a written summary: <strong>3–5 opportunities</strong>, a suggested priority order, and <strong>one recommended next step</strong>.
                 </p>
                 <Link
                   href="/consult"
                   className="inline-block bg-white text-charcoal px-8 py-3.5 text-[15px] font-medium hover:bg-gray-100 transition-all duration-200 hover:-translate-y-0.5"
                 >
-                  Learn more
+                  Pay $99 — Book Strategy Call
                 </Link>
+                <p className="text-[13px] text-white/70 mt-4 leading-relaxed">
+                  After payment, Roger emails or texts you to schedule
+                </p>
               </div>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-1.5 h-1.5 bg-white rounded-full mt-2"></div>
-                  <p className="text-[15px] text-white/80 leading-relaxed">
-                    Prepaid standalone service, not credited toward project work
-                  </p>
+                  <div className="flex-shrink-0 w-6 h-6 border border-white/40 flex items-center justify-center text-white text-xs font-medium mt-0.5">1</div>
+                  <div>
+                    <p className="text-[15px] text-white font-medium mb-1">Live strategy session</p>
+                    <p className="text-[14px] text-white/70 leading-relaxed">30–45 min, Zoom or Microsoft Teams</p>
+                  </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-1.5 h-1.5 bg-white rounded-full mt-2"></div>
-                  <p className="text-[15px] text-white/80 leading-relaxed">
-                    Scheduled directly with Roger Cerpa after payment
-                  </p>
+                  <div className="flex-shrink-0 w-6 h-6 border border-white/40 flex items-center justify-center text-white text-xs font-medium mt-0.5">2</div>
+                  <div>
+                    <p className="text-[15px] text-white font-medium mb-1">Opportunity list</p>
+                    <p className="text-[14px] text-white/70 leading-relaxed">3–5 concrete ideas tied to your business</p>
+                  </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-1.5 h-1.5 bg-white rounded-full mt-2"></div>
-                  <p className="text-[15px] text-white/80 leading-relaxed">
-                    Email summary highlighting key opportunities and recommended next steps
+                  <div className="flex-shrink-0 w-6 h-6 border border-white/40 flex items-center justify-center text-white text-xs font-medium mt-0.5">3</div>
+                  <div>
+                    <p className="text-[15px] text-white font-medium mb-1">Priority order</p>
+                    <p className="text-[14px] text-white/70 leading-relaxed">What to do first vs later</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 border border-white/40 flex items-center justify-center text-white text-xs font-medium mt-0.5">4</div>
+                  <div>
+                    <p className="text-[15px] text-white font-medium mb-1">Written summary email</p>
+                    <p className="text-[14px] text-white/70 leading-relaxed">Within 24–48 hours</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-6 h-6 border border-white/40 flex items-center justify-center text-white text-xs font-medium mt-0.5">5</div>
+                  <div>
+                    <p className="text-[15px] text-white font-medium mb-1">Clear next step</p>
+                    <p className="text-[14px] text-white/70 leading-relaxed">Discovery, DIY, or "not now" — so you're not left guessing</p>
+                  </div>
+                </div>
+                <div className="border-t border-white/20 pt-6 mt-8">
+                  <p className="text-[13px] text-white/70 leading-relaxed">
+                    Prepaid standalone. <strong className="text-white/90">Not</strong> credited toward discovery or project work. No full SOW, no build, no follow-up call included.
                   </p>
                 </div>
               </div>
@@ -167,24 +186,21 @@ export default function Home() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Reveal delay={100}>
             <h2 className="text-4xl md:text-5xl font-semibold text-text mb-6 tracking-tight">
-              Ready to move forward?
+              Ready for a clear next step?
             </h2>
             <p className="text-lg text-text-muted mb-10 leading-relaxed">
-              Book a strategy call or reach out to discuss your project
+              Book the $99 Technology Strategy Call. Pay first, Roger schedules with you, and you get a written summary within 24–48 hours of the call.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col gap-4 items-center">
               <Link
                 href="/consult"
                 className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
               >
-                Book $99 call
+                Book the $99 Strategy Call
               </Link>
-              <Link
-                href="/contact"
-                className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
-              >
-                Contact us
-              </Link>
+              <p className="text-sm text-text-muted">
+                Prefer email? <a href="mailto:cerpamedia@gmail.com" className="hover:text-text underline">cerpamedia@gmail.com</a> · <a href="tel:+19432487410" className="hover:text-text underline">(943) 248-7410</a>
+              </p>
             </div>
           </Reveal>
         </div>

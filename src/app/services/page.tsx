@@ -89,10 +89,10 @@ export default function ServicesPage() {
           <Reveal>
             <div className="text-center">
               <h1 className="text-5xl md:text-6xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
-                Our Services
+                Technology that removes friction from how you operate
               </h1>
               <p className="text-xl text-text-muted max-w-3xl mx-auto leading-relaxed">
-                Comprehensive technology services designed to help small businesses operate more efficiently
+                Custom web apps, practical AI, and automation for small businesses — with paid discovery first, fixed scope when you build, and ownership that stays yours.
               </p>
             </div>
           </Reveal>
@@ -105,17 +105,14 @@ export default function ServicesPage() {
             <div className="bg-charcoal p-8 md:p-10 mb-16">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div className="flex-1">
-                  <div className="inline-block border border-white/20 px-3 py-1 mb-3">
-                    <span className="text-[11px] font-medium text-white uppercase tracking-wider">New offering</span>
-                  </div>
-                  <h2 className="text-3xl md:text-4xl font-semibold text-white mb-3 tracking-tight">
-                    Technology Strategy Call
+                  <h2 className="text-3xl md:text-4xl font-semibold text-white mb-4 tracking-tight">
+                    Stuck without a plan?
                   </h2>
-                  <p className="text-lg text-white/90 mb-2">
-                    $99 · 30–45 minutes · One-on-one guidance
+                  <p className="text-[15px] text-white/90 leading-relaxed mb-3">
+                    Pay $99 for a 30–45 min call with Roger. Get 3–5 opportunities and a written summary within 24–48 hours.
                   </p>
-                  <p className="text-[15px] text-white/70 leading-relaxed">
-                    Expert technology advice in a focused session. Prepaid standalone consultation with written summary delivered within 24–48 hours.
+                  <p className="text-[13px] text-white/70 leading-relaxed">
+                    Prepaid standalone — not credited toward discovery.
                   </p>
                 </div>
                 <div className="flex-shrink-0">
@@ -123,7 +120,7 @@ export default function ServicesPage() {
                     href="/consult"
                     className="inline-block bg-white text-charcoal px-8 py-3 text-[15px] font-medium hover:bg-gray-100 transition-all duration-200 hover:-translate-y-0.5"
                   >
-                    Learn More
+                    Pay $99 — Book Call
                   </Link>
                 </div>
               </div>
