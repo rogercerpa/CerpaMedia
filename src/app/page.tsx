@@ -122,7 +122,7 @@ export default function Home() {
                 Tools that actually buy back hours
               </h2>
               <p className="text-lg text-text-muted max-w-2xl mx-auto leading-relaxed">
-                The right stack doesn't add complexity — it gives you time back and keeps you in control
+                The right stack doesn't add complexity — it gives you time back and keeps you in control. Pick and try your own, or we'll implement it for you.
               </p>
             </div>
           </Reveal>
@@ -160,8 +160,11 @@ export default function Home() {
                 <p className="text-[15px] text-text-muted leading-relaxed mb-2">
                   <strong className="text-text">Make</strong> (and peers like Zapier or n8n) — glue that runs without you babysitting. When a form submits, a row updates, or a payment hits, the next five steps just happen.
                 </p>
-                <p className="text-[15px] text-text-muted leading-relaxed">
-                  Outcome: fewer manual loops, fewer mistakes, and you're not the bottleneck.
+                <p className="text-[15px] text-text-muted leading-relaxed mb-3">
+                  <strong className="text-text">Outcome:</strong> fewer manual loops, fewer mistakes, and you're not the bottleneck.
+                </p>
+                <p className="text-[15px] text-text leading-relaxed">
+                  Want it set up right? We'll map your process, build the flows, and hand you the keys — <Link href="/consult" className="underline hover:text-text-muted">book the $99 Strategy Call</Link> to start.
                 </p>
               </div>
 
@@ -170,8 +173,11 @@ export default function Home() {
                 <p className="text-[15px] text-text-muted leading-relaxed mb-2">
                   <strong className="text-text">Notion</strong> — the business brain the team can find. Documents, wikis, and databases that don't disappear into email threads or scattered drives.
                 </p>
-                <p className="text-[15px] text-text-muted leading-relaxed">
-                  Outcome: new hires onboard faster, answers live in one place, and you're not re-explaining the same process every week.
+                <p className="text-[15px] text-text-muted leading-relaxed mb-3">
+                  <strong className="text-text">Outcome:</strong> new hires onboard faster, answers live in one place, and you're not re-explaining the same process every week.
+                </p>
+                <p className="text-[15px] text-text leading-relaxed">
+                  Or let us structure it for you — from templates to integrations. <Link href="/consult" className="underline hover:text-text-muted">Start with the Strategy Call.</Link>
                 </p>
               </div>
 
@@ -180,14 +186,17 @@ export default function Home() {
                 <p className="text-[15px] text-text-muted leading-relaxed mb-2">
                   <strong className="text-text">Grok Bot / OpenAI Dots</strong> — work that keeps moving between meetings. Summarize transcripts, draft replies, update boards, track action items.
                 </p>
-                <p className="text-[15px] text-text-muted leading-relaxed">
-                  Outcome: less context-switching, more flow. The business doesn't stall when you're heads-down.
+                <p className="text-[15px] text-text-muted leading-relaxed mb-3">
+                  <strong className="text-text">Outcome:</strong> less context-switching, more flow. The business doesn't stall when you're heads-down.
+                </p>
+                <p className="text-[15px] text-text leading-relaxed">
+                  We integrate agents into your workflow — connecting Slack, CRM, and task boards so they actually do the work. <Link href="/consult" className="underline hover:text-text-muted">Let's talk.</Link>
                 </p>
               </div>
 
               <div className="border border-border p-6 bg-bg">
-                <p className="text-[15px] text-text-muted leading-relaxed italic">
-                  Stack choice depends on your business. There's no one-size-fits-all list — just layers that work together and give you leverage.
+                <p className="text-[15px] text-text-muted leading-relaxed">
+                  <strong className="text-text">Stack choice depends on your business.</strong> There's no one-size-fits-all list — just layers that work together and give you leverage. Explore on your own or get a clear plan from us before you commit.
                 </p>
               </div>
             </div>
@@ -195,12 +204,15 @@ export default function Home() {
 
           <Reveal delay={300}>
             <div className="text-center">
-              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+              <p className="text-[15px] text-text-muted mb-6 max-w-2xl mx-auto leading-relaxed">
+                Want buyer's guidance on what to pick? Check Insights for landscape comparisons. Ready to implement? Book the Strategy Call and we'll map your next step.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link
                   href="/insights"
                   className="inline-block text-text hover:text-text-muted transition-colors font-medium text-[15px] underline"
                 >
-                  Read more in Insights
+                  Read tool guides in Insights
                 </Link>
                 <span className="hidden sm:inline text-text-muted">·</span>
                 <Link
