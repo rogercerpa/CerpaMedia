@@ -245,7 +245,7 @@ export default function Home() {
                   Pay $99 — Book Strategy Call
                 </Link>
                 <p className="text-[13px] text-white/70 mt-4 leading-relaxed">
-                  After payment, Roger emails or texts you to schedule
+                  After payment, Roger emails or calls you to schedule
                 </p>
               </div>
               <div className="space-y-6">
