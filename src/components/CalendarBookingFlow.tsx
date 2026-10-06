@@ -421,18 +421,20 @@ export function CalendarBookingFlow() {
 
             <div>
               <label htmlFor="customerPhone" className="block text-text font-medium mb-2">
-                Phone Number *
+                Phone Number
               </label>
               <input
                 type="tel"
                 id="customerPhone"
-                required
                 value={formData.customerPhone}
                 onChange={(e) =>
                   setFormData({ ...formData, customerPhone: e.target.value })
                 }
                 className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
               />
+              <p className="text-sm text-text-muted mt-1">
+                Optional — only if you'd like us to call you about scheduling. We email or call; we don't text.
+              </p>
             </div>
 
             <div>
@@ -507,6 +509,23 @@ export function CalendarBookingFlow() {
             </div>
 
             <div className="pt-4">
+              <div className="mb-6 p-4 bg-bg-subtle border border-border text-sm text-text-muted leading-relaxed">
+                <p>
+                  By continuing, you agree to our{" "}
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
+                    Terms of Service
+                  </a>{" "}
+                  and{" "}
+                  <a href="/strategy-call-policy" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
+                    Strategy Call Policy
+                  </a>
+                  , and you acknowledge our{" "}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
+                    Privacy Policy
+                  </a>
+                  . The $99 fee is prepaid and is not credited toward future projects. Cancel 24+ hours ahead for a full refund. Late cancellations and no-shows aren't refundable.
+                </p>
+              </div>
               <button
                 type="submit"
                 className="w-full bg-cta text-cta-text px-8 py-4 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
@@ -514,7 +533,7 @@ export function CalendarBookingFlow() {
                 Continue to Payment ($99)
               </button>
               <p className="text-sm text-text-muted text-center mt-4">
-                You'll be redirected to Stripe to complete your payment securely
+                You'll be redirected to Stripe to complete your payment securely. CerpaMedia never sees your full card number.
               </p>
             </div>
           </form>
