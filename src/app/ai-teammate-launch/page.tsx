@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "AI Teammate Launch - CerpaMedia",
-  description: "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up Grok Bot, OpenAI Dots, Meta Muse, or Claude — you own the accounts.",
+  description: "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork — you own the accounts.",
 };
 
 export default function AITeammateLaunchPage() {
@@ -204,7 +204,7 @@ export default function AITeammateLaunchPage() {
                     <strong className="text-text">Option B:</strong> Two 1-hour virtual sessions (Zoom or Microsoft Teams)
                   </p>
                   <p className="text-[15px] text-text-muted leading-relaxed mt-2">
-                    We pick the right tool (Grok Bot, OpenAI Dots, Meta Muse, or Claude), set up your 2 teammates, configure approval rules, and test live.
+                    We pick the right tool (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), set up your 2 teammates, configure approval rules, and test live.
                   </p>
                 </div>
               </div>
@@ -242,7 +242,7 @@ export default function AITeammateLaunchPage() {
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
                 <h3 className="text-xl font-medium mb-2 text-text">The right tool picked for you</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  We evaluate Grok Bot, OpenAI Dots, Meta Muse, and Claude against your workflow, then set up the winner. You're not guessing.
+                  We evaluate Grok Bot, OpenAI Dots, Meta Muse, and Claude Cowork against your workflow, then set up the winner. You're not guessing.
                 </p>
               </div>
 
@@ -358,7 +358,7 @@ export default function AITeammateLaunchPage() {
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
                 <h3 className="text-xl font-medium mb-2 text-text">Updates when the tools change</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  When Grok, Dots, Muse, or Claude ships a breaking update, we handle the migration — you don't wake up to broken workflows
+                  When Grok, Dots, Muse, or Claude Cowork ships a breaking update, we handle the migration — you don't wake up to broken workflows
                 </p>
               </div>
 
@@ -406,6 +406,13 @@ export default function AITeammateLaunchPage() {
               </div>
 
               <div className="border border-border p-8 bg-bg">
+                <h3 className="text-lg font-medium mb-3 text-text">What do the AI tools cost me?</h3>
+                <p className="text-[15px] text-text-muted leading-relaxed">
+                  You pay the platform vendor directly for your subscription. Most require a paid plan — for example, Claude Cowork is included with paid Claude plans (Pro, Max, Team, or Enterprise), not the free plan. During our intake and setup, we'll help you pick the right tier for your workload so you're not overpaying.
+                </p>
+              </div>
+
+              <div className="border border-border p-8 bg-bg">
                 <h3 className="text-lg font-medium mb-3 text-text">What if it doesn't save me 3 hours a week?</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
                   We keep fixing remotely — no extra charge — until your first teammate hits that bar. The 60-day guarantee window starts on launch day. After 60 days, ongoing support moves to the optional Teammate Care plan ($149/month). No refunds, but you keep the setup and accounts.
@@ -422,7 +429,7 @@ export default function AITeammateLaunchPage() {
               <div className="border border-border p-8 bg-bg">
                 <h3 className="text-lg font-medium mb-3 text-text">How do you pick which tool to use?</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  During the intake form and setup session, we ask what tools you already use, what approvals you need, and what jobs you want automated. Then we evaluate Grok Bot, OpenAI Dots, Meta Muse, and Claude for integration ease, cost, and fit. You're not locked into one platform just because it's trendy.
+                  During the intake form and setup session, we ask what tools you already use, what approvals you need, and what jobs you want automated. Then we evaluate Grok Bot, OpenAI Dots, Meta Muse, and Claude Cowork for integration ease, cost, and fit. You're not locked into one platform just because it's trendy.
                 </p>
               </div>
 
