@@ -216,8 +216,7 @@ export default function TermsPage() {
               <div>
                 <h2 className="text-3xl font-semibold text-text mb-4">15. Contact</h2>
                 <div className="text-text-muted leading-relaxed space-y-1">
-                  <p className="font-medium text-text">CerpaMedia LLC (CerpaMedia)</p>
-                  <p>518 Ridge View Xing, Woodstock, GA 30188</p>
+                  <p className="font-medium text-text">CerpaMedia LLC, Woodstock, GA</p>
                   <p>
                     <a href="mailto:cerpamedia@gmail.com" className="text-text hover:underline">cerpamedia@gmail.com</a> · <a href="tel:+19432487410" className="text-text hover:underline">(943) 248-7410</a>
                   </p>

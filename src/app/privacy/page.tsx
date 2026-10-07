@@ -30,7 +30,7 @@ export default function PrivacyPage() {
             <div className="prose prose-lg max-w-none space-y-8">
               <div>
                 <p className="text-text-muted leading-relaxed">
-                  CerpaMedia ("CerpaMedia," "we," "us") is a trade name of CerpaMedia LLC, a Georgia limited liability company, located at 518 Ridge View Xing, Woodstock, GA 30188. This policy explains what personal information we collect through cerpamedia.com (the "Site"), why we collect it, and the choices you have.
+                  CerpaMedia ("CerpaMedia," "we," "us") is a trade name of CerpaMedia LLC, a Georgia limited liability company, located in Woodstock, GA. This policy explains what personal information we collect through cerpamedia.com (the "Site"), why we collect it, and the choices you have.
                 </p>
               </div>
 
@@ -190,7 +190,7 @@ export default function PrivacyPage() {
 
                 <h3 className="text-xl font-medium text-text mt-6 mb-3">How to make a request</h3>
                 <p className="text-text-muted leading-relaxed">
-                  Email <a href="mailto:cerpamedia@gmail.com" className="text-text hover:underline font-medium">cerpamedia@gmail.com</a> with the subject line "Privacy Request," or mail CerpaMedia LLC, 518 Ridge View Xing, Woodstock, GA 30188. We aim to respond within 30 days and no later than any period the law requires.
+                  Email <a href="mailto:cerpamedia@gmail.com" className="text-text hover:underline font-medium">cerpamedia@gmail.com</a> with the subject line "Privacy Request," or mail CerpaMedia LLC, Woodstock, GA. We aim to respond within 30 days and no later than any period the law requires.
                 </p>
               </div>
 
@@ -218,8 +218,7 @@ export default function PrivacyPage() {
               <div>
                 <h2 className="text-3xl font-semibold text-text mb-4">12. Contact us</h2>
                 <div className="text-text-muted leading-relaxed space-y-1">
-                  <p className="font-medium text-text">CerpaMedia LLC (CerpaMedia)</p>
-                  <p>518 Ridge View Xing, Woodstock, GA 30188</p>
+                  <p className="font-medium text-text">CerpaMedia LLC, Woodstock, GA</p>
                   <p>
                     <a href="mailto:cerpamedia@gmail.com" className="text-text hover:underline">cerpamedia@gmail.com</a> · <a href="tel:+19432487410" className="text-text hover:underline">(943) 248-7410</a>
                   </p>
