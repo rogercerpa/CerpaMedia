@@ -172,7 +172,7 @@ export default function ConsultPage() {
                 <div>
                   <h3 className="text-lg font-medium mb-2 text-text">Roger reaches out</h3>
                   <p className="text-[15px] text-text-muted leading-relaxed">
-                    Usually by email or text within 1 business day to pick Zoom or Teams and a time (Eastern).
+                    Usually by email or call within 1 business day to pick Zoom or Teams and a time (Eastern).
                   </p>
                 </div>
               </div>
@@ -208,7 +208,7 @@ export default function ConsultPage() {
 
             <div className="text-center border-t border-border pt-12">
               <p className="text-sm text-text-muted mb-6 max-w-2xl mx-auto leading-relaxed">
-                After you pay, watch for Roger's email or text to schedule. This call is a <strong className="text-text">prepaid standalone</strong> service and is <strong className="text-text">not</strong> credited toward discovery or project work.
+                After you pay, watch for Roger's email or call to schedule. This call is a <strong className="text-text">prepaid standalone</strong> service and is <strong className="text-text">not</strong> credited toward discovery or project work.
               </p>
             </div>
           </Reveal>
