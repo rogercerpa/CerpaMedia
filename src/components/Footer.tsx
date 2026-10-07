@@ -5,12 +5,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           <div className="md:col-span-4">
             <h3 className="text-[15px] font-medium mb-2 text-white">CerpaMedia</h3>
-            <p className="text-[14px] text-gray-400 leading-relaxed mb-3">
+            <p className="text-[14px] text-gray-400 leading-relaxed">
               Technology services for small business operations
-            </p>
-            <p className="text-[13px] text-gray-400 leading-relaxed">
-              518 Ridge View Xing<br />
-              Woodstock, GA 30188
             </p>
           </div>
           
