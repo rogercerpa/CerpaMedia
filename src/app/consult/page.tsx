@@ -125,7 +125,7 @@ export default function ConsultPage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-text-muted">•</span>
-                  <span className="text-[15px] leading-relaxed"><strong className="text-text">No credit</strong> toward discovery or future projects</span>
+                  <span className="text-[15px] leading-relaxed"><strong className="text-text">No credit</strong> toward discovery or other project work (exception: credited toward AI Teammate Launch if purchased within 30 days)</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="text-text-muted">•</span>

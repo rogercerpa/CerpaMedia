@@ -248,7 +248,7 @@ export async function POST(request: NextRequest) {
               currency: "usd",
               product_data: {
                 name: "Technology Strategy Call",
-                description: "30-45 minute expert technology consultation",
+                description: "30-45 minute expert consultation. Not credited toward discovery or other work. Exception: credited toward AI Teammate Launch if purchased within 30 days.",
               },
               unit_amount: 9900,
             },

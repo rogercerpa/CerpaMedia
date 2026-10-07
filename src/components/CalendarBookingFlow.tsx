@@ -797,7 +797,7 @@ export function CalendarBookingFlow() {
                   <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
                     Privacy Policy
                   </a>
-                  . The $99 fee is prepaid and is not credited toward future projects. Cancel 24+ hours ahead for a full refund. Late cancellations and no-shows aren't refundable.
+                  . The $99 fee is prepaid and is not credited toward discovery or other project work, with one exception: if you purchase AI Teammate Launch within 30 days of your call, the $99 comes off. Cancel 24+ hours ahead for a full refund. Late cancellations and no-shows aren't refundable.
                 </p>
               </div>
               <button
