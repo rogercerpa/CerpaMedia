@@ -31,7 +31,7 @@ export default function AITeammateLaunchPage() {
                 For small business owners (usually solo or teams of 1–4) ready to hand real work to AI — without DIY guesswork or wasted tool subscriptions.
               </p>
               <p className="text-[15px] text-text-muted mb-12 max-w-2xl mx-auto leading-relaxed">
-                You own the tool accounts and pay vendors directly. We pick the right platform, launch 2 teammates from a starter menu, set approval rules, and guarantee they save at least 3 hours a week — or we keep fixing for free.
+                You own the tool accounts and pay vendors directly. We pick the right platform, launch 2 teammates from a starter menu, set approval rules, and guarantee free fixes if your first teammate isn't saving at least 3 hours a week (60-day window).
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
@@ -128,7 +128,7 @@ export default function AITeammateLaunchPage() {
               <div className="border border-border p-6 hover:border-text-muted transition-all duration-300">
                 <h3 className="text-lg font-medium mb-2 text-text">Review replies & Google Business Profile posts</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Responds to customer reviews in your voice, keeps your profile active
+                  Drafts replies to customer reviews in your voice for your OK, keeps your profile active
                 </p>
               </div>
 
@@ -142,14 +142,14 @@ export default function AITeammateLaunchPage() {
               <div className="border border-border p-6 hover:border-text-muted transition-all duration-300">
                 <h3 className="text-lg font-medium mb-2 text-text">Invoice reminders</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Tracks overdue payments, sends friendly follow-ups, escalates when needed
+                  Tracks overdue payments, drafts friendly follow-ups for your OK, flags the ones that need a call
                 </p>
               </div>
 
               <div className="border border-border p-6 hover:border-text-muted transition-all duration-300">
                 <h3 className="text-lg font-medium mb-2 text-text">Lead intake</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Qualifies inquiries, asks follow-up questions, routes hot leads to your CRM
+                  Qualifies inquiries, drafts follow-up questions for your OK, routes hot leads to your CRM
                 </p>
               </div>
 
@@ -358,7 +358,7 @@ export default function AITeammateLaunchPage() {
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
                 <h3 className="text-xl font-medium mb-2 text-text">Updates when the tools change</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  When Grok, Dots, Muse, or Claude Cowork ships a breaking update, we handle the migration — you don't wake up to broken workflows
+                  When Grok, Dots, Muse, or Claude Cowork ships a breaking update, we handle the migration — we update your setup so your teammates keep working
                 </p>
               </div>
 
@@ -401,7 +401,7 @@ export default function AITeammateLaunchPage() {
               <div className="border border-border p-8 bg-bg">
                 <h3 className="text-lg font-medium mb-3 text-text">Who owns the tool accounts?</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  You do. Accounts are created in your name (or your business name). You pay the platform vendor directly — Grok, OpenAI, Meta, or Anthropic. CerpaMedia is added as a collaborator to configure and maintain your teammates. If you ever stop working with us, you keep full access.
+                  You do. Accounts are created in your name (or your business name). You pay the platform vendor directly — xAI (Grok), OpenAI, Meta, or Anthropic. CerpaMedia is added as a collaborator to configure and maintain your teammates. If you ever stop working with us, you keep full access.
                 </p>
               </div>
 
@@ -461,7 +461,7 @@ export default function AITeammateLaunchPage() {
               First 5 clients only. 4 launch slots per month.
             </p>
             <p className="text-[15px] text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-              After you reach out, Roger contacts you by email or call to schedule the intake form and setup session. You own the accounts, we set up the teammates, and you're guaranteed to save at least 3 hours a week — or we keep fixing for free.
+              After you reach out, Roger contacts you by email or call to schedule the intake form and setup session. You own the accounts, we set up the teammates, and if your first teammate isn't saving at least 3 hours a week, we keep fixing it free (60-day window).
             </p>
             <div className="flex flex-col gap-4 items-center">
               <a
