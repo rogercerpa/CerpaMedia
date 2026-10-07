@@ -44,7 +44,7 @@ export default function AITeammateLaunchPage() {
                   href="/consult"
                   className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
                 >
-                  Not sure yet? Book a $99 Strategy Call
+                  Not sure yet? Book a $99 Strategy Call — credited toward this if purchased within 30 days
                 </Link>
               </div>
               <p className="text-[13px] text-text-muted mt-6">
@@ -184,7 +184,7 @@ export default function AITeammateLaunchPage() {
                 <div>
                   <h3 className="text-lg font-medium mb-2 text-text">15-minute intake form</h3>
                   <p className="text-[15px] text-text-muted leading-relaxed">
-                    Tell us which jobs you want automated, what tools you already use, and what approvals you need. Takes 15 minutes.
+                    Tell us which jobs you want automated, what tools you already use, and what approvals you need. Takes 15 minutes. The form is sent after full payment is received.
                   </p>
                 </div>
               </div>
@@ -198,13 +198,13 @@ export default function AITeammateLaunchPage() {
                 <div>
                   <h3 className="text-lg font-medium mb-2 text-text">Setup session (in-person or virtual)</h3>
                   <p className="text-[15px] text-text-muted leading-relaxed mb-2">
-                    <strong className="text-text">Option A:</strong> One 2-hour in-person visit (within 30–60 minutes of Woodstock, GA)
+                    <strong className="text-text">Option A:</strong> One 2-hour in-person visit (if you're within 60 minutes of Woodstock, GA by Google Maps at booking)
                   </p>
                   <p className="text-[15px] text-text-muted leading-relaxed">
                     <strong className="text-text">Option B:</strong> Two 1-hour virtual sessions (Zoom or Microsoft Teams)
                   </p>
                   <p className="text-[15px] text-text-muted leading-relaxed mt-2">
-                    We pick the right tool (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), set up your 2 teammates, configure approval rules, and test live.
+                    We pick the right tool (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), set up your 2 teammates, configure approval rules, and test live. Extra in-person visits after launch are billed at $125/hr including drive time.
                   </p>
                 </div>
               </div>
@@ -218,7 +218,7 @@ export default function AITeammateLaunchPage() {
                 <div>
                   <h3 className="text-lg font-medium mb-2 text-text">Day-14 check-in with scorecard</h3>
                   <p className="text-[15px] text-text-muted leading-relaxed">
-                    Two weeks after launch, we review the scorecard: hours saved, tasks completed, friction points. If you're not saving at least 3 hours a week, we keep fixing for free.
+                    Two weeks after the launch session, we review the scorecard: hours saved (measured as tasks completed × minutes saved per task), tasks completed, friction points. If you're not saving at least 3 hours a week, we keep fixing for free. The 60-day guarantee window starts at the launch session. Each fix is completed within 5 business days.
                   </p>
                 </div>
               </div>
@@ -300,13 +300,13 @@ export default function AITeammateLaunchPage() {
 
               <div className="space-y-4 mb-8">
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  If you're not saving at least 3 hours per week with your first teammate by day 14, we keep tuning and fixing remotely until you hit that bar — no additional charge.
+                  If you're not saving at least 3 hours per week with your first teammate by day 14, we keep tuning and fixing remotely until you hit that bar — no additional charge. Hours saved are measured as tasks completed × minutes saved per task, shown on your day-14 scorecard.
                 </p>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  <strong className="text-text">What's covered:</strong> adjustments to your 2 launched teammates, remote troubleshooting, and re-training the AI on your processes.
+                  <strong className="text-text">What's covered:</strong> adjustments to your 2 launched teammates, remote troubleshooting, and re-training the AI on your processes. Each fix is completed within 5 business days.
                 </p>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  <strong className="text-text">Time window:</strong> 60 days from launch. After that, ongoing support moves to the optional Teammate Care plan.
+                  <strong className="text-text">Time window:</strong> 60 days from the launch session. After that, ongoing support moves to the optional Teammate Care plan.
                 </p>
                 <p className="text-[15px] text-text-muted leading-relaxed">
                   <strong className="text-text">You must:</strong> keep your tool account paid and active, and use the teammate at least once per business day during the 60-day window.
@@ -378,7 +378,7 @@ export default function AITeammateLaunchPage() {
 
               <div className="border border-border p-6 bg-bg-subtle">
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  <strong className="text-text">Month to month.</strong> Cancel anytime. New teammates beyond the starter menu, or custom connectors (CRM, accounting, ops tools) are quoted separately.
+                  <strong className="text-text">Month to month.</strong> Cancellation takes effect at the end of your paid month. An unused quarterly job doesn't carry over. New teammates beyond the starter menu, or custom connectors (CRM, accounting, ops tools) are quoted separately.
                 </p>
               </div>
             </div>
@@ -413,16 +413,30 @@ export default function AITeammateLaunchPage() {
               </div>
 
               <div className="border border-border p-8 bg-bg">
+                <h3 className="text-lg font-medium mb-3 text-text">What if my plan doesn't have a collaborator seat?</h3>
+                <p className="text-[15px] text-text-muted leading-relaxed">
+                  If your plan is single-seat with no collaborator access, we set it up on your device while you're signed in. We never ask for your passwords. After setup, you have full control and can use your teammates from any device where you're logged in.
+                </p>
+              </div>
+
+              <div className="border border-border p-8 bg-bg">
+                <h3 className="text-lg font-medium mb-3 text-text">When do I pay?</h3>
+                <p className="text-[15px] text-text-muted leading-relaxed">
+                  Full payment ($799 founding rate) is due before the intake form is sent. Once payment clears, Roger contacts you to schedule, and you receive the intake form link.
+                </p>
+              </div>
+
+              <div className="border border-border p-8 bg-bg">
                 <h3 className="text-lg font-medium mb-3 text-text">What if it doesn't save me 3 hours a week?</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  We keep fixing remotely — no extra charge — until your first teammate hits that bar. The 60-day guarantee window starts on launch day. After 60 days, ongoing support moves to the optional Teammate Care plan ($149/month). No refunds, but you keep the setup and accounts.
+                  We keep fixing remotely — no extra charge — until your first teammate hits that bar. The 60-day guarantee window starts at the launch session. After 60 days, ongoing support moves to the optional Teammate Care plan ($149/month). No refunds, but you keep the setup and accounts.
                 </p>
               </div>
 
               <div className="border border-border p-8 bg-bg">
                 <h3 className="text-lg font-medium mb-3 text-text">In-person or virtual — which is better?</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  In-person (one 2-hour session) works well if you're within 30–60 minutes of Woodstock, GA and want to knock it out in one sitting. Virtual (two 1-hour sessions) gives you breathing room to test between calls. Both get you to the same finish line.
+                  In-person (one 2-hour session) works well if you're within 60 minutes of Woodstock, GA by Google Maps at booking and want to knock it out in one sitting. Virtual (two 1-hour sessions) gives you breathing room to test between calls. Both get you to the same finish line.
                 </p>
               </div>
 

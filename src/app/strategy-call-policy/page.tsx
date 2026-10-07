@@ -33,7 +33,7 @@ export default function StrategyCallPolicyPage() {
             <div className="prose prose-lg max-w-none space-y-8">
               <div>
                 <p className="text-text-muted leading-relaxed">
-                  The Technology Strategy Call costs <strong className="text-text">$99, paid in advance through Stripe</strong>. It is a standalone service and is <strong className="text-text">not credited toward any other project</strong>. This policy explains how cancellations, refunds, and rescheduling work.
+                  The Technology Strategy Call costs <strong className="text-text">$99, paid in advance through Stripe</strong>. It is a standalone service. The $99 fee is <strong className="text-text">not credited toward discovery or other project work</strong>, with one exception: <strong className="text-text">if you purchase AI Teammate Launch within 30 days of your call, the $99 comes off</strong>. This policy explains how cancellations, refunds, and rescheduling work.
                 </p>
               </div>
 

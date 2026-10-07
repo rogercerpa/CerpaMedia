@@ -208,7 +208,7 @@ export default function ConsultPage() {
 
             <div className="text-center border-t border-border pt-12">
               <p className="text-sm text-text-muted mb-6 max-w-2xl mx-auto leading-relaxed">
-                After you pay, watch for Roger's email or call to schedule. This call is a <strong className="text-text">prepaid standalone</strong> service and is <strong className="text-text">not</strong> credited toward discovery or project work.
+                After you pay, watch for Roger's email or call to schedule. This call is a <strong className="text-text">prepaid standalone</strong> service. The $99 fee is <strong className="text-text">not</strong> credited toward discovery or other project work, with one exception: <strong className="text-text">if you purchase AI Teammate Launch within 30 days of this call, the $99 comes off</strong>.
               </p>
             </div>
           </Reveal>

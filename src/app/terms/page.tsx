@@ -78,7 +78,7 @@ export default function TermsPage() {
 
                 <h3 className="text-xl font-medium text-text mt-6 mb-3">Standalone product</h3>
                 <p className="text-text-muted leading-relaxed">
-                  The $99 fee is <strong className="text-text">not credited or applied</strong> toward discovery, a Statement of Work, or any other project.
+                  The $99 fee is <strong className="text-text">not credited or applied</strong> toward discovery, a Statement of Work, or other project work, with one exception: <strong className="text-text">if you purchase AI Teammate Launch within 30 days of your Strategy Call, the $99 is credited toward that purchase</strong>.
                 </p>
 
                 <h3 className="text-xl font-medium text-text mt-6 mb-3">Scheduling, cancellations, refunds, and no-shows</h3>
