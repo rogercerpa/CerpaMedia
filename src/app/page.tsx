@@ -28,7 +28,7 @@ export default async function Home() {
                 {hero.headline}
               </h1>
               <p className="text-xl md:text-2xl text-text-muted max-w-3xl mx-auto mb-12 leading-relaxed">
-                {hero.subheadline.split("you own the accounts and code").map((part, i, arr) => 
+                {hero.subheadline.split("you own the accounts and code.").map((part, i, arr) => 
                   i === arr.length - 1 ? part : (
                     <span key={i}>{part}<strong className="text-text">you own the accounts and code.</strong></span>
                   )
