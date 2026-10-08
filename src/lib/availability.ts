@@ -2,11 +2,14 @@
  * Availability Engine for CerpaMedia Booking System
  * 
  * Calculates available time slots based on:
- * - Date-specific availability (preferred)
- * - Weekly availability rules (weekday + time ranges, fallback)
- * - Blocked dates
- * - Existing bookings
- * - Slot settings (length, buffer, min lead time)
+ * - Date-specific availability (DateAvailability table — ONLY SOURCE)
+ * - Blocked dates (BlockedDate table)
+ * - Existing bookings (Booking table)
+ * - Checkout holds (CheckoutHold table)
+ * - Slot settings (BookingSettings table: length, buffer, min lead time)
+ * 
+ * DEFAULT BEHAVIOR: NO availability unless explicitly added via DateAvailability.
+ * Weekly rules (AvailabilityRule) are NO LONGER used as a fallback.
  */
 
 import { prisma } from "./prisma";
@@ -227,25 +230,12 @@ export async function getAvailableSlots(
   startDate: Date,
   endDate: Date
 ): Promise<TimeSlot[]> {
-  let rules: AvailabilityRule[];
   let dateAvailabilities: DateAvailability[];
   let blockedDates: BlockedDate[];
   let bookings: Booking[];
   let holds: CheckoutHold[];
   let settingsArray: BookingSettings[];
   const now = new Date();
-
-  try {
-    rules = await prisma.availabilityRule.findMany();
-  } catch (error) {
-    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
-    throw new AvailabilityError(
-      "Failed to fetch availability rules",
-      "SLOTS_RULES_FAILED",
-      prismaCode,
-      prismaCode ? `Prisma error ${prismaCode} - check if AvailabilityRule table exists` : "Database query failed"
-    );
-  }
 
   try {
     dateAvailabilities = await prisma.dateAvailability.findMany({
@@ -385,7 +375,7 @@ export async function getAvailableSlots(
       };
 
   const allSlots: TimeSlot[] = [];
-  const timezone = dateAvailabilities[0]?.timezone || rules[0]?.timezone || "America/New_York";
+  const timezone = dateAvailabilities[0]?.timezone || "America/New_York";
   
   const minStartTime = new Date(Date.now() + settings.minLeadTimeHrs * 60 * 60 * 1000);
 
@@ -404,6 +394,7 @@ export async function getAvailableSlots(
       const dateStr = format(toZonedTime(currentDate, timezone), "yyyy-MM-dd", { timeZone: timezone });
       const dateAvails = dateAvailMap.get(dateStr);
       
+      // ONLY use DateAvailability records — no fallback to weekly rules
       if (dateAvails && dateAvails.length > 0) {
         for (const avail of dateAvails) {
           const daySlots = generateDaySlots(
@@ -423,29 +414,8 @@ export async function getAvailableSlots(
           
           allSlots.push(...availableSlots);
         }
-      } else if (rules.length > 0) {
-        const weekday = getWeekdayInTimezone(currentDate, timezone);
-        const dayRules = rules.filter((r) => r.weekday === weekday);
-        
-        for (const rule of dayRules) {
-          const daySlots = generateDaySlots(
-            currentDate,
-            rule.startTime,
-            rule.endTime,
-            settings,
-            rule.timezone
-          );
-          
-          const availableSlots = daySlots.filter(
-            (slot) =>
-              slot.start >= minStartTime &&
-              !overlapsWithBooking(slot.start, slot.end, bookings) &&
-              !overlapsWithHold(slot.start, slot.end, holds, now)
-          );
-          
-          allSlots.push(...availableSlots);
-        }
       }
+      // No "else if (rules.length > 0)" fallback — only explicit date availability
     }
     
     currentDate.setDate(currentDate.getDate() + 1);
@@ -461,25 +431,12 @@ export async function isSlotAvailable(
   startTime: Date,
   endTime: Date
 ): Promise<boolean> {
-  let rules: AvailabilityRule[];
   let dateAvailabilities: DateAvailability[];
   let blockedDates: BlockedDate[];
   let bookings: Booking[];
   let holds: CheckoutHold[];
   let settingsArray: BookingSettings[];
   const now = new Date();
-
-  try {
-    rules = await prisma.availabilityRule.findMany();
-  } catch (error) {
-    const prismaCode = error instanceof Prisma.PrismaClientKnownRequestError ? error.code : undefined;
-    throw new AvailabilityError(
-      "Failed to fetch availability rules",
-      "SLOTS_RULES_FAILED",
-      prismaCode,
-      prismaCode ? `Prisma error ${prismaCode} - check if AvailabilityRule table exists` : "Database query failed"
-    );
-  }
 
   try {
     const dateStart = startOfDay(startTime);
@@ -674,8 +631,9 @@ export async function isSlotAvailable(
     return false;
   }
 
-  const timezone = dateAvailabilities[0]?.timezone || rules[0]?.timezone || "America/New_York";
+  const timezone = dateAvailabilities[0]?.timezone || "America/New_York";
   
+  // ONLY check DateAvailability records — no fallback to weekly rules
   if (dateAvailabilities.length > 0) {
     const startTimeStr = format(toZonedTime(startTime, timezone), "HH:mm", { timeZone: timezone });
     const endTimeStr = format(toZonedTime(endTime, timezone), "HH:mm", { timeZone: timezone });
@@ -690,22 +648,6 @@ export async function isSlotAvailable(
     });
   }
 
-  const weekday = getWeekdayInTimezone(startTime, timezone);
-  const dayRules = rules.filter((r) => r.weekday === weekday);
-
-  if (dayRules.length === 0) {
-    return false;
-  }
-
-  const startTimeStr = format(toZonedTime(startTime, timezone), "HH:mm", { timeZone: timezone });
-  const endTimeStr = format(toZonedTime(endTime, timezone), "HH:mm", { timeZone: timezone });
-
-  const startMinutes = parseTime(startTimeStr);
-  const endMinutes = parseTime(endTimeStr);
-
-  return dayRules.some((rule) => {
-    const ruleStart = parseTime(rule.startTime);
-    const ruleEnd = parseTime(rule.endTime);
-    return startMinutes >= ruleStart && endMinutes <= ruleEnd;
-  });
+  // No date availability = not available (no weekly rule fallback)
+  return false;
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { addWeeks, eachDayOfInterval, parseISO, format, isWeekend, startOfWeek, endOfWeek } from "date-fns";
+import { AvailabilityPreview } from "./AvailabilityPreview";
 
 interface DateAvailability {
   id: string;
@@ -537,6 +538,9 @@ export default function DateAvailabilityManager() {
 
   return (
     <div className="space-y-6">
+      {/* Preview: What Customers See */}
+      <AvailabilityPreview />
+
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-800">{error}</p>

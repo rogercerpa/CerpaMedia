@@ -40,7 +40,10 @@ export default async function AdminAvailabilityPage() {
             Availability Management
           </h2>
           <p className="text-gray-600">
-            Set specific dates and hours when you're available for consultations (America/New_York timezone)
+            Set specific dates and hours when you're available for consultations (America/New_York timezone).
+          </p>
+          <p className="text-sm text-gray-500 mt-2">
+            <strong>Important:</strong> Only dates you add here will show slots to customers. No default availability.
           </p>
         </div>
 
