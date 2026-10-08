@@ -130,8 +130,8 @@ function createDateAtTime(
 ): Date {
   const [hours, minutes] = timeStr.split(":").map(Number);
   
-  const zonedDate = toZonedTime(date, timezone);
-  const dateString = format(zonedDate, "yyyy-MM-dd", { timeZone: timezone });
+  // Use UTC calendar day from the date (don't convert to timezone first)
+  const dateString = formatCalendarDate(date);
   const isoString = `${dateString}T${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:00`;
   
   return fromZonedTime(isoString, timezone);
@@ -139,12 +139,11 @@ function createDateAtTime(
 
 /**
  * Check if a date is blocked
- * Uses UTC calendar date comparison (noon UTC dates)
+ * Uses UTC calendar date comparison
  */
 function isDateBlocked(date: Date, blockedDates: BlockedDate[], timezone: string): boolean {
-  // Convert to target timezone to get the correct calendar day
-  const zonedDate = toZonedTime(date, timezone);
-  const dateStr = format(zonedDate, "yyyy-MM-dd", { timeZone: timezone });
+  // Use UTC calendar day for comparison
+  const dateStr = formatCalendarDate(date);
   return blockedDates.some((blocked) => {
     const blockedStr = formatCalendarDate(blocked.date);
     return blockedStr === dateStr;
@@ -383,7 +382,8 @@ export async function getAvailableSlots(
 
   const dateAvailMap = new Map<string, DateAvailability[]>();
   for (const avail of dateAvailabilities) {
-    const dateStr = format(toZonedTime(avail.date, timezone), "yyyy-MM-dd", { timeZone: timezone });
+    // Use formatCalendarDate to get the UTC calendar day without timezone conversion
+    const dateStr = formatCalendarDate(avail.date);
     if (!dateAvailMap.has(dateStr)) {
       dateAvailMap.set(dateStr, []);
     }
@@ -393,7 +393,8 @@ export async function getAvailableSlots(
   const currentDate = new Date(startDate);
   while (currentDate <= endDate) {
     if (!isDateBlocked(currentDate, blockedDates, timezone)) {
-      const dateStr = format(toZonedTime(currentDate, timezone), "yyyy-MM-dd", { timeZone: timezone });
+      // Use formatCalendarDate to match how dates are stored in the map
+      const dateStr = formatCalendarDate(currentDate);
       const dateAvails = dateAvailMap.get(dateStr);
       
       // ONLY use DateAvailability records — no fallback to weekly rules
