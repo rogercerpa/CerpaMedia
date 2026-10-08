@@ -1,4 +1,4 @@
--- Additive migration: Add CMS fields to Service table
+-- AddServiceCMSFields: Add CMS management fields to Service table
 -- All new columns are nullable or have defaults to preserve existing rows
 
 ALTER TABLE "Service" ADD COLUMN IF NOT EXISTS "slug" TEXT;
