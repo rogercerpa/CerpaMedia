@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -77,6 +78,10 @@ export async function POST(request: NextRequest) {
         seoDescription,
       },
     });
+
+    revalidatePath("/");
+    revalidatePath("/services");
+    revalidatePath(`/services/${slug}`);
 
     return NextResponse.json({ service }, { status: 201 });
   } catch (error) {
