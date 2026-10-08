@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -26,6 +27,8 @@ export async function POST(request: NextRequest) {
         ogImageUrl: ogImageUrl || null,
       },
     });
+
+    revalidatePath(path);
 
     return NextResponse.json(seoMeta);
   } catch (error) {

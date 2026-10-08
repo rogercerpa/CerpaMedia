@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -20,6 +21,8 @@ export async function PATCH(
       where: { id },
       data: body,
     });
+
+    revalidatePath("/");
 
     return NextResponse.json(faq);
   } catch (error) {
@@ -48,6 +51,8 @@ export async function DELETE(
       where: { id },
       data: { deletedAt: new Date() },
     });
+
+    revalidatePath("/");
 
     return NextResponse.json({ success: true });
   } catch (error) {
