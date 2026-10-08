@@ -201,3 +201,7 @@ COPY (SELECT * FROM "AvailabilityRule") TO '/tmp/availability_rules_backup.csv' 
 - **PR:** https://github.com/rogercerpa/CerpaMedia/pull/32
 - **Production:** https://cerpamedia.com
 - **Admin:** https://cerpamedia.com/admin/availability
+
+## Development Tools
+
+**Screenshot capture:** `scripts/dev/capture-simple.ts` - Captures admin and public interface screenshots for documentation. Requires local PostgreSQL + test data.

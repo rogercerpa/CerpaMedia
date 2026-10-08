@@ -109,10 +109,7 @@ describe('getAvailableSlots', () => {
     expect(duration).toBe(60);
   });
 
-  it.skip('returns no slots for a blocked date', async () => {
-    // TODO: Fix blocked date logic in tests
-    // Blocked dates work correctly in the app (verified by manual testing)
-    // but the test setup needs adjustment for proper date comparison
+  it('returns no slots for a blocked date', async () => {
     const startDate = new Date('2026-10-15T00:00:00Z');
     const endDate = new Date('2026-10-17T00:00:00Z');
 
@@ -230,5 +227,41 @@ describe('getAvailableSlots', () => {
       slot.start.getUTCHours() === 14 && slot.start.getUTCMinutes() === 0
     );
     expect(tenAmSlot).toBeUndefined();
+  });
+
+  it('blocks dates correctly near midnight ET/UTC boundary', async () => {
+    // Test case: Oct 15 8 PM ET is Oct 16 00:00 UTC
+    // A BlockedDate for Oct 15 should block ALL slots on Oct 15 ET, even late evening
+    const startDate = new Date('2026-10-15T00:00:00Z');
+    const endDate = new Date('2026-10-17T00:00:00Z');
+
+    // Mock DateAvailability for Oct 15 - extended hours into late evening
+    (prisma.dateAvailability.findMany as any).mockResolvedValue([
+      {
+        id: 'avail1',
+        date: new Date('2026-10-15T12:00:00.000Z'),
+        startTime: '10:00',
+        endTime: '22:00', // 10 PM ET = 2 AM next day UTC
+        timezone: 'America/New_York',
+      },
+    ]);
+
+    // Mock BlockedDate for Oct 15
+    (prisma.blockedDate.findMany as any).mockResolvedValue([
+      {
+        id: 'blocked1',
+        date: new Date('2026-10-15T12:00:00.000Z'),
+        reason: 'Evening event',
+      },
+    ]);
+
+    (prisma.bookingSettings.findMany as any).mockResolvedValue([
+      { id: 'settings1', slotLengthMin: 60, bufferMin: 15, minLeadTimeHrs: 0 },
+    ]);
+
+    const slots = await getAvailableSlots(startDate, endDate);
+
+    // Should be 0 because Oct 15 is blocked, even though some slots would be on Oct 16 in UTC
+    expect(slots).toHaveLength(0);
   });
 });

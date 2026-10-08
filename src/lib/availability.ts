@@ -141,8 +141,10 @@ function createDateAtTime(
  * Check if a date is blocked
  * Uses UTC calendar date comparison (noon UTC dates)
  */
-function isDateBlocked(date: Date, blockedDates: BlockedDate[]): boolean {
-  const dateStr = formatCalendarDate(date);
+function isDateBlocked(date: Date, blockedDates: BlockedDate[], timezone: string): boolean {
+  // Convert to target timezone to get the correct calendar day
+  const zonedDate = toZonedTime(date, timezone);
+  const dateStr = format(zonedDate, "yyyy-MM-dd", { timeZone: timezone });
   return blockedDates.some((blocked) => {
     const blockedStr = formatCalendarDate(blocked.date);
     return blockedStr === dateStr;
@@ -390,7 +392,7 @@ export async function getAvailableSlots(
 
   const currentDate = new Date(startDate);
   while (currentDate <= endDate) {
-    if (!isDateBlocked(currentDate, blockedDates)) {
+    if (!isDateBlocked(currentDate, blockedDates, timezone)) {
       const dateStr = format(toZonedTime(currentDate, timezone), "yyyy-MM-dd", { timeZone: timezone });
       const dateAvails = dateAvailMap.get(dateStr);
       
@@ -619,7 +621,10 @@ export async function isSlotAvailable(
     return false;
   }
 
-  if (isDateBlocked(startTime, blockedDates)) {
+  // Get timezone from dateAvailabilities or use default
+  const timezone = dateAvailabilities[0]?.timezone || "America/New_York";
+
+  if (isDateBlocked(startTime, blockedDates, timezone)) {
     return false;
   }
 
@@ -631,7 +636,7 @@ export async function isSlotAvailable(
     return false;
   }
 
-  const timezone = dateAvailabilities[0]?.timezone || "America/New_York";
+  const availTimezone = dateAvailabilities[0]?.timezone || timezone;
   
   // ONLY check DateAvailability records — no fallback to weekly rules
   if (dateAvailabilities.length > 0) {
