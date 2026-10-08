@@ -3,6 +3,14 @@
 import { useState, useEffect } from "react";
 import { Reveal } from "./Reveal";
 
+// Convert a Date to YYYY-MM-DD using its local date components (no timezone conversion)
+export function toLocalDateKey(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 interface TimeSlot {
   start: string;
   end: string;
@@ -267,10 +275,9 @@ export function CalendarBookingFlow() {
     const current = new Date(startDate);
     
     for (let i = 0; i < 42; i++) {
-      // Use en-CA locale to get YYYY-MM-DD format, matching how we group slots
-      const dateStr = current.toLocaleDateString("en-CA", {
-        timeZone: "America/New_York",
-      });
+      // Build key from local date components (no timezone conversion)
+      // This ensures day 25 always keys as "2026-10-25" regardless of browser timezone
+      const dateStr = toLocalDateKey(current);
       
       days.push({
         date: new Date(current),
