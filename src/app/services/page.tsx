@@ -102,6 +102,34 @@ export default function ServicesPage() {
       <section className="py-16 md:py-20 border-t border-border">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal delay={100}>
+            <div className="border-2 border-cta p-8 md:p-10 mb-8 bg-bg">
+              <div className="mb-6">
+                <div className="inline-block border border-border px-3 py-1 mb-4">
+                  <span className="text-[11px] font-medium text-text uppercase tracking-wider">First 5 clients · Founding rate</span>
+                </div>
+                <h2 className="text-3xl md:text-4xl font-semibold text-text mb-4 tracking-tight">
+                  Two AI teammates set up and saving you hours every week
+                </h2>
+                <p className="text-xl font-medium text-text mb-3">
+                  $799 founding price for the first 5 clients · Regular $1,199
+                </p>
+                <p className="text-[15px] text-text-muted leading-relaxed mb-4">
+                  We pick the right platform (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), launch 2 teammates from a starter menu, and set approval rules so nothing sends, spends, or deletes without your OK.
+                </p>
+                <p className="text-[13px] text-text-muted leading-relaxed mb-6">
+                  You own the tool accounts and pay vendors directly. If your first teammate isn't saving at least 3 hours a week, we keep fixing it free (60-day window from the launch session). No refunds.
+                </p>
+                <Link
+                  href="/services/ai-teammate-launch"
+                  className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                >
+                  See how it works
+                </Link>
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={100}>
             <div className="bg-charcoal p-8 md:p-10 mb-16">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div className="flex-1">
@@ -112,7 +140,7 @@ export default function ServicesPage() {
                     Pay $99 for a 30–45 min call with Roger. Get 3–5 opportunities and a written summary within 24–48 hours.
                   </p>
                   <p className="text-[13px] text-white/70 leading-relaxed">
-                    Prepaid standalone — not credited toward discovery or other work. Exception: credited toward AI Teammate Launch if purchased within 30 days.
+                    Prepaid standalone — not credited toward discovery or other work. Exception: credited toward <Link href="/services/ai-teammate-launch" className="hover:underline text-white/90">AI Teammate Launch</Link> if purchased within 30 days.
                   </p>
                 </div>
                 <div className="flex-shrink-0">

@@ -28,6 +28,11 @@ export default function Home() {
                   Or email Roger
                 </a>
               </div>
+              <div className="mt-8 pt-6 border-t border-border max-w-2xl mx-auto">
+                <p className="text-[15px] text-text-muted leading-relaxed">
+                  <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href="/services/ai-teammate-launch" className="text-text hover:underline font-medium">AI Teammate Launch</Link> — $799 founding rate for the first 5 clients.
+                </p>
+              </div>
             </div>
           </Reveal>
         </div>
@@ -286,7 +291,7 @@ export default function Home() {
                 </div>
                 <div className="border-t border-white/20 pt-6 mt-8">
                   <p className="text-[13px] text-white/70 leading-relaxed">
-                    Prepaid standalone. <strong className="text-white/90">Not</strong> credited toward discovery or other project work. One exception: credited toward AI Teammate Launch if purchased within 30 days. No full SOW, no build, no follow-up call included.
+                    Prepaid standalone. <strong className="text-white/90">Not</strong> credited toward discovery or other project work. One exception: credited toward <Link href="/services/ai-teammate-launch" className="text-white/90 hover:underline">AI Teammate Launch</Link> if purchased within 30 days. No full SOW, no build, no follow-up call included.
                   </p>
                 </div>
               </div>

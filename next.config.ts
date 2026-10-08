@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async redirects() {
+    return [
+      {
+        source: "/ai-teammate-launch",
+        destination: "/services/ai-teammate-launch",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

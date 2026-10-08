@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { Reveal } from "@/components/Reveal";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Strategy Call Policy - CerpaMedia",
@@ -33,7 +34,7 @@ export default function StrategyCallPolicyPage() {
             <div className="prose prose-lg max-w-none space-y-8">
               <div>
                 <p className="text-text-muted leading-relaxed">
-                  The Technology Strategy Call costs <strong className="text-text">$99, paid in advance through Stripe</strong>. It is a standalone service. The $99 fee is <strong className="text-text">not credited toward discovery or other project work</strong>, with one exception: <strong className="text-text">if you purchase AI Teammate Launch within 30 days of your call, the $99 comes off</strong>. This policy explains how cancellations, refunds, and rescheduling work.
+                  The Technology Strategy Call costs <strong className="text-text">$99, paid in advance through Stripe</strong>. It is a standalone service. The $99 fee is <strong className="text-text">not credited toward discovery or other project work</strong>, with one exception: <strong className="text-text">if you purchase <Link href="/services/ai-teammate-launch" className="text-text hover:underline">AI Teammate Launch</Link> within 30 days of your call, the $99 comes off</strong>. This policy explains how cancellations, refunds, and rescheduling work.
                 </p>
               </div>
 
