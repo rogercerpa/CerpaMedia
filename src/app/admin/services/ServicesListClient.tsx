@@ -175,6 +175,11 @@ export default function ServicesListClient({ services, deletedServices }: Servic
                   <span className="font-semibold">Slug:</span> {service.slug}
                 </p>
               )}
+              {service.published && service.slug === "technology-strategy-call" && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Shown as the $99 block, not in the grid
+                </p>
+              )}
             </div>
             <div className="text-right ml-4">
               <div className="text-lg font-semibold text-gray-900 mb-1">

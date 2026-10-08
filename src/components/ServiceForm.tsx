@@ -17,6 +17,7 @@ interface ServiceFormData {
   priceNote: string;
   badgeText: string;
   featured: boolean;
+  features: string[];
   ctaLabel: string;
   ctaUrl: string;
   sortOrder: string;
@@ -44,6 +45,7 @@ export default function ServiceForm({ initialData, mode }: ServiceFormProps) {
       priceNote: "",
       badgeText: "",
       featured: false,
+      features: [],
       ctaLabel: "Get a Quote",
       ctaUrl: "/contact",
       sortOrder: "0",
@@ -92,6 +94,7 @@ export default function ServiceForm({ initialData, mode }: ServiceFormProps) {
         priceNote: formData.priceNote || null,
         badgeText: formData.badgeText || null,
         featured: formData.featured,
+        features: formData.features,
         ctaLabel: formData.ctaLabel,
         ctaUrl: formData.ctaUrl,
         sortOrder: parseInt(formData.sortOrder, 10),
@@ -331,6 +334,81 @@ export default function ServiceForm({ initialData, mode }: ServiceFormProps) {
           <p className="mt-1 text-xs text-gray-500">Show in featured section</p>
         </div>
 
+        {/* Features Editor */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Features (What we offer bullets)
+          </label>
+          <div className="space-y-2">
+            {formData.features.map((feature, index) => (
+              <div key={index} className="flex gap-2">
+                <input
+                  type="text"
+                  value={feature}
+                  onChange={(e) => {
+                    const newFeatures = [...formData.features];
+                    newFeatures[index] = e.target.value;
+                    setFormData((prev) => ({ ...prev, features: newFeatures }));
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  placeholder="e.g., Custom website design and development"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (index > 0) {
+                      const newFeatures = [...formData.features];
+                      [newFeatures[index - 1], newFeatures[index]] = [newFeatures[index], newFeatures[index - 1]];
+                      setFormData((prev) => ({ ...prev, features: newFeatures }));
+                    }
+                  }}
+                  disabled={index === 0}
+                  className="px-3 py-2 bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Move up"
+                >
+                  ↑
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (index < formData.features.length - 1) {
+                      const newFeatures = [...formData.features];
+                      [newFeatures[index], newFeatures[index + 1]] = [newFeatures[index + 1], newFeatures[index]];
+                      setFormData((prev) => ({ ...prev, features: newFeatures }));
+                    }
+                  }}
+                  disabled={index === formData.features.length - 1}
+                  className="px-3 py-2 bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                  title="Move down"
+                >
+                  ↓
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newFeatures = formData.features.filter((_, i) => i !== index);
+                    setFormData((prev) => ({ ...prev, features: newFeatures }));
+                  }}
+                  className="px-3 py-2 bg-red-100 text-red-700 text-sm hover:bg-red-200"
+                  title="Remove"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => {
+                setFormData((prev) => ({ ...prev, features: [...prev.features, ""] }));
+              }}
+              className="w-full px-4 py-2 bg-gray-100 text-gray-700 text-sm hover:bg-gray-200 border border-gray-300"
+            >
+              + Add Feature
+            </button>
+          </div>
+          <p className="mt-1 text-xs text-gray-500">Shown as bullets in the "What we offer" section on public cards</p>
+        </div>
+
         <div>
           <label className="flex items-center gap-2">
             <input
@@ -364,6 +442,7 @@ export default function ServiceForm({ initialData, mode }: ServiceFormProps) {
             className="w-full px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
             placeholder="e.g., Get a Quote"
           />
+          <p className="mt-1 text-xs text-gray-500">Not shown on public service cards yet.</p>
         </div>
 
         <div>
@@ -384,6 +463,7 @@ export default function ServiceForm({ initialData, mode }: ServiceFormProps) {
             className="w-full px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
             placeholder="/contact"
           />
+          <p className="mt-1 text-xs text-gray-500">Not shown on public service cards yet.</p>
         </div>
 
         <div className="md:col-span-2">
@@ -450,37 +530,54 @@ export default function ServiceForm({ initialData, mode }: ServiceFormProps) {
       <div className="border-t pt-6 mt-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
         <div className="bg-gray-50 p-6 rounded-lg">
-          <div className="max-w-md">
-            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+          {formData.featured ? (
+            // Featured service preview (matches AI Teammate Launch block)
+            <div className="border-2 border-gray-900 p-8 md:p-10 bg-white max-w-3xl">
               {formData.badgeText && (
-                <div className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded mb-3">
-                  {formData.badgeText}
+                <div className="inline-block border border-gray-300 px-3 py-1 mb-4">
+                  <span className="text-[11px] font-medium text-gray-900 uppercase tracking-wider">{formData.badgeText}</span>
                 </div>
               )}
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-4 tracking-tight">
                 {formData.title || "Service Title"}
-              </h3>
-              <p className="text-gray-600 mb-4">
-                {formData.shortDesc || "Short description will appear here"}
+              </h2>
+              <p className="text-xl font-medium text-gray-900 mb-3">
+                {formData.priceLabel || "Price"}
               </p>
-              {formData.outcome && (
-                <p className="text-sm text-gray-700 mb-4">
-                  <strong>Outcome:</strong> {formData.outcome}
-                </p>
-              )}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                <div className="text-lg font-semibold text-gray-900">
-                  {formData.priceLabel || "Price"}
-                </div>
-                <button
-                  type="button"
-                  className="bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:bg-gray-800 transition-colors"
-                >
-                  {formData.ctaLabel || "Get a Quote"}
-                </button>
-              </div>
+              <p className="text-[15px] text-gray-600 leading-relaxed mb-4">
+                {formData.description || "Description will appear here"}
+              </p>
+              <button
+                type="button"
+                className="inline-block bg-gray-900 text-white px-8 py-3.5 text-[15px] font-medium"
+              >
+                {formData.ctaLabel || "Get a Quote"}
+              </button>
             </div>
-          </div>
+          ) : (
+            // Regular service card preview (matches public /services cards)
+            <div className="border border-gray-300 p-8 max-w-3xl bg-white">
+              <h2 className="text-3xl font-semibold text-gray-900 mb-4 tracking-tight">
+                {formData.title || "Service Title"}
+              </h2>
+              <p className="text-[15px] text-gray-600 mb-6 leading-relaxed">
+                {formData.description || "Description will appear here"}
+              </p>
+              {formData.features.length > 0 && (
+                <div className="border-t border-gray-300 pt-6">
+                  <h3 className="font-medium text-gray-900 mb-3 text-sm uppercase tracking-wider">What we offer</h3>
+                  <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {formData.features.map((feature, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <span className="text-gray-600 text-[15px]">•</span>
+                        <span className="text-gray-600 text-[15px] leading-relaxed">{feature || "(empty)"}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
           {formData.published && formData.slug && (
             <div className="mt-4">
               <a

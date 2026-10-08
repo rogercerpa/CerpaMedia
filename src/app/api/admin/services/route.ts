@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
       priceNote,
       badgeText,
       featured,
+      features,
       ctaLabel,
       ctaUrl,
       sortOrder,
@@ -49,6 +50,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate features array
+    const validFeatures = Array.isArray(features) 
+      ? features.filter((f: unknown) => typeof f === "string" && f.trim().length > 0)
+      : [];
+
     const service = await prisma.service.create({
       data: {
         title,
@@ -62,6 +68,7 @@ export async function POST(request: NextRequest) {
         priceNote,
         badgeText,
         featured: !!featured,
+        features: validFeatures,
         ctaLabel,
         ctaUrl,
         sortOrder: parseInt(sortOrder, 10),

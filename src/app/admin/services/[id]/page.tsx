@@ -40,6 +40,7 @@ export default async function EditServicePage({
     priceNote: service.priceNote || "",
     badgeText: service.badgeText || "",
     featured: service.featured,
+    features: service.features,
     ctaLabel: service.ctaLabel,
     ctaUrl: service.ctaUrl,
     sortOrder: service.sortOrder.toString(),
