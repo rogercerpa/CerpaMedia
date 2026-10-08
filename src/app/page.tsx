@@ -286,7 +286,7 @@ export default function Home() {
                 </div>
                 <div className="border-t border-white/20 pt-6 mt-8">
                   <p className="text-[13px] text-white/70 leading-relaxed">
-                    Prepaid standalone. <strong className="text-white/90">Not</strong> credited toward discovery or project work. No full SOW, no build, no follow-up call included.
+                    Prepaid standalone. <strong className="text-white/90">Not</strong> credited toward discovery or other project work. One exception: credited toward AI Teammate Launch if purchased within 30 days. No full SOW, no build, no follow-up call included.
                   </p>
                 </div>
               </div>

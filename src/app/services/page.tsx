@@ -112,7 +112,7 @@ export default function ServicesPage() {
                     Pay $99 for a 30–45 min call with Roger. Get 3–5 opportunities and a written summary within 24–48 hours.
                   </p>
                   <p className="text-[13px] text-white/70 leading-relaxed">
-                    Prepaid standalone — not credited toward discovery.
+                    Prepaid standalone — not credited toward discovery or other work. Exception: credited toward AI Teammate Launch if purchased within 30 days.
                   </p>
                 </div>
                 <div className="flex-shrink-0">
