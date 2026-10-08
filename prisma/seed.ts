@@ -55,6 +55,13 @@ async function main() {
       shortDesc: "Custom websites and web applications tailored to your business requirements.",
       longDesc: "Custom websites and web applications tailored to your business requirements. We build responsive, fast, and user-friendly solutions that work across all devices.",
       description: "Custom websites and web applications tailored to your business requirements. We build responsive, fast, and user-friendly solutions that work across all devices.",
+      features: [
+        "Custom website design and development",
+        "Responsive design for mobile and desktop",
+        "Content management systems",
+        "E-commerce solutions",
+        "Performance optimization"
+      ],
       outcome: "Responsive, fast websites that work across all devices",
       priceLabel: "Starting at $5,000",
       price: 5000,
@@ -72,6 +79,13 @@ async function main() {
       shortDesc: "Complex web applications that power your business operations.",
       longDesc: "Complex web applications that power your business operations. From customer portals to internal management systems, we build scalable solutions.",
       description: "Complex web applications that power your business operations. From customer portals to internal management systems, we build scalable solutions.",
+      features: [
+        "Custom business applications",
+        "Database design and integration",
+        "API development and integration",
+        "User authentication and security",
+        "Cloud hosting and deployment"
+      ],
       outcome: "Scalable applications from customer portals to management systems",
       priceLabel: "Starting at $10,000",
       price: 10000,
@@ -89,6 +103,13 @@ async function main() {
       shortDesc: "Native and cross-platform mobile applications for iOS and Android.",
       longDesc: "Native and cross-platform mobile applications for iOS and Android. Extend your business reach with mobile solutions your customers can access anywhere.",
       description: "Native and cross-platform mobile applications for iOS and Android. Extend your business reach with mobile solutions your customers can access anywhere.",
+      features: [
+        "iOS and Android app development",
+        "Cross-platform solutions",
+        "Mobile-first design approach",
+        "App store submission and updates",
+        "Push notifications and offline functionality"
+      ],
       outcome: "Mobile solutions your customers can access anywhere",
       priceLabel: "Starting at $15,000",
       price: 15000,
@@ -106,6 +127,13 @@ async function main() {
       shortDesc: "Practical integration of AI capabilities into your existing systems.",
       longDesc: "Practical integration of AI capabilities into your existing systems. We help you understand where AI makes sense and implement solutions that deliver real value.",
       description: "Practical integration of AI capabilities into your existing systems. We help you understand where AI makes sense and implement solutions that deliver real value.",
+      features: [
+        "AI feasibility assessment",
+        "Integration with existing systems",
+        "Natural language processing",
+        "Machine learning model implementation",
+        "AI-powered automation"
+      ],
       outcome: "AI solutions that deliver real value in your workflow",
       priceLabel: "Starting at $8,000",
       price: 8000,
@@ -123,6 +151,13 @@ async function main() {
       shortDesc: "Strategic guidance on adopting AI technologies.",
       longDesc: "Strategic guidance on adopting AI technologies. We help you separate hype from practical applications and make informed decisions about AI investments.",
       description: "Strategic guidance on adopting AI technologies. We help you separate hype from practical applications and make informed decisions about AI investments.",
+      features: [
+        "AI strategy and roadmap development",
+        "Use case identification and validation",
+        "Vendor and solution evaluation",
+        "Risk assessment and mitigation",
+        "Training and knowledge transfer"
+      ],
       outcome: "Informed decisions about AI investments for your business",
       priceLabel: "Starting at $2,500",
       price: 2500,
@@ -140,6 +175,13 @@ async function main() {
       shortDesc: "Identify and implement automation opportunities across your business processes.",
       longDesc: "Identify and implement automation opportunities across your business processes. Reduce manual work, minimize errors, and free up your team for higher-value activities.",
       description: "Identify and implement automation opportunities across your business processes. Reduce manual work, minimize errors, and free up your team for higher-value activities.",
+      features: [
+        "Process analysis and mapping",
+        "Automation opportunity identification",
+        "Tool selection and implementation",
+        "Workflow optimization",
+        "Monitoring and continuous improvement"
+      ],
       outcome: "Reduced manual work and errors, higher-value team activities",
       priceLabel: "Starting at $3,000",
       price: 3000,
@@ -157,6 +199,13 @@ async function main() {
       shortDesc: "Comprehensive review and optimization of your business processes.",
       longDesc: "Comprehensive review and optimization of your business processes. We combine process improvement methodologies with automation technologies to drive efficiency.",
       description: "Comprehensive review and optimization of your business processes. We combine process improvement methodologies with automation technologies to drive efficiency.",
+      features: [
+        "Current state assessment",
+        "Process redesign and optimization",
+        "Automation implementation",
+        "Change management support",
+        "Metrics and performance tracking"
+      ],
       outcome: "Optimized processes that drive efficiency and growth",
       priceLabel: "Starting at $5,000",
       price: 5000,
@@ -174,6 +223,7 @@ async function main() {
       shortDesc: "Two AI teammates set up and saving you hours every week",
       longDesc: "Two AI teammates set up and saving you hours every week. We pick the right platform (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), launch 2 teammates from a starter menu, and set approval rules so nothing sends, spends, or deletes without your OK.",
       description: "We pick the right platform (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), launch 2 teammates from a starter menu, and set approval rules so nothing sends, spends, or deletes without your OK. You own the tool accounts and pay vendors directly. If your first teammate isn't saving at least 3 hours a week, we keep fixing it free (60-day window from the launch session).",
+      features: [],
       outcome: "Two AI teammates working in 14 days",
       priceLabel: "$799 founding price · Regular $1,199",
       price: 799,
@@ -193,6 +243,7 @@ async function main() {
       shortDesc: "Pay $99 for a 30–45 min call with Roger. Get 3–5 opportunities and a written summary within 24–48 hours.",
       longDesc: "Pay $99 for a 30–45 min call with Roger. Get 3–5 opportunities and a written summary within 24–48 hours. Prepaid standalone — not credited toward discovery or other work. Exception: credited toward AI Teammate Launch if purchased within 30 days.",
       description: "Pay $99 for a 30–45 min call with Roger. Get 3–5 opportunities and a written summary within 24–48 hours. Prepaid standalone — not credited toward discovery or other work. Exception: credited toward AI Teammate Launch if purchased within 30 days.",
+      features: [],
       outcome: "Clear next step with 3–5 opportunities",
       priceLabel: "$99",
       price: 99,
@@ -207,13 +258,34 @@ async function main() {
   ];
 
   for (const service of services) {
-    // Idempotent: match on slug, only insert if not exists
+    // Idempotent: match on slug OR title to handle both new and existing rows
     const existing = await prisma.service.findFirst({
-      where: { slug: service.slug },
+      where: {
+        OR: [
+          { slug: service.slug },
+          { title: service.title },
+        ],
+      },
     });
 
     if (existing) {
-      console.log(`  Service already exists: ${service.title} (slug: ${service.slug})`);
+      // Update existing row with new fields, preserving ID
+      await prisma.service.update({
+        where: { id: existing.id },
+        data: {
+          slug: service.slug,
+          features: service.features,
+          outcome: service.outcome,
+          description: service.description,
+          price: service.price,
+          priceNote: service.priceNote,
+          badgeText: service.badgeText,
+          featured: service.featured,
+          seoTitle: service.seoTitle,
+          seoDescription: service.seoDescription,
+        },
+      });
+      console.log(`✓ Updated service: ${service.title} (ID: ${existing.id}, slug: ${service.slug})`);
     } else {
       await prisma.service.create({
         data: service,

@@ -20,6 +20,7 @@ model Service {
   slug           String?   @unique
   outcome        String?   @db.Text
   description    String?   @db.Text
+  features       String[]  @default([])
   price          Float?
   priceNote      String?   @db.Text
   badgeText      String?

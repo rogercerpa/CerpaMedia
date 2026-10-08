@@ -102,12 +102,17 @@ export default async function ServicesPage() {
                   <p className="text-[15px] text-text-muted mb-6 leading-relaxed">
                     {service.description}
                   </p>
-                  {service.outcome && (
-                    <div className="border-t border-border pt-6">
-                      <h3 className="font-medium text-text mb-3 text-sm uppercase tracking-wider">Outcome</h3>
-                      <p className="text-text-muted text-[15px] leading-relaxed">{service.outcome}</p>
-                    </div>
-                  )}
+                  <div className="border-t border-border pt-6">
+                    <h3 className="font-medium text-text mb-3 text-sm uppercase tracking-wider">What we offer</h3>
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {service.features.map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-start gap-3">
+                          <span className="text-text-muted text-[15px]">•</span>
+                          <span className="text-text-muted text-[15px] leading-relaxed">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               ))}
             </div>
