@@ -446,6 +446,56 @@ export default function ServiceForm({ initialData, mode }: ServiceFormProps) {
         </div>
       </div>
 
+      {/* Preview Section */}
+      <div className="border-t pt-6 mt-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Preview</h3>
+        <div className="bg-gray-50 p-6 rounded-lg">
+          <div className="max-w-md">
+            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
+              {formData.badgeText && (
+                <div className="inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded mb-3">
+                  {formData.badgeText}
+                </div>
+              )}
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {formData.title || "Service Title"}
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {formData.shortDesc || "Short description will appear here"}
+              </p>
+              {formData.outcome && (
+                <p className="text-sm text-gray-700 mb-4">
+                  <strong>Outcome:</strong> {formData.outcome}
+                </p>
+              )}
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                <div className="text-lg font-semibold text-gray-900">
+                  {formData.priceLabel || "Price"}
+                </div>
+                <button
+                  type="button"
+                  className="bg-gray-900 text-white px-4 py-2 text-sm font-medium hover:bg-gray-800 transition-colors"
+                >
+                  {formData.ctaLabel || "Get a Quote"}
+                </button>
+              </div>
+            </div>
+          </div>
+          {formData.published && formData.slug && (
+            <div className="mt-4">
+              <a
+                href={`/services/${formData.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                → View on site (in new tab)
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="flex items-center justify-between pt-4 border-t border-gray-200">
         <Link
           href="/admin/services"
