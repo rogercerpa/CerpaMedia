@@ -85,7 +85,8 @@ export function CalendarBookingFlow() {
       
       const grouped: SlotsByDay = {};
       data.slots.forEach((slot: TimeSlot) => {
-        const date = new Date(slot.start).toLocaleDateString("en-US", {
+        // Extract YYYY-MM-DD in ET timezone
+        const date = new Date(slot.start).toLocaleDateString("en-CA", {
           timeZone: "America/New_York",
         });
         if (!grouped[date]) {
@@ -266,7 +267,8 @@ export function CalendarBookingFlow() {
     const current = new Date(startDate);
     
     for (let i = 0; i < 42; i++) {
-      const dateStr = current.toLocaleDateString("en-US", {
+      // Use en-CA locale to get YYYY-MM-DD format, matching how we group slots
+      const dateStr = current.toLocaleDateString("en-CA", {
         timeZone: "America/New_York",
       });
       
