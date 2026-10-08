@@ -1,158 +1,126 @@
-# Services CMS
+# Services CMS Documentation
 
-Complete content management system for the services shown on the public site.
+## Overview
 
-## What's Editable
+The Services CMS allows managing service offerings through an admin interface with full CRUD operations, soft delete, reordering, and live preview.
 
-From `/admin/services`, Roger can:
+## Schema Changes
 
-- **Add new services** with full metadata
-- **Edit existing services** (title, description, pricing, CTAs, SEO)
-- **Reorder services** (up/down buttons or drag)
-- **Publish/unpublish** services (toggle visibility)
-- **Feature services** (show in special featured section)
-- **Soft delete** services (hide from public and admin list, but preserve data)
-- **Duplicate services** (create a copy as starting point)
+### Production Deployment Path
 
-### Service Fields
+Production (Neon) does NOT use Prisma Migrate. Past schema changes (like DateAvailability) were deployed via `prisma db push`.
 
-- **Title** and **Slug** (URL path)
-- **Short Description** (one-line summary for cards)
-- **Description** (full text shown on cards)
-- **Outcome** (optional one-line benefit statement)
-- **Price Label** (display text, e.g., "Starting at $5,000")
-- **Price** (numeric value for sorting/filtering)
-- **Price Note** (optional, e.g., "First 5 clients only")
-- **Badge Text** (optional label shown on featured cards)
-- **Featured** (show in featured section)
-- **CTA Label** and **CTA URL**
-- **Sort Order** (lower numbers appear first)
-- **Published** (visible on public site)
-- **SEO Title** and **SEO Description**
+**To deploy this schema change to production:**
 
-## Public Site Integration
+1. The migration SQL file at `prisma/migrations/20261008173400_add_service_cms_fields/migration.sql` contains additive-only changes with `IF NOT EXISTS` guards
+2. Apply it manually via the Neon SQL editor or psql:
+   ```sql
+   -- All ALTER TABLE statements use IF NOT EXISTS
+   -- All CREATE INDEX statements use IF NOT EXISTS
+   ```
+3. After applying, run the seed to backfill existing services with new fields
 
-The following pages read from the database with automatic fallback to hardcoded content if the DB is unavailable:
+**Rollback:**
 
-- **`/services`** — lists published, non-deleted services in sort order
-- **`/` (home page)** — displays the AI Teammate Launch featured service teaser
-- **`/services/ai-teammate-launch`** — page body is still hardcoded (only the card/teaser is editable)
+Since all new columns are nullable or have defaults, rolling back code is safe. The old columns remain and new code simply ignores the new columns.
 
-### Fallback Behavior
+### Schema Change Details
 
-If `DATABASE_URL` is not set or the DB is unreachable, the site renders the current hardcoded content so **the site never breaks**. This allows Vercel previews (which have no DATABASE_URL) to still render properly.
+**New fields added to Service model:**
+- `slug` (TEXT, unique, nullable) - URL-friendly identifier
+- `outcome` (TEXT, nullable) - Expected outcome description
+- `description` (TEXT, nullable) - Full description (vs shortDesc)
+- `features` (TEXT[], default []) - List of feature bullets
+- `price` (FLOAT, nullable) - Numeric price for sorting/filtering
+- `priceNote` (TEXT, nullable) - Additional pricing context
+- `badgeText` (TEXT, nullable) - Badge label for featured services
+- `featured` (BOOLEAN, default false) - Featured flag
+- `seoTitle` (TEXT, nullable) - SEO-optimized title
+- `seoDescription` (TEXT, nullable) - SEO meta description
+- `deletedAt` (TIMESTAMP, nullable) - Soft delete timestamp
 
-## Running the Migration and Seed in Production
+**Indexes added:**
+- Unique index on `slug`
+- Index on `featured`
+- Index on `deletedAt`
 
-**⚠️ DO NOT run these commands until Roger approves.**
+## Seed Idempotency
 
-The migration is **additive only** — it only adds new columns and does not drop or rename anything. Existing rows remain valid.
+The seed script (`prisma/seed.ts`) is idempotent and safe to run multiple times:
 
-### Step 1: Create the Migration
+1. Matches existing services by `slug` OR `title`
+2. Updates existing rows with new field values
+3. Preserves original IDs
+4. Only creates new services if they don't exist
 
-If the migration file doesn't already exist:
-
-```bash
-npx prisma migrate dev --name add_service_cms_fields
-```
-
-### Step 2: Run the Migration in Production
+**Running the seed:**
 
 ```bash
-npx prisma migrate deploy
+DATABASE_URL=<connection-string> npx tsx prisma/seed.ts
 ```
 
-This applies the schema changes to the production database.
+**Expected behavior:**
+- First run: Updates 8 existing services with new fields, creates 1 new (AI Teammate Launch)
+- Second run: No duplicates, all updates idempotent
 
-### Step 3: Run the Seed Script
+## Public vs Admin Rendering
 
-```bash
-npm run db:seed
-```
+### Public Pages (main parity)
 
-The seed script is **idempotent**:
-- It matches services by `slug`
-- Only inserts services that don't already exist
-- Safe to run multiple times without duplicating data
+The public /services page and home teaser render exactly as on main:
+- **Services grid**: Shows title, description, and features list
+- **NO prices displayed** per card
+- **NO CTAs displayed** per card
+- Features array matches main's hardcoded lists exactly
 
-After seeding, the 7 current public services plus the AI Teammate Launch featured card and Technology Strategy Call will be in the database with the exact current copy.
+### Admin Pages
 
-## Rollback
+Admin can edit all fields including:
+- Prices (stored but not shown publicly)
+- Outcome (stored but not shown publicly)
+- SEO fields
+- Featured flag
+- Publish/unpublish
+- Soft delete
 
-If something goes wrong:
+## Feature Lists
 
-1. **Public site automatically falls back** to hardcoded content if the DB is unavailable
-2. **To undo the migration** (nuclear option, loses all CMS data):
+Each service has a features array for the "What we offer" section. These match main's hardcoded features:
 
-```bash
-npx prisma migrate resolve --rolled-back <migration-name>
-```
+**Web Development:**
+- Custom website design and development
+- Responsive design for mobile and desktop
+- Content management systems
+- E-commerce solutions
+- Performance optimization
 
-Replace `<migration-name>` with the migration folder name (e.g., `20261008_add_service_cms_fields`).
+**Web Applications:**
+- Custom business applications
+- Database design and integration
+- API development and integration
+- User authentication and security
+- Cloud hosting and deployment
 
-Then revert the `prisma/schema.prisma` changes and re-generate:
+(etc. - see `src/lib/services.ts` fallbackServices for complete list)
 
-```bash
-git checkout main -- prisma/schema.prisma
-npx prisma generate
-```
+## Questions for Roger
 
-## Testing Locally
-
-To test with a throwaway local Postgres:
-
-1. **Start a local Postgres** (Docker or native):
-
-```bash
-docker run --name test-postgres -e POSTGRES_PASSWORD=password -p 5432:5432 -d postgres:16
-```
-
-2. **Set the local DATABASE_URL** in `.env.local`:
-
-```
-DATABASE_URL="postgresql://postgres:password@localhost:5432/cerpamedia_test?schema=public"
-```
-
-3. **Run the migration**:
-
-```bash
-npx prisma migrate dev
-```
-
-4. **Run the seed script twice** to verify idempotency:
-
-```bash
-npm run db:seed
-npm run db:seed
-```
-
-The second run should report "Service already exists" for all services.
-
-5. **Start the dev server**:
-
-```bash
-npm run dev
-```
-
-6. **Visit `/admin/services`** (log in first at `/admin/login`) to test the CMS.
+1. **Public pricing display:** The CMS stores prices but doesn't show them publicly (matching main). Should this change?
+2. **Technology Strategy Call in grid:** Should this appear in the public grid or only in the featured callout?
+3. **Home page featured services:** Should the home teaser pull from `featured=true` services or stay hardcoded?
 
 ## Phase 2 Options
 
-Other content that could become editable (estimated hours at $125/hr, for reference only):
+Rough estimates at $125/hr:
 
-- **Home hero and CTAs** (2 hours) — Make the home page hero section and primary CTAs editable
-- **FAQ** (3 hours) — Add a FAQ CMS with ordering and categories
-- **Testimonials or proof** (4 hours) — Add a testimonials CMS with images and quotes
-- **AI Teammate Launch full page body** (2 hours) — Make the entire AI Teammate Launch page editable (currently only the card is editable)
-- **Insights editing improvements** (4 hours) — Add a rich text editor and image upload to the Insights CMS
-- **Booking management actions** (6 hours) — Add cancel and reschedule actions from `/admin/bookings`
-- **Site-wide settings** (3 hours) — Add a settings panel for contact email, phone, and footer content
+- **Home hero/CTAs optimization** (~4 hrs): Update hero CTAs to dynamically pull from services
+- **FAQ section** (~6 hrs): Add FAQ model and admin CRUD
+- **Testimonials** (~8 hrs): Add testimonial model, admin CRUD, and public display
+- **AI Teammate Launch full page** (~10 hrs): Expand the landing page with more detail sections
+- **Insights editor improvements** (~6 hrs): Add image upload, better markdown preview
+- **Booking cancel/reschedule** (~12 hrs): Allow customers to cancel or reschedule bookings
+- **Site settings** (~8 hrs): Global settings for contact info, business hours, etc.
 
-**Core Services CMS estimate**: 12 hours actual (includes testing, documentation, and screenshots)
+## Hours for This Build
 
-## Notes
-
-- Customer-facing copy has not changed — all current public content is preserved exactly
-- No SMS/text options added
-- No street address added (only "CerpaMedia LLC, Woodstock, GA" shown publicly)
-- The "coming in M2–M4" badge has been removed from `/admin/services`
+This build (Services CMS with public parity) took approximately **X hours** at $125/hr.
