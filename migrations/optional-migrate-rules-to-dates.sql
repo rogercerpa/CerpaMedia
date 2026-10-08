@@ -1,0 +1,38 @@
+-- Migration: Convert AvailabilityRule to DateAvailability (optional)
+--
+-- ⚠️ IMPORTANT: Do NOT run this against production without approval from Roger.
+--
+-- This script converts weekly recurring rules (AvailabilityRule) into explicit
+-- date-specific availability (DateAvailability) for the next 90 days.
+--
+-- Example: If you have a rule for "Monday 10:00-16:00", this creates individual
+-- DateAvailability records for every Monday in the next 90 days with those hours.
+--
+-- BEFORE RUNNING:
+-- 1. Get Roger's approval
+-- 2. Back up the database
+-- 3. Test on a non-production database first
+--
+-- This script should be run via a TypeScript migration script, not directly,
+-- because it requires date arithmetic that varies by timezone.
+--
+-- See: migrations/migrate-rules-to-dates.ts (to be created)
+
+-- Pseudocode for the migration:
+--
+-- FOR EACH AvailabilityRule r:
+--   startDate = TODAY
+--   endDate = TODAY + 90 days
+--   
+--   FOR EACH date d IN [startDate, endDate]:
+--     IF d.weekday == r.weekday AND d is not blocked:
+--       INSERT INTO DateAvailability (date, startTime, endTime, timezone)
+--       VALUES (d, r.startTime, r.endTime, r.timezone)
+--
+-- THEN:
+--   DELETE FROM AvailabilityRule (optional, or keep as historical data)
+
+-- To verify after migration:
+-- SELECT COUNT(*) FROM DateAvailability;
+-- Expected: ~13 records per weekday rule (90 days / 7 days ≈ 13 weeks)
+-- If you have 5 rules (Mon-Fri), expect ~65 new DateAvailability records.
