@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getAdminSession } from "@/lib/auth";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import Link from "next/link";
-import DateAvailabilityManager from "@/components/DateAvailabilityManager";
+import UnifiedAvailabilityManager from "@/components/UnifiedAvailabilityManager";
 
 export default async function AdminAvailabilityPage() {
   const email = await getAdminSession();
@@ -40,14 +40,11 @@ export default async function AdminAvailabilityPage() {
             Availability Management
           </h2>
           <p className="text-gray-600">
-            Set specific dates and hours when you're available for consultations (America/New_York timezone).
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            <strong>Important:</strong> Only dates you add here will show slots to customers. No default availability.
+            Click dates on the calendar to open them for booking or block them. Only dates you explicitly open will show slots to customers.
           </p>
         </div>
 
-        <DateAvailabilityManager />
+        <UnifiedAvailabilityManager />
       </div>
     </div>
   );
