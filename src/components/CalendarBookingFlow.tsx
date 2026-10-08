@@ -3,6 +3,14 @@
 import { useState, useEffect } from "react";
 import { Reveal } from "./Reveal";
 
+// Convert a Date to YYYY-MM-DD using its local date components (no timezone conversion)
+export function toLocalDateKey(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
 interface TimeSlot {
   start: string;
   end: string;
@@ -85,7 +93,8 @@ export function CalendarBookingFlow() {
       
       const grouped: SlotsByDay = {};
       data.slots.forEach((slot: TimeSlot) => {
-        const date = new Date(slot.start).toLocaleDateString("en-US", {
+        // Extract YYYY-MM-DD in ET timezone
+        const date = new Date(slot.start).toLocaleDateString("en-CA", {
           timeZone: "America/New_York",
         });
         if (!grouped[date]) {
@@ -266,9 +275,9 @@ export function CalendarBookingFlow() {
     const current = new Date(startDate);
     
     for (let i = 0; i < 42; i++) {
-      const dateStr = current.toLocaleDateString("en-US", {
-        timeZone: "America/New_York",
-      });
+      // Build key from local date components (no timezone conversion)
+      // This ensures day 25 always keys as "2026-10-25" regardless of browser timezone
+      const dateStr = toLocalDateKey(current);
       
       days.push({
         date: new Date(current),
@@ -346,34 +355,43 @@ export function CalendarBookingFlow() {
         </Reveal>
         
         <Reveal delay={100}>
-          <div className="max-w-3xl mx-auto border border-border bg-white p-6">
-            <div className="flex items-center justify-between mb-6">
+          <div className="max-w-3xl mx-auto border border-border bg-white p-4 sm:p-6">
+            {/* Mobile-optimized calendar header */}
+            <div className="flex items-center justify-between gap-2 sm:gap-4 mb-6">
               <button
                 onClick={prevMonth}
-                className="px-4 py-2 border border-border text-text hover:bg-bg-subtle transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center border border-border text-text hover:bg-bg-subtle transition-colors disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
                 disabled={currentMonth.getMonth() === new Date().getMonth() && 
                          currentMonth.getFullYear() === new Date().getFullYear()}
+                aria-label="Previous month"
               >
-                ← Previous
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
               </button>
-              <h3 className="text-xl font-medium text-text">{monthName}</h3>
+              
+              <h3 className="text-base sm:text-xl font-medium text-text whitespace-nowrap flex-1 text-center">{monthName}</h3>
+              
               <button
                 onClick={nextMonth}
-                className="px-4 py-2 border border-border text-text hover:bg-bg-subtle transition-colors"
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center border border-border text-text hover:bg-bg-subtle transition-colors shrink-0"
+                aria-label="Next month"
               >
-                Next →
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </div>
             
-            <div className="grid grid-cols-7 gap-2 mb-2">
+            <div className="grid grid-cols-7 gap-1 mb-1">
               {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                <div key={day} className="text-center text-sm font-medium text-text-muted py-2">
+                <div key={day} className="text-center text-xs sm:text-sm font-medium text-text-muted py-2">
                   {day}
                 </div>
               ))}
             </div>
             
-            <div className="grid grid-cols-7 gap-2">
+            <div className="grid grid-cols-7 gap-1">
               {calendarDays.map((day, idx) => (
                 <button
                   key={idx}
@@ -385,7 +403,7 @@ export function CalendarBookingFlow() {
                   }}
                   disabled={!day.hasSlots || !day.isCurrentMonth}
                   className={`
-                    aspect-square flex items-center justify-center text-sm border transition-all
+                    aspect-square min-h-[44px] flex items-center justify-center text-sm border transition-all
                     ${!day.isCurrentMonth ? "text-gray-300 cursor-not-allowed border-transparent" : ""}
                     ${day.isCurrentMonth && !day.hasSlots ? "text-gray-400 cursor-not-allowed border-gray-200" : ""}
                     ${day.hasSlots && day.isCurrentMonth ? "text-text border-border hover:border-text-muted hover:bg-bg-subtle cursor-pointer font-medium" : ""}
@@ -396,14 +414,14 @@ export function CalendarBookingFlow() {
               ))}
             </div>
             
-            <div className="mt-6 pt-6 border-t border-border">
-              <div className="flex items-center gap-4 text-sm text-text-muted">
+            <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-border">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-text-muted">
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border border-border bg-white"></div>
+                  <div className="w-4 h-4 border border-border bg-white shrink-0"></div>
                   <span>Available</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border border-gray-200 text-gray-400"></div>
+                  <div className="w-4 h-4 border border-gray-200 text-gray-400 shrink-0"></div>
                   <span>No availability</span>
                 </div>
               </div>
