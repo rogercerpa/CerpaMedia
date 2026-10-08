@@ -9,40 +9,40 @@ export interface SeoMetaData {
 
 export const defaultSeoMeta: Record<string, SeoMetaData> = {
   "/": {
-    title: "CerpaMedia - Web Apps, AI & Automation for Small Businesses",
-    description: "Stop losing hours to tools that don't talk to each other. CerpaMedia helps small businesses get practical web apps, AI, and automation with a clear plan first.",
+    title: "CerpaMedia - Technology Services for Small Business",
+    description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
   },
   "/services": {
-    title: "Services - CerpaMedia",
-    description: "Web development, AI integration, automation consulting, and more. Practical technology solutions for small businesses.",
+    title: "CerpaMedia - Technology Services for Small Business",
+    description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
   },
   "/consult": {
-    title: "Book $99 Technology Strategy Call - CerpaMedia",
-    description: "30-45 minute call with Roger. Get 3-5 opportunities and a written summary within 24-48 hours.",
+    title: "CerpaMedia - Technology Services for Small Business",
+    description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
   },
-  "/ai-teammate-launch": {
+  "/services/ai-teammate-launch": {
     title: "AI Teammate Launch - CerpaMedia",
-    description: "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up the teammates, you own the accounts.",
+    description: "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork — you own the accounts.",
   },
   "/insights": {
-    title: "Insights - AI & Tech for Small Businesses - CerpaMedia",
-    description: "Practical insights on AI, automation, and technology for small businesses. Real-world guidance without the hype.",
+    title: "CerpaMedia - Technology Services for Small Business",
+    description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
   },
   "/contact": {
-    title: "Contact - CerpaMedia",
-    description: "Get in touch with CerpaMedia. Email cerpamedia@gmail.com or call (943) 248-7410.",
+    title: "CerpaMedia - Technology Services for Small Business",
+    description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
   },
   "/privacy": {
     title: "Privacy Policy - CerpaMedia",
-    description: "Privacy policy for CerpaMedia services.",
+    description: "CerpaMedia Privacy Policy - How we collect, use, and protect your personal information.",
   },
   "/terms": {
     title: "Terms of Service - CerpaMedia",
-    description: "Terms of service for CerpaMedia services.",
+    description: "CerpaMedia Terms of Service - Your agreement for using our Site and booking the Technology Strategy Call.",
   },
   "/strategy-call-policy": {
     title: "Strategy Call Policy - CerpaMedia",
-    description: "Policy and terms for the $99 Technology Strategy Call.",
+    description: "Technology Strategy Call refund, cancellation, reschedule and no-show policy.",
   },
 };
 
@@ -57,18 +57,19 @@ export async function getSeoMeta(path: string): Promise<SeoMetaData> {
       },
     });
 
+    // Only return metadata if there's a DB entry with actual values
     if (!meta || (!meta.title && !meta.description && !meta.ogImageUrl)) {
-      return defaultSeoMeta[path] || {};
+      return {};
     }
 
     return {
-      title: meta.title || defaultSeoMeta[path]?.title,
-      description: meta.description || defaultSeoMeta[path]?.description,
+      title: meta.title || undefined,
+      description: meta.description || undefined,
       ogImageUrl: meta.ogImageUrl || undefined,
     };
   } catch (error) {
     console.error(`Failed to fetch SEO meta for ${path}:`, error);
-    return defaultSeoMeta[path] || {};
+    return {};
   }
 }
 

@@ -2,10 +2,25 @@ import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { getServiceBySlug, fallbackFeaturedService } from "@/lib/services";
 import { getHeroContent, getHowItWorksContent, getPublishedFaqs, getPublishedTestimonials } from "@/lib/content";
-import { buildMetadata } from "@/lib/seo";
+import { getSeoMeta } from "@/lib/seo";
+import type { Metadata } from "next";
 
-export async function generateMetadata() {
-  return buildMetadata("/");
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeoMeta("/");
+  
+  // Only override if there's a DB value, otherwise use layout default
+  if (!seo.title && !seo.description) {
+    return {};
+  }
+  
+  const metadata: Metadata = {};
+  if (seo.title) metadata.title = seo.title;
+  if (seo.description) metadata.description = seo.description;
+  if (seo.ogImageUrl) {
+    metadata.openGraph = { images: [seo.ogImageUrl] };
+  }
+  
+  return metadata;
 }
 
 export default async function Home() {

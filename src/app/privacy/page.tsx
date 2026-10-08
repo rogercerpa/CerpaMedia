@@ -1,10 +1,16 @@
 import { Metadata } from "next";
 import { Reveal } from "@/components/Reveal";
+import { getSeoMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy - CerpaMedia",
-  description: "CerpaMedia Privacy Policy - How we collect, use, and protect your personal information.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeoMeta("/privacy");
+  
+  return {
+    title: seo.title || "Privacy Policy - CerpaMedia",
+    description: seo.description || "CerpaMedia Privacy Policy - How we collect, use, and protect your personal information.",
+    ...(seo.ogImageUrl && { openGraph: { images: [seo.ogImageUrl] } }),
+  };
+}
 
 export default function PrivacyPage() {
   return (

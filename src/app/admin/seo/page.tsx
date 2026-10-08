@@ -8,7 +8,7 @@ const PUBLIC_PAGES = [
   { path: "/", label: "Home" },
   { path: "/services", label: "Services" },
   { path: "/consult", label: "Consult / Strategy Call" },
-  { path: "/ai-teammate-launch", label: "AI Teammate Launch" },
+  { path: "/services/ai-teammate-launch", label: "AI Teammate Launch" },
   { path: "/insights", label: "Insights (index)" },
   { path: "/contact", label: "Contact" },
   { path: "/privacy", label: "Privacy Policy" },
