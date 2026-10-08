@@ -7,19 +7,33 @@ datasource db {
 }
 
 model Service {
-  id           String   @id @default(cuid())
-  title        String   @unique
-  shortDesc    String   @db.Text
-  longDesc     String   @db.Text
-  priceLabel   String
-  ctaLabel     String
-  ctaUrl       String
-  sortOrder    Int      @default(0)
-  published    Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             String    @id @default(cuid())
+  title          String    @unique
+  shortDesc      String    @db.Text
+  longDesc       String    @db.Text
+  priceLabel     String
+  ctaLabel       String
+  ctaUrl         String
+  sortOrder      Int       @default(0)
+  published      Boolean   @default(false)
+  // New CMS fields (additive only, with defaults/optional to preserve existing data)
+  slug           String?   @unique
+  outcome        String?   @db.Text
+  description    String?   @db.Text
+  price          Float?
+  priceNote      String?   @db.Text
+  badgeText      String?
+  featured       Boolean   @default(false)
+  seoTitle       String?
+  seoDescription String?   @db.Text
+  deletedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@index([published, sortOrder])
+  @@index([slug])
+  @@index([featured])
+  @@index([deletedAt])
 }
 
 model AvailabilityRule {

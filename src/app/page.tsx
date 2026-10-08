@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
+import { getServiceBySlug, fallbackFeaturedService } from "@/lib/services";
 
-export default function Home() {
+export default async function Home() {
+  // Fetch AI Teammate Launch service from DB with fallback
+  const featured = await getServiceBySlug("ai-teammate-launch") || fallbackFeaturedService;
+  
   return (
     <div>
       <section className="bg-bg py-24 md:py-32 lg:py-40">
@@ -30,7 +34,7 @@ export default function Home() {
               </div>
               <div className="mt-8 pt-6 border-t border-border max-w-2xl mx-auto">
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href="/services/ai-teammate-launch" className="text-text hover:underline font-medium">AI Teammate Launch</Link> — $799 founding rate for the first 5 clients.
+                  <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href={featured.ctaUrl} className="text-text hover:underline font-medium">{featured.title.replace(/Two AI teammates set up and saving you hours every week/i, 'AI Teammate Launch')}</Link> — {featured.priceLabel.split('·')[0].trim()} for the first 5 clients.
                 </p>
               </div>
             </div>
