@@ -114,10 +114,10 @@ export default function ServicesPage() {
                   $799 founding price for the first 5 clients · Regular $1,199
                 </p>
                 <p className="text-[15px] text-text-muted leading-relaxed mb-4">
-                  We pick the right platform (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), launch 2 teammates from a starter menu, set approval rules, and guarantee free fixes for 60 days from the launch session until it saves at least 3 hours a week.
+                  We pick the right platform (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), launch 2 teammates from a starter menu, and set approval rules so nothing sends, spends, or deletes without your OK.
                 </p>
                 <p className="text-[13px] text-text-muted leading-relaxed mb-6">
-                  You own the tool accounts and pay vendors directly. We set up the teammates, and if your first teammate isn't saving at least 3 hours a week by day 14, we keep fixing it free (60-day window). No refunds.
+                  You own the tool accounts and pay vendors directly. If your first teammate isn't saving at least 3 hours a week, we keep fixing it free (60-day window from the launch session). No refunds.
                 </p>
                 <Link
                   href="/services/ai-teammate-launch"
