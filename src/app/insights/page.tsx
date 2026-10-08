@@ -2,8 +2,13 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { format } from "date-fns";
+import { buildMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata() {
+  return buildMetadata("/insights");
+}
 
 export default async function InsightsPage() {
   const posts = await prisma.insightPost.findMany({

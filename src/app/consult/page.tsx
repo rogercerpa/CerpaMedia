@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { CalendarBookingFlow } from "@/components/CalendarBookingFlow";
+import { buildMetadata } from "@/lib/seo";
+
+export async function generateMetadata() {
+  return buildMetadata("/consult");
+}
 
 export default function ConsultPage() {
   return (

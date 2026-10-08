@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { getPublishedServices, getServiceBySlug, fallbackServices, fallbackFeaturedService } from "@/lib/services";
+import { buildMetadata } from "@/lib/seo";
+
+export async function generateMetadata() {
+  return buildMetadata("/services");
+}
 
 export default async function ServicesPage() {
   // Fetch services from DB with fallback
