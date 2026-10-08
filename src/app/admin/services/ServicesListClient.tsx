@@ -14,13 +14,19 @@ export default function ServicesListClient({ services }: ServicesListClientProps
   const [deleting, setDeleting] = useState<string | null>(null);
   const [publishing, setPublishing] = useState<string | null>(null);
   const [reordering, setReordering] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; title: string } | null>(null);
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Are you sure you want to delete "${title}"? This can be undone by restoring it.`)) {
-      return;
-    }
+  const handleDeleteClick = (id: string, title: string) => {
+    setDeleteConfirm({ id, title });
+  };
 
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm) return;
+    
+    const { id } = deleteConfirm;
+    setDeleteConfirm(null);
     setDeleting(id);
+    
     try {
       const response = await fetch(`/api/admin/services/${id}`, {
         method: "DELETE",
@@ -37,6 +43,10 @@ export default function ServicesListClient({ services }: ServicesListClientProps
     } finally {
       setDeleting(null);
     }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteConfirm(null);
   };
 
   const handleTogglePublish = async (id: string, currentlyPublished: boolean) => {
@@ -139,7 +149,9 @@ export default function ServicesListClient({ services }: ServicesListClientProps
               </div>
               <p className="text-gray-600 mb-2">{service.shortDesc}</p>
               {service.slug && (
-                <p className="text-sm text-gray-500 font-mono">/services/{service.slug}</p>
+                <p className="text-sm text-gray-500">
+                  <span className="font-semibold">Slug:</span> {service.slug}
+                </p>
               )}
             </div>
             <div className="text-right ml-4">
@@ -189,7 +201,7 @@ export default function ServicesListClient({ services }: ServicesListClientProps
                   ↓
                 </button>
                 <button
-                  onClick={() => handleDelete(service.id, service.title)}
+                  onClick={() => handleDeleteClick(service.id, service.title)}
                   disabled={deleting === service.id}
                   className="text-red-600 hover:text-red-800 disabled:opacity-50"
                 >
@@ -203,6 +215,38 @@ export default function ServicesListClient({ services }: ServicesListClientProps
           </div>
         </div>
       ))}
+
+      {/* Delete Confirmation Modal */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+              Confirm Deletion
+            </h3>
+            <p className="text-gray-700 mb-6">
+              Are you sure you want to delete "<strong>{deleteConfirm.title}</strong>"?
+              <br />
+              <span className="text-sm text-gray-600 mt-2 block">
+                This will soft-delete the service. You can restore it later from the list.
+              </span>
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={handleDeleteCancel}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
