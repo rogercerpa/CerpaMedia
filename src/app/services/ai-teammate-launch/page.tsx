@@ -5,6 +5,15 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "AI Teammate Launch - CerpaMedia",
   description: "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork — you own the accounts.",
+  alternates: {
+    canonical: "https://cerpamedia.com/services/ai-teammate-launch",
+  },
+  openGraph: {
+    title: "AI Teammate Launch - CerpaMedia",
+    description: "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork — you own the accounts.",
+    url: "https://cerpamedia.com/services/ai-teammate-launch",
+    type: "website",
+  },
 };
 
 export default function AITeammateLaunchPage() {
@@ -34,21 +43,21 @@ export default function AITeammateLaunchPage() {
                 You own the tool accounts and pay vendors directly. We pick the right platform, launch 2 teammates from a starter menu, set approval rules, and guarantee free fixes if your first teammate isn't saving at least 3 hours a week (60-day window).
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href={`mailto:${checkoutEmail}?subject=${encodeURIComponent(checkoutSubject)}`}
-                  className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
-                >
-                  Claim your $799 founding rate
-                </a>
                 <Link
                   href="/consult"
+                  className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                >
+                  Book the $99 Strategy Call
+                </Link>
+                <a
+                  href={`mailto:${checkoutEmail}?subject=${encodeURIComponent(checkoutSubject)}`}
                   className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
                 >
-                  Not sure yet? Book a $99 Strategy Call — credited toward this if purchased within 30 days
-                </Link>
+                  Or reserve by email
+                </a>
               </div>
               <p className="text-[13px] text-text-muted mt-6">
-                After you reach out, Roger contacts you by email or call to schedule
+                The $99 is credited toward this if purchased within 30 days. After you reach out, Roger contacts you by email or call to schedule.
               </p>
             </div>
           </Reveal>
@@ -478,14 +487,14 @@ export default function AITeammateLaunchPage() {
               After you reach out, Roger contacts you by email or call to schedule the intake form and setup session. You own the accounts, we set up the teammates, and if your first teammate isn't saving at least 3 hours a week, we keep fixing it free (60-day window).
             </p>
             <div className="flex flex-col gap-4 items-center">
-              <a
-                href={`mailto:${checkoutEmail}?subject=${encodeURIComponent(checkoutSubject)}`}
+              <Link
+                href="/consult"
                 className="inline-block bg-white text-charcoal px-8 py-3.5 text-[15px] font-medium hover:bg-gray-100 transition-all duration-200 hover:-translate-y-0.5"
               >
-                Get started at $799
-              </a>
+                Book the $99 Strategy Call
+              </Link>
               <p className="text-sm text-white/70">
-                Questions first? <a href="mailto:cerpamedia@gmail.com" className="hover:text-white underline">cerpamedia@gmail.com</a>
+                The $99 is credited toward this if purchased within 30 days. Questions first? <a href="mailto:cerpamedia@gmail.com" className="hover:text-white underline">cerpamedia@gmail.com</a>
               </p>
             </div>
           </Reveal>

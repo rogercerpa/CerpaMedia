@@ -3,14 +3,14 @@ export default function Footer() {
     <footer className="bg-charcoal text-white border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          <div className="md:col-span-4">
+          <div className="md:col-span-3">
             <h3 className="text-[15px] font-medium mb-2 text-white">CerpaMedia</h3>
             <p className="text-[14px] text-gray-400 leading-relaxed">
               Technology services for small business operations
             </p>
           </div>
           
-          <div className="md:col-span-3">
+          <div className="md:col-span-2">
             <h4 className="text-[13px] font-medium mb-3 text-white uppercase tracking-wide">Contact</h4>
             <div className="space-y-2">
               <a 
@@ -29,21 +29,32 @@ export default function Footer() {
           </div>
           
           <div className="md:col-span-2">
-            <h4 className="text-[13px] font-medium mb-3 text-white uppercase tracking-wide">Links</h4>
+            <h4 className="text-[13px] font-medium mb-3 text-white uppercase tracking-wide">Services</h4>
             <ul className="space-y-2">
               <li>
                 <a href="/services" className="text-[14px] text-gray-400 hover:text-white transition-colors">
-                  Services
+                  All Services
                 </a>
               </li>
               <li>
-                <a href="/insights" className="text-[14px] text-gray-400 hover:text-white transition-colors">
-                  Insights
+                <a href="/services/ai-teammate-launch" className="text-[14px] text-gray-400 hover:text-white transition-colors">
+                  AI Teammate Launch
                 </a>
               </li>
               <li>
                 <a href="/consult" className="text-[14px] text-gray-400 hover:text-white transition-colors">
                   Strategy Call
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div className="md:col-span-2">
+            <h4 className="text-[13px] font-medium mb-3 text-white uppercase tracking-wide">Resources</h4>
+            <ul className="space-y-2">
+              <li>
+                <a href="/insights" className="text-[14px] text-gray-400 hover:text-white transition-colors">
+                  Insights
                 </a>
               </li>
               <li>
