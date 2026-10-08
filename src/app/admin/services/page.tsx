@@ -21,6 +21,13 @@ export default async function AdminServicesPage() {
     orderBy: [{ sortOrder: "asc" }, { title: "asc" }],
   });
 
+  const deletedServices = await prisma.service.findMany({
+    where: {
+      deletedAt: { not: null },
+    },
+    orderBy: [{ deletedAt: "desc" }],
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm border-b border-gray-200">
@@ -60,7 +67,7 @@ export default async function AdminServicesPage() {
           </Link>
         </div>
 
-        <ServicesListClient services={services} />
+        <ServicesListClient services={services} deletedServices={deletedServices} />
 
         {services.length === 0 && (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">

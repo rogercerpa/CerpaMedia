@@ -7,9 +7,10 @@ import { Service } from "@prisma/client";
 
 interface ServicesListClientProps {
   services: Service[];
+  deletedServices: Service[];
 }
 
-export default function ServicesListClient({ services }: ServicesListClientProps) {
+export default function ServicesListClient({ services, deletedServices }: ServicesListClientProps) {
   const router = useRouter();
   const [deleting, setDeleting] = useState<string | null>(null);
   const [publishing, setPublishing] = useState<string | null>(null);
@@ -47,6 +48,27 @@ export default function ServicesListClient({ services }: ServicesListClientProps
 
   const handleDeleteCancel = () => {
     setDeleteConfirm(null);
+  };
+
+  const handleRestore = async (id: string) => {
+    try {
+      const response = await fetch(`/api/admin/services/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ deletedAt: null }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to restore service");
+      }
+
+      router.refresh();
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to restore service");
+    }
   };
 
   const handleTogglePublish = async (id: string, currentlyPublished: boolean) => {
@@ -244,6 +266,39 @@ export default function ServicesListClient({ services }: ServicesListClientProps
                 Delete
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Deleted Services Section */}
+      {deletedServices.length > 0 && (
+        <div className="mt-12">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Deleted Services ({deletedServices.length})
+          </h3>
+          <div className="space-y-4">
+            {deletedServices.map((service) => (
+              <div
+                key={service.id}
+                className="bg-gray-50 rounded-lg p-4 border border-gray-200 opacity-75"
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h4 className="font-semibold text-gray-900">{service.title}</h4>
+                    <p className="text-sm text-gray-600">{service.shortDesc}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Deleted: {service.deletedAt ? new Date(service.deletedAt).toLocaleString() : ""}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => handleRestore(service.id)}
+                    className="px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                  >
+                    Restore
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
