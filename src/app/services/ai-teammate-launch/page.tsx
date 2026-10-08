@@ -213,7 +213,7 @@ export default function AITeammateLaunchPage() {
                     <strong className="text-text">Option B:</strong> Two 1-hour virtual sessions (Zoom or Microsoft Teams)
                   </p>
                   <p className="text-[15px] text-text-muted leading-relaxed mt-2">
-                    We pick the right tool (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), set up your 2 teammates, configure approval rules, and test live. Extra in-person visits after launch are billed at $125/hr including drive time.
+                    We pick the right tool (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), set up your 2 teammates, configure approval rules, and test live. Nothing runs on a schedule until after testing. Extra in-person visits after launch are billed at $125/hr including drive time.
                   </p>
                 </div>
               </div>
@@ -227,10 +227,17 @@ export default function AITeammateLaunchPage() {
                 <div>
                   <h3 className="text-lg font-medium mb-2 text-text">Day-14 check-in with scorecard</h3>
                   <p className="text-[15px] text-text-muted leading-relaxed">
-                    Two weeks after the launch session, we review the scorecard: hours saved (measured as tasks completed × minutes saved per task), tasks completed, friction points. If you're not saving at least 3 hours a week, we keep fixing for free. The 60-day guarantee window starts at the launch session. Each fix is completed within 5 business days.
+                    Your Day-14 scorecard shows hours saved (tasks × minutes saved), how often each teammate finished the job, how often a person had to step in, and what each approved result cost you in tool fees. If you're not saving at least 3 hours a week, we keep fixing for free. The 60-day guarantee window starts at the launch session. Each fix is completed within 5 business days.
                   </p>
                 </div>
               </div>
+            </div>
+
+            <div className="border border-border p-8 bg-bg mt-8">
+              <h3 className="text-lg font-medium mb-3 text-text">How launch day works</h3>
+              <p className="text-[15px] text-text-muted leading-relaxed">
+                We don't hand you a bot and hope. Each teammate does a 90-second practice run in writing, then one real task from your week while you watch. We save what worked as a skill and test it on a second example. Nothing runs on a schedule until it's had 3 clean runs — we set that up remotely by Day 7.
+              </p>
             </div>
           </Reveal>
         </div>
@@ -263,23 +270,23 @@ export default function AITeammateLaunchPage() {
               </div>
 
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
-                <h3 className="text-xl font-medium mb-2 text-text">Approval rules so nothing breaks</h3>
+                <h3 className="text-xl font-medium mb-2 text-text">You keep the keys</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Nothing sends, spends, or deletes without your OK. Teammates draft, flag, and queue — you review and approve.
+                  Green: reversible work like reading, sorting and drafting — it just does it. Yellow: updates inside the tools you approved. Red: sending, spending, publishing, deleting, changing access, or accepting terms — it always asks you first. Day one starts read-only. We never ask for your passwords, and we don't connect payments, password managers, or customer messaging tools on day one.
                 </p>
               </div>
 
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
-                <h3 className="text-xl font-medium mb-2 text-text">One-page owner's guide</h3>
+                <h3 className="text-xl font-medium mb-2 text-text">A written job description for each teammate</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  How to pause a teammate, change a job, or hand off access. Plain English, no jargon.
+                  What it owns, what it reads, what it may do alone, what it must ask you first, and what 'done' looks like. When it's unsure, the rule is simple: stop and ask.
                 </p>
               </div>
 
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
                 <h3 className="text-xl font-medium mb-2 text-text">Day-14 scorecard</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Hours saved, tasks completed, what's working, what needs tuning. You'll know if it's paying off.
+                  Your Day-14 scorecard shows hours saved (tasks × minutes saved), how often each teammate finished the job, how often a person had to step in, and what each approved result cost you in tool fees.
                 </p>
               </div>
 
@@ -358,6 +365,27 @@ export default function AITeammateLaunchPage() {
               </div>
 
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
+                <h3 className="text-xl font-medium mb-2 text-text">A weekly receipt for every routine — runs, passes, fixes, runtime, keep or kill</h3>
+                <p className="text-[15px] text-text-muted leading-relaxed">
+                  Simple scorecard showing tasks completed and estimated time reclaimed — so you know it's still worth it
+                </p>
+              </div>
+
+              <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
+                <h3 className="text-xl font-medium mb-2 text-text">A monthly 'would you miss it?' check so you only keep what earns its spot</h3>
+                <p className="text-[15px] text-text-muted leading-relaxed">
+                  Regular review to ensure each teammate is pulling its weight and delivering value
+                </p>
+              </div>
+
+              <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
+                <h3 className="text-xl font-medium mb-2 text-text">A trust ladder: teammates start by preparing and asking, and earn more freedom only after 5 clean runs in a row</h3>
+                <p className="text-[15px] text-text-muted leading-relaxed">
+                  With a tested undo and your OK. They step back down if quality slips or a tool changes.
+                </p>
+              </div>
+
+              <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
                 <h3 className="text-xl font-medium mb-2 text-text">1 new job per quarter</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
                   Add a job from the starter menu every 3 months — no extra charge
@@ -375,13 +403,6 @@ export default function AITeammateLaunchPage() {
                 <h3 className="text-xl font-medium mb-2 text-text">Email support (1 business day reply)</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
                   Stuck or see odd behavior? Email anytime, get a response within 1 business day
-                </p>
-              </div>
-
-              <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
-                <h3 className="text-xl font-medium mb-2 text-text">Monthly hours-saved report</h3>
-                <p className="text-[15px] text-text-muted leading-relaxed">
-                  Simple scorecard showing tasks completed and estimated time reclaimed — so you know it's still worth it
                 </p>
               </div>
 
@@ -467,6 +488,13 @@ export default function AITeammateLaunchPage() {
                 <h3 className="text-lg font-medium mb-3 text-text">What's the founding rate, and how long does it last?</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
                   $799 for the first 5 clients (regular price $1,199 afterward). We're limiting to 4 launch slots per month while we refine the process. Once the first 5 are launched, the price goes up.
+                </p>
+              </div>
+
+              <div className="border border-border p-8 bg-bg">
+                <h3 className="text-lg font-medium mb-3 text-text">Can my whole team share one AI teammate?</h3>
+                <p className="text-[15px] text-text-muted leading-relaxed">
+                  Yes, for teams of 2–4 on Grok Bot: one shared Team Bot your team can chat with in the app or in Slack. It needs a Cursor Teams plan with one seat per person, paid directly to Cursor (see <a href="https://cursor.com/pricing" target="_blank" rel="noopener" className="text-text hover:underline">cursor.com/pricing</a> for current rates). Your business owns the bot, not us. Shared bots get read-only access and can't send or spend; anything risky happens only in a 1:1 chat where you're signed in yourself. Your Slack admin approves the app, and each teammate links their Slack account.
                 </p>
               </div>
             </div>
