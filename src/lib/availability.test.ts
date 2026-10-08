@@ -264,4 +264,40 @@ describe('getAvailableSlots', () => {
     // Should be 0 because Oct 15 is blocked, even though some slots would be on Oct 16 in UTC
     expect(slots).toHaveLength(0);
   });
+
+  it('ensures calendar dates match slot dates in YYYY-MM-DD format', async () => {
+    // This test verifies the fix for the off-by-one calendar bug
+    // Slot times in UTC should map to the correct calendar date in ET
+    const startDate = new Date('2026-10-25T00:00:00Z');
+    const endDate = new Date('2026-10-26T00:00:00Z');
+
+    // Mock availability for Oct 25
+    (prisma.dateAvailability.findMany as any).mockResolvedValue([
+      {
+        id: 'avail1',
+        date: new Date('2026-10-25T04:00:00.000Z'), // Oct 25 midnight UTC (Oct 24 8 PM ET)
+        startTime: '10:00',
+        endTime: '15:00',
+        timezone: 'America/New_York',
+      },
+    ]);
+
+    (prisma.blockedDate.findMany as any).mockResolvedValue([]);
+    (prisma.bookingSettings.findMany as any).mockResolvedValue([
+      { id: 'settings1', slotLengthMin: 60, bufferMin: 15, minLeadTimeHrs: 0 },
+    ]);
+
+    const slots = await getAvailableSlots(startDate, endDate);
+
+    expect(slots.length).toBeGreaterThan(0);
+    
+    // All slots should be on Oct 25 in ET, not Oct 26
+    // Using en-CA locale gives YYYY-MM-DD format
+    slots.forEach(slot => {
+      const dateStr = slot.start.toLocaleDateString('en-CA', {
+        timeZone: 'America/New_York',
+      });
+      expect(dateStr).toBe('2026-10-25');
+    });
+  });
 });
