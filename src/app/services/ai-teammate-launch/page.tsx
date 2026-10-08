@@ -365,23 +365,23 @@ export default function AITeammateLaunchPage() {
               </div>
 
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
-                <h3 className="text-xl font-medium mb-2 text-text">A weekly receipt for every routine — runs, passes, fixes, runtime, keep or kill</h3>
+                <h3 className="text-xl font-medium mb-2 text-text">Weekly receipt for every routine</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Simple scorecard showing tasks completed and estimated time reclaimed — so you know it's still worth it
+                  Runs, passes, fixes needed, runtime, and a keep-or-kill call, so you can see each routine is still earning its spot.
                 </p>
               </div>
 
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
-                <h3 className="text-xl font-medium mb-2 text-text">A monthly 'would you miss it?' check so you only keep what earns its spot</h3>
+                <h3 className="text-xl font-medium mb-2 text-text">Monthly 'would you miss it?' check</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Regular review to ensure each teammate is pulling its weight and delivering value
+                  Once a month we ask the honest question about each routine. If you wouldn't miss it, we cut it, so you only keep what earns its spot.
                 </p>
               </div>
 
               <div className="border border-border p-8 hover:border-text-muted transition-all duration-300">
-                <h3 className="text-xl font-medium mb-2 text-text">A trust ladder: teammates start by preparing and asking, and earn more freedom only after 5 clean runs in a row</h3>
+                <h3 className="text-xl font-medium mb-2 text-text">A trust ladder</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  With a tested undo and your OK. They step back down if quality slips or a tool changes.
+                  Teammates start by preparing and asking. They earn more freedom only after 5 clean runs in a row, with a tested undo and your OK. They step back down if quality slips or a tool changes.
                 </p>
               </div>
 
