@@ -15,17 +15,9 @@ export default async function Home() {
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
                 Stop losing hours to tools that don't talk to each other.
               </h1>
-              <p className="text-xl md:text-2xl text-text-muted max-w-3xl mx-auto mb-12 leading-relaxed">
+              <p className="text-xl md:text-2xl text-text-muted max-w-3xl mx-auto leading-relaxed">
                 CerpaMedia helps small businesses get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and <strong className="text-text">you own the accounts and code.</strong>
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="mailto:cerpamedia@gmail.com"
-                  className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
-                >
-                  Or email Roger
-                </a>
-              </div>
               <div className="mt-8 pt-6 border-t border-border max-w-2xl mx-auto">
                 <p className="text-[15px] text-text-muted leading-relaxed">
                   <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href="/services/ai-teammate-launch" className="text-text hover:underline font-medium">AI Teammate Launch</Link> — $799 founding rate for the first 5 clients.
