@@ -39,8 +39,8 @@ const fallbackHero: HeroContent = {
   subheadline: "CerpaMedia helps small businesses get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and you own the accounts and code.",
   primaryCtaLabel: "",
   primaryCtaUrl: "",
-  secondaryCtaLabel: "Or email Roger",
-  secondaryCtaUrl: "mailto:cerpamedia@gmail.com",
+  secondaryCtaLabel: "",
+  secondaryCtaUrl: "",
 };
 
 const fallbackHowItWorks: HowItWorksContent = {

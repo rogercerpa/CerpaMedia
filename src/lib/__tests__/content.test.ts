@@ -67,6 +67,8 @@ describe('Content Queries', () => {
       expect(result.headline).toBe("Stop losing hours to tools that don't talk to each other.");
       expect(result.primaryCtaLabel).toBe("");
       expect(result.primaryCtaUrl).toBe("");
+      expect(result.secondaryCtaLabel).toBe("");
+      expect(result.secondaryCtaUrl).toBe("");
     });
   });
 

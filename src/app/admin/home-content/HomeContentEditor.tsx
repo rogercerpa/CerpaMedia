@@ -30,8 +30,8 @@ const defaultHero: HeroContent = {
   subheadline: "CerpaMedia helps small businesses get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and you own the accounts and code.",
   primaryCtaLabel: "",
   primaryCtaUrl: "",
-  secondaryCtaLabel: "Or email Roger",
-  secondaryCtaUrl: "mailto:cerpamedia@gmail.com",
+  secondaryCtaLabel: "",
+  secondaryCtaUrl: "",
 };
 
 const defaultHowItWorks: HowItWorksContent = {
@@ -147,7 +147,7 @@ export default function HomeContentEditor({ hero, howItWorks }: Props) {
               />
             </div>
             <p className="md:col-span-2 text-xs text-gray-500">
-              Leave the primary CTA label or URL blank to hide that button on the public home page.
+              Leave a CTA label or URL blank to hide that link on the public home page.
             </p>
 
             <div>

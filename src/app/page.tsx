@@ -49,22 +49,27 @@ export default async function Home() {
                   )
                 )}
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                {hero.primaryCtaLabel?.trim() && hero.primaryCtaUrl?.trim() ? (
-                  <Link
-                    href={hero.primaryCtaUrl}
-                    className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
-                  >
-                    {hero.primaryCtaLabel}
-                  </Link>
-                ) : null}
-                <a
-                  href={hero.secondaryCtaUrl}
-                  className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
-                >
-                  {hero.secondaryCtaLabel}
-                </a>
-              </div>
+              {(hero.primaryCtaLabel?.trim() && hero.primaryCtaUrl?.trim()) ||
+              (hero.secondaryCtaLabel?.trim() && hero.secondaryCtaUrl?.trim()) ? (
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  {hero.primaryCtaLabel?.trim() && hero.primaryCtaUrl?.trim() ? (
+                    <Link
+                      href={hero.primaryCtaUrl}
+                      className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                    >
+                      {hero.primaryCtaLabel}
+                    </Link>
+                  ) : null}
+                  {hero.secondaryCtaLabel?.trim() && hero.secondaryCtaUrl?.trim() ? (
+                    <a
+                      href={hero.secondaryCtaUrl}
+                      className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
+                    >
+                      {hero.secondaryCtaLabel}
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
               <div className="mt-8 pt-6 border-t border-border max-w-2xl mx-auto">
                 <p className="text-[15px] text-text-muted leading-relaxed">
                   <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href="/services/ai-teammate-launch" className="text-text hover:underline font-medium">AI Teammate Launch</Link> — $799 founding rate for the first 5 clients.
