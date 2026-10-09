@@ -28,6 +28,10 @@ export function publicDemoMode(args: { killSwitch: boolean }): PublicDemoMode {
   return args.killSwitch ? "replay" : "samples";
 }
 
+export function utcDateKey(now = new Date()): string {
+  return now.toISOString().slice(0, 10);
+}
+
 export const ANALYTICS_EVENTS = [
   "guide_read",
   "demo_run",

@@ -331,7 +331,7 @@ export default async function AdminDashboard() {
               </div>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Foundations preview</h3>
-            <p className="text-gray-600 text-sm">Signed note, stamp, badge, and photo slots — not live</p>
+            <p className="text-gray-600 text-sm">Signed note, stamp, and badge — not live</p>
           </Link>
 
           <Link
