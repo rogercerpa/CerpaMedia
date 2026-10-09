@@ -1,86 +1,18 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
+import { getPublishedServices, getServiceBySlug, fallbackServices, fallbackFeaturedService } from "@/lib/services";
 
-export default function ServicesPage() {
-  const services = [
-    {
-      title: "Web Development",
-      description: "Custom websites and web applications tailored to your business requirements. We build responsive, fast, and user-friendly solutions that work across all devices.",
-      features: [
-        "Custom website design and development",
-        "Responsive design for mobile and desktop",
-        "Content management systems",
-        "E-commerce solutions",
-        "Performance optimization"
-      ]
-    },
-    {
-      title: "Web Applications",
-      description: "Complex web applications that power your business operations. From customer portals to internal management systems, we build scalable solutions.",
-      features: [
-        "Custom business applications",
-        "Database design and integration",
-        "API development and integration",
-        "User authentication and security",
-        "Cloud hosting and deployment"
-      ]
-    },
-    {
-      title: "Mobile Apps",
-      description: "Native and cross-platform mobile applications for iOS and Android. Extend your business reach with mobile solutions your customers can access anywhere.",
-      features: [
-        "iOS and Android app development",
-        "Cross-platform solutions",
-        "Mobile-first design approach",
-        "App store submission and updates",
-        "Push notifications and offline functionality"
-      ]
-    },
-    {
-      title: "AI System Integration",
-      description: "Practical integration of AI capabilities into your existing systems. We help you understand where AI makes sense and implement solutions that deliver real value.",
-      features: [
-        "AI feasibility assessment",
-        "Integration with existing systems",
-        "Natural language processing",
-        "Machine learning model implementation",
-        "AI-powered automation"
-      ]
-    },
-    {
-      title: "AI Consulting",
-      description: "Strategic guidance on adopting AI technologies. We help you separate hype from practical applications and make informed decisions about AI investments.",
-      features: [
-        "AI strategy and roadmap development",
-        "Use case identification and validation",
-        "Vendor and solution evaluation",
-        "Risk assessment and mitigation",
-        "Training and knowledge transfer"
-      ]
-    },
-    {
-      title: "Automation Consulting",
-      description: "Identify and implement automation opportunities across your business processes. Reduce manual work, minimize errors, and free up your team for higher-value activities.",
-      features: [
-        "Process analysis and mapping",
-        "Automation opportunity identification",
-        "Tool selection and implementation",
-        "Workflow optimization",
-        "Monitoring and continuous improvement"
-      ]
-    },
-    {
-      title: "Business Process Improvement & Automation",
-      description: "Comprehensive review and optimization of your business processes. We combine process improvement methodologies with automation technologies to drive efficiency.",
-      features: [
-        "Current state assessment",
-        "Process redesign and optimization",
-        "Automation implementation",
-        "Change management support",
-        "Metrics and performance tracking"
-      ]
-    }
-  ];
+export default async function ServicesPage() {
+  // Fetch services from DB with fallback
+  const dbServices = await getPublishedServices();
+  const featuredService = await getServiceBySlug("ai-teammate-launch");
+  
+  // Use DB services if available, otherwise fallback to hardcoded
+  const services = dbServices.length > 0 
+    ? dbServices.filter(s => !s.featured && s.slug !== "technology-strategy-call")
+    : fallbackServices;
+  
+  const featured = featuredService || fallbackFeaturedService;
 
   return (
     <div>
@@ -104,26 +36,28 @@ export default function ServicesPage() {
           <Reveal delay={100}>
             <div className="border-2 border-cta p-8 md:p-10 mb-8 bg-bg">
               <div className="mb-6">
-                <div className="inline-block border border-border px-3 py-1 mb-4">
-                  <span className="text-[11px] font-medium text-text uppercase tracking-wider">First 5 clients · Founding rate</span>
-                </div>
+                {featured.badgeText && (
+                  <div className="inline-block border border-border px-3 py-1 mb-4">
+                    <span className="text-[11px] font-medium text-text uppercase tracking-wider">{featured.badgeText}</span>
+                  </div>
+                )}
                 <h2 className="text-3xl md:text-4xl font-semibold text-text mb-4 tracking-tight">
-                  Two AI teammates set up and saving you hours every week
+                  {featured.title}
                 </h2>
                 <p className="text-xl font-medium text-text mb-3">
-                  $799 founding price for the first 5 clients · Regular $1,199
+                  {featured.priceLabel}
                 </p>
                 <p className="text-[15px] text-text-muted leading-relaxed mb-4">
-                  We pick the right platform (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), launch 2 teammates from a starter menu, and set approval rules so nothing sends, spends, or deletes without your OK.
+                  {featured.description}
                 </p>
                 <p className="text-[13px] text-text-muted leading-relaxed mb-6">
                   You own the tool accounts and pay vendors directly. If your first teammate isn't saving at least 3 hours a week, we keep fixing it free (60-day window from the launch session). No refunds.
                 </p>
                 <Link
-                  href="/services/ai-teammate-launch"
+                  href={featured.ctaUrl}
                   className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
                 >
-                  See how it works
+                  {featured.ctaLabel}
                 </Link>
               </div>
             </div>
@@ -157,9 +91,9 @@ export default function ServicesPage() {
 
           <Reveal stagger staggerDelay={100}>
             <div className="space-y-12">
-              {services.map((service, index) => (
+              {services.map((service) => (
                 <div
-                  key={index}
+                  key={service.slug}
                   className="border border-border p-8 hover:border-text-muted transition-all duration-300"
                 >
                   <h2 className="text-3xl font-semibold text-text mb-4 tracking-tight">

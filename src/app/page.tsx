@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
+import { getServiceBySlug, fallbackFeaturedService } from "@/lib/services";
 
-export default function Home() {
+export default async function Home() {
+  // Fetch AI Teammate Launch service from DB with fallback
+  const featured = await getServiceBySlug("ai-teammate-launch") || fallbackFeaturedService;
+  
   return (
     <div>
       <section className="bg-bg py-24 md:py-32 lg:py-40">

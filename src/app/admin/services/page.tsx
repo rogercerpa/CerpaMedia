@@ -3,6 +3,9 @@ import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import Link from "next/link";
+import ServicesListClient from "./ServicesListClient";
+
+export const dynamic = "force-dynamic";
 
 export default async function AdminServicesPage() {
   const email = await getAdminSession();
@@ -12,7 +15,17 @@ export default async function AdminServicesPage() {
   }
 
   const services = await prisma.service.findMany({
+    where: {
+      deletedAt: null,
+    },
     orderBy: [{ sortOrder: "asc" }, { title: "asc" }],
+  });
+
+  const deletedServices = await prisma.service.findMany({
+    where: {
+      deletedAt: { not: null },
+    },
+    orderBy: [{ deletedAt: "desc" }],
   });
 
   return (
@@ -41,70 +54,20 @@ export default async function AdminServicesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Services</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Services Management</h2>
             <p className="text-gray-600">
-              {services.length} service{services.length !== 1 ? "s" : ""} in the
-              database
+              {services.length} service{services.length !== 1 ? "s" : ""} in the database
             </p>
           </div>
-          <div className="text-sm bg-primary-100 text-primary-700 px-3 py-1.5 rounded">
-            Full CMS editing coming in M2–M4
-          </div>
+          <Link
+            href="/admin/services/new"
+            className="bg-gray-900 text-white px-6 py-2.5 text-sm font-medium hover:bg-gray-800 transition-colors"
+          >
+            + New Service
+          </Link>
         </div>
 
-        <div className="space-y-4">
-          {services.map((service) => (
-            <div
-              key={service.id}
-              className="bg-white rounded-lg shadow-md p-6 border-l-4 border-primary-600"
-            >
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      {service.title}
-                    </h3>
-                    {service.published ? (
-                      <span className="inline-block text-xs bg-green-100 text-green-700 px-2 py-1 rounded">
-                        Published
-                      </span>
-                    ) : (
-                      <span className="inline-block text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                        Draft
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-gray-600 mb-3">{service.shortDesc}</p>
-                </div>
-                <div className="text-right ml-4">
-                  <div className="text-lg font-semibold text-primary-600 mb-1">
-                    {service.priceLabel}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Order: {service.sortOrder}
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-3 mt-3">
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex gap-4">
-                    <span className="text-gray-600">
-                      <span className="font-medium">CTA:</span> {service.ctaLabel}
-                    </span>
-                    <span className="text-gray-600">
-                      <span className="font-medium">URL:</span> {service.ctaUrl}
-                    </span>
-                  </div>
-                  <div className="text-gray-500">
-                    Updated:{" "}
-                    {new Date(service.updatedAt).toLocaleDateString()}
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <ServicesListClient services={services} deletedServices={deletedServices} />
 
         {services.length === 0 && (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">

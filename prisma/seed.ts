@@ -1,6 +1,10 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
 
-const prisma = new PrismaClient();
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("Seeding database...");
@@ -42,112 +46,252 @@ async function main() {
   }
   console.log("✓ Created/updated default availability rules");
 
+  // Services: current public content with new CMS fields
+  // Using exact copy from /services page to ensure nothing changes visibly
   const services = [
     {
+      slug: "web-development",
       title: "Web Development",
-      shortDesc:
-        "Custom websites and web applications tailored to your business requirements.",
-      longDesc:
-        "Custom websites and web applications tailored to your business requirements. We build responsive, fast, and user-friendly solutions that work across all devices.",
+      shortDesc: "Custom websites and web applications tailored to your business requirements.",
+      longDesc: "Custom websites and web applications tailored to your business requirements. We build responsive, fast, and user-friendly solutions that work across all devices.",
+      description: "Custom websites and web applications tailored to your business requirements. We build responsive, fast, and user-friendly solutions that work across all devices.",
+      features: [
+        "Custom website design and development",
+        "Responsive design for mobile and desktop",
+        "Content management systems",
+        "E-commerce solutions",
+        "Performance optimization"
+      ],
+      outcome: "Responsive, fast websites that work across all devices",
       priceLabel: "Starting at $5,000",
+      price: 5000,
       ctaLabel: "Get a Quote",
       ctaUrl: "/contact",
       sortOrder: 1,
       published: true,
+      featured: false,
+      seoTitle: "Web Development Services - CerpaMedia",
+      seoDescription: "Custom websites and web applications tailored to your business. Responsive, fast, and user-friendly solutions.",
     },
     {
+      slug: "web-applications",
       title: "Web Applications",
-      shortDesc:
-        "Complex web applications that power your business operations.",
-      longDesc:
-        "Complex web applications that power your business operations. From customer portals to internal management systems, we build scalable solutions.",
+      shortDesc: "Complex web applications that power your business operations.",
+      longDesc: "Complex web applications that power your business operations. From customer portals to internal management systems, we build scalable solutions.",
+      description: "Complex web applications that power your business operations. From customer portals to internal management systems, we build scalable solutions.",
+      features: [
+        "Custom business applications",
+        "Database design and integration",
+        "API development and integration",
+        "User authentication and security",
+        "Cloud hosting and deployment"
+      ],
+      outcome: "Scalable applications from customer portals to management systems",
       priceLabel: "Starting at $10,000",
+      price: 10000,
       ctaLabel: "Get a Quote",
       ctaUrl: "/contact",
       sortOrder: 2,
       published: true,
+      featured: false,
+      seoTitle: "Web Application Development - CerpaMedia",
+      seoDescription: "Complex web applications that power your business operations. Scalable solutions for customer portals and internal systems.",
     },
     {
+      slug: "mobile-apps",
       title: "Mobile Apps",
-      shortDesc:
-        "Native and cross-platform mobile applications for iOS and Android.",
-      longDesc:
-        "Native and cross-platform mobile applications for iOS and Android. Extend your business reach with mobile solutions your customers can access anywhere.",
+      shortDesc: "Native and cross-platform mobile applications for iOS and Android.",
+      longDesc: "Native and cross-platform mobile applications for iOS and Android. Extend your business reach with mobile solutions your customers can access anywhere.",
+      description: "Native and cross-platform mobile applications for iOS and Android. Extend your business reach with mobile solutions your customers can access anywhere.",
+      features: [
+        "iOS and Android app development",
+        "Cross-platform solutions",
+        "Mobile-first design approach",
+        "App store submission and updates",
+        "Push notifications and offline functionality"
+      ],
+      outcome: "Mobile solutions your customers can access anywhere",
       priceLabel: "Starting at $15,000",
+      price: 15000,
       ctaLabel: "Get a Quote",
       ctaUrl: "/contact",
       sortOrder: 3,
       published: true,
+      featured: false,
+      seoTitle: "Mobile App Development - CerpaMedia",
+      seoDescription: "Native and cross-platform mobile applications for iOS and Android. Extend your business reach with mobile solutions.",
     },
     {
+      slug: "ai-system-integration",
       title: "AI System Integration",
-      shortDesc:
-        "Practical integration of AI capabilities into your existing systems.",
-      longDesc:
-        "Practical integration of AI capabilities into your existing systems. We help you understand where AI makes sense and implement solutions that deliver real value.",
+      shortDesc: "Practical integration of AI capabilities into your existing systems.",
+      longDesc: "Practical integration of AI capabilities into your existing systems. We help you understand where AI makes sense and implement solutions that deliver real value.",
+      description: "Practical integration of AI capabilities into your existing systems. We help you understand where AI makes sense and implement solutions that deliver real value.",
+      features: [
+        "AI feasibility assessment",
+        "Integration with existing systems",
+        "Natural language processing",
+        "Machine learning model implementation",
+        "AI-powered automation"
+      ],
+      outcome: "AI solutions that deliver real value in your workflow",
       priceLabel: "Starting at $8,000",
+      price: 8000,
       ctaLabel: "Get a Quote",
       ctaUrl: "/contact",
       sortOrder: 4,
       published: true,
+      featured: false,
+      seoTitle: "AI System Integration Services - CerpaMedia",
+      seoDescription: "Practical integration of AI capabilities into your existing systems. Implement AI solutions that deliver real value.",
     },
     {
+      slug: "ai-consulting",
       title: "AI Consulting",
-      shortDesc:
-        "Strategic guidance on adopting AI technologies.",
-      longDesc:
-        "Strategic guidance on adopting AI technologies. We help you separate hype from practical applications and make informed decisions about AI investments.",
+      shortDesc: "Strategic guidance on adopting AI technologies.",
+      longDesc: "Strategic guidance on adopting AI technologies. We help you separate hype from practical applications and make informed decisions about AI investments.",
+      description: "Strategic guidance on adopting AI technologies. We help you separate hype from practical applications and make informed decisions about AI investments.",
+      features: [
+        "AI strategy and roadmap development",
+        "Use case identification and validation",
+        "Vendor and solution evaluation",
+        "Risk assessment and mitigation",
+        "Training and knowledge transfer"
+      ],
+      outcome: "Informed decisions about AI investments for your business",
       priceLabel: "Starting at $2,500",
+      price: 2500,
       ctaLabel: "Get a Quote",
       ctaUrl: "/contact",
       sortOrder: 5,
       published: true,
+      featured: false,
+      seoTitle: "AI Consulting Services - CerpaMedia",
+      seoDescription: "Strategic guidance on adopting AI technologies. Separate hype from practical applications and make informed decisions.",
     },
     {
+      slug: "automation-consulting",
       title: "Automation Consulting",
-      shortDesc:
-        "Identify and implement automation opportunities across your business processes.",
-      longDesc:
-        "Identify and implement automation opportunities across your business processes. Reduce manual work, minimize errors, and free up your team for higher-value activities.",
+      shortDesc: "Identify and implement automation opportunities across your business processes.",
+      longDesc: "Identify and implement automation opportunities across your business processes. Reduce manual work, minimize errors, and free up your team for higher-value activities.",
+      description: "Identify and implement automation opportunities across your business processes. Reduce manual work, minimize errors, and free up your team for higher-value activities.",
+      features: [
+        "Process analysis and mapping",
+        "Automation opportunity identification",
+        "Tool selection and implementation",
+        "Workflow optimization",
+        "Monitoring and continuous improvement"
+      ],
+      outcome: "Reduced manual work and errors, higher-value team activities",
       priceLabel: "Starting at $3,000",
+      price: 3000,
       ctaLabel: "Get a Quote",
       ctaUrl: "/contact",
       sortOrder: 6,
       published: true,
+      featured: false,
+      seoTitle: "Automation Consulting Services - CerpaMedia",
+      seoDescription: "Identify and implement automation opportunities. Reduce manual work, minimize errors, and free up your team for higher-value activities.",
     },
     {
+      slug: "business-process-improvement-automation",
       title: "Business Process Improvement & Automation",
-      shortDesc:
-        "Comprehensive review and optimization of your business processes.",
-      longDesc:
-        "Comprehensive review and optimization of your business processes. We combine process improvement methodologies with automation technologies to drive efficiency.",
+      shortDesc: "Comprehensive review and optimization of your business processes.",
+      longDesc: "Comprehensive review and optimization of your business processes. We combine process improvement methodologies with automation technologies to drive efficiency.",
+      description: "Comprehensive review and optimization of your business processes. We combine process improvement methodologies with automation technologies to drive efficiency.",
+      features: [
+        "Current state assessment",
+        "Process redesign and optimization",
+        "Automation implementation",
+        "Change management support",
+        "Metrics and performance tracking"
+      ],
+      outcome: "Optimized processes that drive efficiency and growth",
       priceLabel: "Starting at $5,000",
+      price: 5000,
       ctaLabel: "Get a Quote",
       ctaUrl: "/contact",
       sortOrder: 7,
       published: true,
+      featured: false,
+      seoTitle: "Business Process Improvement & Automation - CerpaMedia",
+      seoDescription: "Comprehensive review and optimization of your business processes. Drive efficiency with process improvement and automation.",
     },
     {
-      title: "Technology Strategy Call",
-      shortDesc:
-        "60-minute consultation to discuss your technology needs and opportunities.",
-      longDesc:
-        "Book a 60-minute one-on-one consultation call to discuss your business technology needs, challenges, and opportunities. Perfect for getting expert guidance on your next technology project or understanding how to leverage technology for your business growth.",
-      priceLabel: "$99",
-      ctaLabel: "Book Now",
-      ctaUrl: "/consult",
+      slug: "ai-teammate-launch",
+      title: "AI Teammate Launch",
+      shortDesc: "Two AI teammates set up and saving you hours every week",
+      longDesc: "Two AI teammates set up and saving you hours every week. We pick the right platform (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), launch 2 teammates from a starter menu, and set approval rules so nothing sends, spends, or deletes without your OK.",
+      description: "We pick the right platform (Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork), launch 2 teammates from a starter menu, and set approval rules so nothing sends, spends, or deletes without your OK. You own the tool accounts and pay vendors directly. If your first teammate isn't saving at least 3 hours a week, we keep fixing it free (60-day window from the launch session).",
+      features: [],
+      outcome: "Two AI teammates working in 14 days",
+      priceLabel: "$799 founding price · Regular $1,199",
+      price: 799,
+      priceNote: "First 5 clients · Founding rate",
+      badgeText: "First 5 clients · Founding rate",
+      ctaLabel: "See how it works",
+      ctaUrl: "/services/ai-teammate-launch",
       sortOrder: 0,
       published: true,
+      featured: true,
+      seoTitle: "AI Teammate Launch - CerpaMedia",
+      seoDescription: "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up the teammates, you own the accounts.",
+    },
+    {
+      slug: "technology-strategy-call",
+      title: "Technology Strategy Call",
+      shortDesc: "Pay $99 for a 30–45 min call with Roger. Get 3–5 opportunities and a written summary within 24–48 hours.",
+      longDesc: "Pay $99 for a 30–45 min call with Roger. Get 3–5 opportunities and a written summary within 24–48 hours. Prepaid standalone — not credited toward discovery or other work. Exception: credited toward AI Teammate Launch if purchased within 30 days.",
+      description: "Pay $99 for a 30–45 min call with Roger. Get 3–5 opportunities and a written summary within 24–48 hours. Prepaid standalone — not credited toward discovery or other work. Exception: credited toward AI Teammate Launch if purchased within 30 days.",
+      features: [],
+      outcome: "Clear next step with 3–5 opportunities",
+      priceLabel: "$99",
+      price: 99,
+      ctaLabel: "Pay $99 — Book Call",
+      ctaUrl: "/consult",
+      sortOrder: -1,
+      published: true,
+      featured: false,
+      seoTitle: "Technology Strategy Call - $99 - CerpaMedia",
+      seoDescription: "30-45 minute call with Roger. Get 3-5 opportunities and a written summary within 24-48 hours. $99 prepaid.",
     },
   ];
 
   for (const service of services) {
-    await prisma.service.upsert({
-      where: { title: service.title },
-      update: service,
-      create: service,
+    // Idempotent: match on slug OR title to handle both new and existing rows
+    const existing = await prisma.service.findFirst({
+      where: {
+        OR: [
+          { slug: service.slug },
+          { title: service.title },
+        ],
+      },
     });
-    console.log(`✓ Created/updated service: ${service.title}`);
+
+    if (existing) {
+      // Update existing row with new fields, preserving ID
+      await prisma.service.update({
+        where: { id: existing.id },
+        data: {
+          slug: service.slug,
+          features: service.features,
+          outcome: service.outcome,
+          description: service.description,
+          price: service.price,
+          priceNote: service.priceNote,
+          badgeText: service.badgeText,
+          featured: service.featured,
+          seoTitle: service.seoTitle,
+          seoDescription: service.seoDescription,
+        },
+      });
+      console.log(`✓ Updated service: ${service.title} (ID: ${existing.id}, slug: ${service.slug})`);
+    } else {
+      await prisma.service.create({
+        data: service,
+      });
+      console.log(`✓ Created service: ${service.title} (slug: ${service.slug})`);
+    }
   }
 
   // Seed sample insight post
@@ -191,7 +335,7 @@ AI automation isn't about replacing your team — it's about freeing them from t
   });
   console.log("✓ Created/updated sample insight post");
 
-  console.log("Seeding completed!");
+  console.log("\n✅ Seeding completed!");
 }
 
 main()
