@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -42,6 +43,7 @@ export async function POST(
         priceNote: original.priceNote,
         badgeText: original.badgeText,
         featured: false, // Don't duplicate featured status
+        features: original.features,
         ctaLabel: original.ctaLabel,
         ctaUrl: original.ctaUrl,
         sortOrder: original.sortOrder + 1,
@@ -50,6 +52,8 @@ export async function POST(
         seoDescription: original.seoDescription,
       },
     });
+
+    revalidatePath("/services");
 
     return NextResponse.json({ service: newService }, { status: 201 });
   } catch (error) {

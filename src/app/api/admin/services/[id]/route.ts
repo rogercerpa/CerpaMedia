@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -99,6 +100,13 @@ export async function PUT(
       },
     });
 
+    revalidatePath("/");
+    revalidatePath("/services");
+    if (existing.slug !== slug) {
+      revalidatePath(`/services/${existing.slug}`);
+    }
+    revalidatePath(`/services/${slug}`);
+
     return NextResponse.json({ service });
   } catch (error) {
     console.error("Error updating service:", error);
@@ -124,10 +132,18 @@ export async function PATCH(
     const body = await request.json();
 
     // Partial update (for publish/unpublish toggle)
+    const existing = await prisma.service.findUnique({ where: { id } });
+    
     const service = await prisma.service.update({
       where: { id },
       data: body,
     });
+
+    revalidatePath("/");
+    revalidatePath("/services");
+    if (existing?.slug) {
+      revalidatePath(`/services/${existing.slug}`);
+    }
 
     return NextResponse.json({ service });
   } catch (error) {
@@ -152,6 +168,9 @@ export async function DELETE(
 
     const { id } = await context.params;
 
+    // Get service before deleting to revalidate its slug
+    const existing = await prisma.service.findUnique({ where: { id } });
+
     // Soft delete
     const service = await prisma.service.update({
       where: { id },
@@ -160,6 +179,12 @@ export async function DELETE(
         published: false, // Unpublish when deleted
       },
     });
+
+    revalidatePath("/");
+    revalidatePath("/services");
+    if (existing?.slug) {
+      revalidatePath(`/services/${existing.slug}`);
+    }
 
     return NextResponse.json({ service });
   } catch (error) {

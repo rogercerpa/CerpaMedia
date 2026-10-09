@@ -366,7 +366,7 @@ AI automation isn't about replacing your team — it's about freeing them from t
           },
           {
             title: "You own the system",
-            description: "GitHub, hosting, domain, database, and third-party accounts stay in your name. We're a collaborator, not a landlord.",
+            description: "GitHub, hosting, domain, database, and third-party accounts stay in <em>your</em> name. We're a collaborator, not a landlord.",
           },
           {
             title: "Practical over trendy",

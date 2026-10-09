@@ -185,9 +185,21 @@ export default function HomeContentEditor({ hero, howItWorks }: Props) {
         <div className="space-y-6">
           {howItWorksData.steps.map((step, index) => (
             <div key={index} className="border border-gray-200 rounded p-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">
-                Step {index + 1}
-              </h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Step {index + 1}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const newSteps = howItWorksData.steps.filter((_, i) => i !== index);
+                    setHowItWorksData({ ...howItWorksData, steps: newSteps });
+                  }}
+                  className="text-sm text-red-600 border border-red-300 rounded px-3 py-1 hover:bg-red-50"
+                >
+                  Remove
+                </button>
+              </div>
               <div className="space-y-3">
                 <div>
                   <label className="block text-sm text-gray-600 mb-1">
@@ -222,6 +234,18 @@ export default function HomeContentEditor({ hero, howItWorks }: Props) {
               </div>
             </div>
           ))}
+          <button
+            type="button"
+            onClick={() => {
+              setHowItWorksData({
+                ...howItWorksData,
+                steps: [...howItWorksData.steps, { title: "", description: "" }],
+              });
+            }}
+            className="text-sm border border-gray-300 rounded px-4 py-2 hover:bg-gray-50"
+          >
+            Add step
+          </button>
         </div>
       </div>
 
