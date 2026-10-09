@@ -36,15 +36,15 @@ describe('SEO Queries', () => {
       expect(result.ogImageUrl).toBe('https://example.com/og.png');
     });
 
-    it('should return default when DB returns null', async () => {
+    it('should return empty object when DB returns null', async () => {
       vi.mocked(prisma.seoMeta.findUnique).mockResolvedValue(null);
 
       const result = await getSeoMeta('/');
 
-      expect(result.title).toContain('CerpaMedia');
+      expect(result).toEqual({});
     });
 
-    it('should use default when DB meta is empty', async () => {
+    it('should return empty object when DB meta is empty', async () => {
       const mockMeta = {
         id: '1',
         path: '/',
@@ -59,18 +59,18 @@ describe('SEO Queries', () => {
 
       const result = await getSeoMeta('/');
 
-      expect(result.title).toContain('CerpaMedia');
+      expect(result).toEqual({});
     });
 
-    it('should return default on error', async () => {
+    it('should return empty object on error', async () => {
       vi.mocked(prisma.seoMeta.findUnique).mockRejectedValue(new Error('DB error'));
 
       const result = await getSeoMeta('/');
 
-      expect(result.title).toBeDefined();
+      expect(result).toEqual({});
     });
 
-    it('should merge DB and defaults', async () => {
+    it('should return only DB fields that are set', async () => {
       const mockMeta = {
         id: '1',
         path: '/services',
@@ -86,7 +86,7 @@ describe('SEO Queries', () => {
       const result = await getSeoMeta('/services');
 
       expect(result.title).toBe('Custom Services Title');
-      expect(result.description).toBeTruthy();
+      expect(result.description).toBeUndefined();
     });
   });
 
