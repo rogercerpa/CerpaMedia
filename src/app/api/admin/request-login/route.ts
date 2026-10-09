@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createMagicLinkToken, isAdminEmail } from "@/lib/auth";
+import { createMagicLinkToken, isAllowedAdminEmail } from "@/lib/auth";
 import { Resend } from "resend";
 import { checkRateLimit, validateEmail } from "@/lib/security";
 
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!isAdminEmail(email)) {
+    if (!(await isAllowedAdminEmail(email))) {
       return NextResponse.json(
         { error: "Unauthorized email address" },
         { status: 403 }

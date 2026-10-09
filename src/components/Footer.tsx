@@ -1,4 +1,14 @@
-export default function Footer() {
+import { isFoundationsUiEnabled } from "@/lib/flags";
+import BuiltByBadge from "@/components/BuiltByBadge";
+
+export default async function Footer() {
+  let showFoundationsBadge = false;
+  try {
+    showFoundationsBadge = await isFoundationsUiEnabled();
+  } catch {
+    showFoundationsBadge = false;
+  }
+
   return (
     <footer className="bg-charcoal text-white border-t border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -91,6 +101,11 @@ export default function Footer() {
           <p className="text-[13px] text-gray-400 text-center">
             &copy; {new Date().getFullYear()} CerpaMedia LLC d/b/a CerpaMedia. All rights reserved.
           </p>
+          {showFoundationsBadge ? (
+            <div className="mt-3">
+              <BuiltByBadge />
+            </div>
+          ) : null}
         </div>
       </div>
     </footer>
