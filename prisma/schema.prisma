@@ -247,6 +247,7 @@ model SiteSetting {
   id                      String    @id @default("default")
   foundationsUiEnabled    Boolean   @default(false)
   analyticsEnabled        Boolean   @default(false)
+  demosPublicEnabled      Boolean   @default(false)
   demoKillSwitch          Boolean   @default(false)
   demoDailySpendCapUsd    Float     @default(5)
   demoSpikeAlertThreshold Int       @default(8)
@@ -343,18 +344,21 @@ model TimelineEntry {
 }
 
 model Demo {
-  id             String       @id @default(cuid())
-  slug           String       @unique
+  id             String        @id @default(cuid())
+  slug           String        @unique
   title          String
-  description    String       @db.Text
-  enabled        Boolean      @default(true)
+  description    String        @db.Text
+  enabled        Boolean       @default(true)
+  status         PublishStatus @default(draft)
+  publishedAt    DateTime?
   replayScript   Json
-  restingMessage String       @default("Demo resting, back tomorrow.")
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  restingMessage String        @default("Demo resting, back tomorrow.")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
   samples        DemoSample[]
 
   @@index([enabled])
+  @@index([status])
 }
 
 model DemoSample {

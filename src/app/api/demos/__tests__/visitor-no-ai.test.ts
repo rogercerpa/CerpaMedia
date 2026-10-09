@@ -54,6 +54,17 @@ describe("public demo API never triggers AI", () => {
     expect(data.samples[0].cachedOutput).toBe("Sorry — here's the plan.");
   });
 
+  it("returns 404 for a visitor when the public payload is hidden", async () => {
+    vi.mocked(getPublicDemoPayload).mockResolvedValue(null);
+    const request = new NextRequest(
+      "http://localhost:3000/api/demos/inbox-rescue"
+    );
+    const response = await GET(request, {
+      params: Promise.resolve({ slug: "inbox-rescue" }),
+    });
+    expect(response.status).toBe(404);
+  });
+
   it("rejects visitor POST so there is no visitor-triggered AI path", async () => {
     const request = new NextRequest(
       "http://localhost:3000/api/demos/inbox-rescue",

@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { promptForDemo } from "@/lib/demo-prompts";
 import type { ReplayScript } from "@/lib/demo-safety";
+import type { AdminRole } from "@/lib/roles";
+import type { PublishStatus } from "@/lib/publishing";
+import WorkflowStatusSelect from "@/components/admin/WorkflowStatusSelect";
 
 type Sample = {
   id?: string;
@@ -16,14 +19,17 @@ type Sample = {
 
 export default function DemoAdminForm({
   isOwner,
+  role,
   flags,
   usage,
   initialData,
 }: {
   isOwner: boolean;
+  role: AdminRole;
   flags: {
     foundationsUiEnabled: boolean;
     analyticsEnabled: boolean;
+    demosPublicEnabled: boolean;
     demoKillSwitch: boolean;
     demoDailySpendCapUsd: number;
     demoSpikeAlertThreshold: number;
@@ -35,6 +41,7 @@ export default function DemoAdminForm({
     title: string;
     description: string;
     enabled: boolean;
+    status: PublishStatus;
     restingMessage: string;
     replayScript: ReplayScript;
     samples: Sample[];
@@ -52,6 +59,9 @@ export default function DemoAdminForm({
     flags.foundationsUiEnabled
   );
   const [analyticsEnabled, setAnalyticsEnabled] = useState(flags.analyticsEnabled);
+  const [demosPublicEnabled, setDemosPublicEnabled] = useState(
+    flags.demosPublicEnabled
+  );
   const [demo, setDemo] = useState(initialData);
   const prompt = promptForDemo(demo.slug);
 
@@ -66,6 +76,7 @@ export default function DemoAdminForm({
       body: JSON.stringify({
         foundationsUiEnabled,
         analyticsEnabled,
+        demosPublicEnabled,
         demoKillSwitch: killSwitch,
         demoDailySpendCapUsd: Number(cap),
         demoSpikeAlertThreshold: Number(threshold),
@@ -90,6 +101,7 @@ export default function DemoAdminForm({
           title: demo.title,
           description: demo.description,
           enabled: demo.enabled,
+          status: demo.status,
           restingMessage: demo.restingMessage,
           replayScript: demo.replayScript,
           samples: demo.samples,
@@ -212,6 +224,15 @@ export default function DemoAdminForm({
           />
           Enable Vercel Web Analytics script (OFF by default so live head tags stay unchanged)
         </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={demosPublicEnabled}
+            onChange={(e) => setDemosPublicEnabled(e.target.checked)}
+            disabled={!isOwner}
+          />
+          Make published demos public on /try (OFF by default — visitors get 404 until this is on)
+        </label>
       </section>
 
       <section className="space-y-4">
@@ -250,8 +271,28 @@ export default function DemoAdminForm({
               setDemo((prev) => ({ ...prev, enabled: e.target.checked }))
             }
           />
-          Demo enabled
+          Demo enabled (admin can still preview while Draft)
         </label>
+        <WorkflowStatusSelect
+          value={demo.status}
+          onChange={(status) => setDemo((prev) => ({ ...prev, status }))}
+          role={role}
+        />
+        <p className="text-sm text-gray-600">
+          <Link
+            href={`/admin/preview/demo/${demo.slug}`}
+            className="text-gray-900 underline"
+          >
+            Open admin preview
+          </Link>
+          {" · "}
+          <Link
+            href="/admin/preview/demo-fallback"
+            className="text-gray-900 underline"
+          >
+            Cap-hit fallback preview
+          </Link>
+        </p>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Resting message

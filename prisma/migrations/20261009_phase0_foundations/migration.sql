@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS "SiteSetting" (
     "id" TEXT NOT NULL DEFAULT 'default',
     "foundationsUiEnabled" BOOLEAN NOT NULL DEFAULT false,
     "analyticsEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "demosPublicEnabled" BOOLEAN NOT NULL DEFAULT false,
     "demoKillSwitch" BOOLEAN NOT NULL DEFAULT false,
     "demoDailySpendCapUsd" DOUBLE PRECISION NOT NULL DEFAULT 5,
     "demoSpikeAlertThreshold" INTEGER NOT NULL DEFAULT 8,
@@ -62,6 +63,7 @@ CREATE TABLE IF NOT EXISTS "Source" (
 CREATE INDEX IF NOT EXISTS "Source_status_idx" ON "Source"("status");
 
 ALTER TABLE "SiteSetting" ALTER COLUMN "id" SET DEFAULT 'default';
+ALTER TABLE "SiteSetting" ADD COLUMN IF NOT EXISTS "demosPublicEnabled" BOOLEAN NOT NULL DEFAULT false;
 
 CREATE TABLE IF NOT EXISTS "SourceLink" (
     "id" TEXT NOT NULL,
@@ -139,6 +141,8 @@ CREATE TABLE IF NOT EXISTS "Demo" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "enabled" BOOLEAN NOT NULL DEFAULT true,
+    "status" "PublishStatus" NOT NULL DEFAULT 'draft',
+    "publishedAt" TIMESTAMP(3),
     "replayScript" JSONB NOT NULL,
     "restingMessage" TEXT NOT NULL DEFAULT 'Demo resting, back tomorrow.',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -148,6 +152,9 @@ CREATE TABLE IF NOT EXISTS "Demo" (
 
 CREATE UNIQUE INDEX IF NOT EXISTS "Demo_slug_key" ON "Demo"("slug");
 CREATE INDEX IF NOT EXISTS "Demo_enabled_idx" ON "Demo"("enabled");
+ALTER TABLE "Demo" ADD COLUMN IF NOT EXISTS "status" "PublishStatus" NOT NULL DEFAULT 'draft';
+ALTER TABLE "Demo" ADD COLUMN IF NOT EXISTS "publishedAt" TIMESTAMP(3);
+CREATE INDEX IF NOT EXISTS "Demo_status_idx" ON "Demo"("status");
 
 CREATE TABLE IF NOT EXISTS "DemoSample" (
     "id" TEXT NOT NULL,

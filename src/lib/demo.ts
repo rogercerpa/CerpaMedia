@@ -2,6 +2,7 @@ import { prisma } from "./prisma";
 import { promptForDemo } from "./demo-prompts";
 import {
   canGenerate,
+  canServePublicDemo,
   estimateGenerationCostUsd,
   publicDemoMode,
   utcDateKey,
@@ -40,25 +41,61 @@ export async function getUsageForToday(now = new Date()) {
   }
 }
 
-export async function getPublicDemoPayload(slug: string) {
-  const demo = await prisma.demo.findUnique({
+type DemoWithSamples = {
+  slug: string;
+  title: string;
+  description: string;
+  enabled: boolean;
+  status: string;
+  restingMessage: string;
+  replayScript: unknown;
+  samples: {
+    id: string;
+    label: string;
+    inputText: string;
+    cachedOutput: string | null;
+  }[];
+};
+
+export type DemoPayload = {
+  slug: string;
+  title: string;
+  description: string;
+  mode: PublicDemoMode;
+  killSwitch: boolean;
+  capHit: boolean;
+  restingMessage: string;
+  replayScript: ReplayScript;
+  samples: {
+    id: string;
+    label: string;
+    inputText: string;
+    cachedOutput: string | null;
+  }[];
+};
+
+async function loadDemoBySlug(slug: string) {
+  return prisma.demo.findUnique({
     where: { slug },
     include: {
       samples: { orderBy: { sortOrder: "asc" } },
     },
   });
+}
 
-  if (!demo || !demo.enabled) {
-    return null;
-  }
-
+export async function buildDemoPayload(
+  demo: DemoWithSamples,
+  options: { forceReplay?: boolean } = {}
+): Promise<DemoPayload> {
   const flags = await getSiteFlags();
   const usage = await getUsageForToday();
-  const mode: PublicDemoMode = publicDemoMode({
-    killSwitch: flags.demoKillSwitch,
-    spendUsd: usage.spendUsd,
-    capUsd: flags.demoDailySpendCapUsd,
-  });
+  const mode: PublicDemoMode = options.forceReplay
+    ? "replay"
+    : publicDemoMode({
+        killSwitch: flags.demoKillSwitch,
+        spendUsd: usage.spendUsd,
+        capUsd: flags.demoDailySpendCapUsd,
+      });
 
   const samples =
     mode === "samples"
@@ -81,6 +118,37 @@ export async function getPublicDemoPayload(slug: string) {
     replayScript: parseReplayScript(demo.replayScript),
     samples,
   };
+}
+
+export async function getPublicDemoPayload(slug: string) {
+  const demo = await loadDemoBySlug(slug);
+  if (!demo) {
+    return null;
+  }
+
+  const flags = await getSiteFlags();
+  if (
+    !canServePublicDemo({
+      enabled: demo.enabled,
+      status: demo.status,
+      demosPublicEnabled: flags.demosPublicEnabled,
+    })
+  ) {
+    return null;
+  }
+
+  return buildDemoPayload(demo);
+}
+
+export async function getAdminDemoPayload(
+  slug: string,
+  options: { forceReplay?: boolean } = {}
+) {
+  const demo = await loadDemoBySlug(slug);
+  if (!demo) {
+    return null;
+  }
+  return buildDemoPayload(demo, options);
 }
 
 type GatewayResult = {

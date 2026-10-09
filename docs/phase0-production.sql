@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS "SiteSetting" (
     "id" TEXT NOT NULL DEFAULT 'default',
     "foundationsUiEnabled" BOOLEAN NOT NULL DEFAULT false,
     "analyticsEnabled" BOOLEAN NOT NULL DEFAULT false,
+    "demosPublicEnabled" BOOLEAN NOT NULL DEFAULT false,
     "demoKillSwitch" BOOLEAN NOT NULL DEFAULT false,
     "demoDailySpendCapUsd" DOUBLE PRECISION NOT NULL DEFAULT 5,
     "demoSpikeAlertThreshold" INTEGER NOT NULL DEFAULT 8,
@@ -69,6 +70,7 @@ CREATE INDEX IF NOT EXISTS "Source_status_idx" ON "Source"("status");
 
 -- Guarded default for the singleton settings row (no-op if already set)
 ALTER TABLE "SiteSetting" ALTER COLUMN "id" SET DEFAULT 'default';
+ALTER TABLE "SiteSetting" ADD COLUMN IF NOT EXISTS "demosPublicEnabled" BOOLEAN NOT NULL DEFAULT false;
 
 CREATE TABLE IF NOT EXISTS "SourceLink" (
     "id" TEXT NOT NULL,
@@ -146,6 +148,8 @@ CREATE TABLE IF NOT EXISTS "Demo" (
     "title" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "enabled" BOOLEAN NOT NULL DEFAULT true,
+    "status" "PublishStatus" NOT NULL DEFAULT 'draft',
+    "publishedAt" TIMESTAMP(3),
     "replayScript" JSONB NOT NULL,
     "restingMessage" TEXT NOT NULL DEFAULT 'Demo resting, back tomorrow.',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -155,6 +159,9 @@ CREATE TABLE IF NOT EXISTS "Demo" (
 
 CREATE UNIQUE INDEX IF NOT EXISTS "Demo_slug_key" ON "Demo"("slug");
 CREATE INDEX IF NOT EXISTS "Demo_enabled_idx" ON "Demo"("enabled");
+ALTER TABLE "Demo" ADD COLUMN IF NOT EXISTS "status" "PublishStatus" NOT NULL DEFAULT 'draft';
+ALTER TABLE "Demo" ADD COLUMN IF NOT EXISTS "publishedAt" TIMESTAMP(3);
+CREATE INDEX IF NOT EXISTS "Demo_status_idx" ON "Demo"("status");
 
 CREATE TABLE IF NOT EXISTS "DemoSample" (
     "id" TEXT NOT NULL,
@@ -218,10 +225,10 @@ VALUES ('owner-cerpamedia', 'cerpamedia@gmail.com', 'owner', CURRENT_TIMESTAMP, 
 ON CONFLICT ("email") DO NOTHING;
 
 INSERT INTO "SiteSetting" (
-  "id", "foundationsUiEnabled", "analyticsEnabled", "demoKillSwitch",
+  "id", "foundationsUiEnabled", "analyticsEnabled", "demosPublicEnabled", "demoKillSwitch",
   "demoDailySpendCapUsd", "demoSpikeAlertThreshold", "createdAt", "updatedAt"
 ) VALUES (
-  'default', false, false, false, 5, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+  'default', false, false, false, false, 5, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 ) ON CONFLICT ("id") DO NOTHING;
 
 INSERT INTO "Source" ("id", "title", "publisher", "publishedDate", "url", "notes", "status", "createdAt", "updatedAt")
@@ -291,13 +298,14 @@ VALUES
 ON CONFLICT ("sourceId", "targetType", "targetId") DO NOTHING;
 
 INSERT INTO "Demo" (
-  "id", "slug", "title", "description", "enabled", "replayScript", "restingMessage", "createdAt", "updatedAt"
+  "id", "slug", "title", "description", "enabled", "status", "replayScript", "restingMessage", "createdAt", "updatedAt"
 ) VALUES (
   'demo-inbox-rescue',
   'inbox-rescue',
   'Inbox Rescue',
   'Watch a customer email turn into a calm draft reply. Recorded replay first. Pick a sample for a cached output. No free-text box.',
   true,
+  'draft',
   '{"inputLabel":"Customer email","outputLabel":"Draft reply","before":"Hi — I called twice yesterday about the leak under the kitchen sink. Nobody called back. If I don''t hear from you today I''m calling someone else.","after":"Hi — sorry you had to wait. I have you flagged for a same-day look this afternoon. I''ll confirm the window as soon as we lock the route. If the leak is active, shut the valve under the sink and text is not needed — email or call is enough.","durationMs":4200}'::jsonb,
   'Demo resting, back tomorrow.',
   CURRENT_TIMESTAMP,
@@ -361,7 +369,7 @@ SELECT * FROM (
   FROM "AdminUser" WHERE email = 'cerpamedia@gmail.com' AND role = 'owner'
   UNION ALL
   SELECT 'SiteSetting default', 1, COUNT(*)::int, (COUNT(*) = 1)
-  FROM "SiteSetting" WHERE id = 'default' AND "foundationsUiEnabled" = false AND "analyticsEnabled" = false AND "demoKillSwitch" = false
+  FROM "SiteSetting" WHERE id = 'default' AND "foundationsUiEnabled" = false AND "analyticsEnabled" = false AND "demosPublicEnabled" = false AND "demoKillSwitch" = false
   UNION ALL
   SELECT 'Source library', 16, COUNT(*)::int, (COUNT(*) = 16)
   FROM "Source"
@@ -379,7 +387,10 @@ SELECT * FROM (
   FROM "TimelineEntry" WHERE status = 'draft'
   UNION ALL
   SELECT 'Inbox Rescue demo', 1, COUNT(*)::int, (COUNT(*) = 1)
-  FROM "Demo" WHERE slug = 'inbox-rescue'
+  FROM "Demo" WHERE slug = 'inbox-rescue' AND status = 'draft' AND enabled = true
+  UNION ALL
+  SELECT 'Demos public flag off', 1, COUNT(*)::int, (COUNT(*) = 1)
+  FROM "SiteSetting" WHERE id = 'default' AND "demosPublicEnabled" = false
   UNION ALL
   SELECT 'Demo samples', 4, COUNT(*)::int, (COUNT(*) = 4)
   FROM "DemoSample" WHERE "demoId" = 'demo-inbox-rescue'

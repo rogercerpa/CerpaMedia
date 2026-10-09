@@ -19,6 +19,18 @@ export function visitorCanTriggerAi(): boolean {
   return false;
 }
 
+export function canServePublicDemo(args: {
+  enabled: boolean;
+  status: string;
+  demosPublicEnabled: boolean;
+}): boolean {
+  return (
+    args.enabled === true &&
+    args.status === "published" &&
+    args.demosPublicEnabled === true
+  );
+}
+
 export function isCapHit(spendUsd: number, capUsd: number): boolean {
   return spendUsd >= capUsd;
 }

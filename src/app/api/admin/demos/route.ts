@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireAdminActor, jsonError } from "@/lib/admin-api";
 import { getSiteFlags } from "@/lib/flags";
 import { getUsageForToday } from "@/lib/demo";
+import { assertPublishAllowed } from "@/lib/publishing";
 
 export async function GET() {
   const auth = await requireAdminActor();
@@ -36,6 +37,7 @@ export async function POST(request: NextRequest) {
       title,
       description,
       enabled = true,
+      status = "draft",
       replayScript,
       restingMessage,
       samples = [],
@@ -50,12 +52,20 @@ export async function POST(request: NextRequest) {
       return jsonError("A demo with this slug already exists.", 400);
     }
 
+    const guard = assertPublishAllowed({
+      role: auth.actor.role,
+      nextStatus: status,
+    });
+    if (!guard.ok) return jsonError(guard.error, guard.status);
+
     const demo = await prisma.demo.create({
       data: {
         slug,
         title,
         description,
         enabled: Boolean(enabled),
+        status,
+        publishedAt: status === "published" ? new Date() : null,
         replayScript,
         restingMessage: restingMessage || "Demo resting, back tomorrow.",
         samples: {

@@ -39,6 +39,7 @@ export default async function EditDemoPage({
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <DemoAdminForm
           isOwner={actor.role === "owner"}
+          role={actor.role}
           flags={flags}
           usage={usage}
           initialData={{
@@ -47,6 +48,7 @@ export default async function EditDemoPage({
             title: demo.title,
             description: demo.description,
             enabled: demo.enabled,
+            status: demo.status,
             restingMessage: demo.restingMessage,
             replayScript: parseReplayScript(demo.replayScript),
             samples: demo.samples.map((sample) => ({

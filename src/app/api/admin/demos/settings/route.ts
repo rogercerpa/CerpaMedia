@@ -27,6 +27,7 @@ export async function PUT(request: NextRequest) {
         id: "default",
         foundationsUiEnabled: Boolean(body.foundationsUiEnabled),
         analyticsEnabled: Boolean(body.analyticsEnabled),
+        demosPublicEnabled: Boolean(body.demosPublicEnabled),
         demoKillSwitch: Boolean(body.demoKillSwitch),
         demoDailySpendCapUsd: Number(body.demoDailySpendCapUsd ?? 5),
         demoSpikeAlertThreshold: Number(body.demoSpikeAlertThreshold ?? 8),
@@ -34,6 +35,7 @@ export async function PUT(request: NextRequest) {
       update: {
         foundationsUiEnabled: Boolean(body.foundationsUiEnabled),
         analyticsEnabled: Boolean(body.analyticsEnabled),
+        demosPublicEnabled: Boolean(body.demosPublicEnabled),
         demoKillSwitch: Boolean(body.demoKillSwitch),
         demoDailySpendCapUsd: Number(body.demoDailySpendCapUsd ?? 5),
         demoSpikeAlertThreshold: Number(body.demoSpikeAlertThreshold ?? 8),

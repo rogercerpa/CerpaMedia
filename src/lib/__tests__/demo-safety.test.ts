@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   canGenerate,
+  canServePublicDemo,
   publicDemoMode,
   visitorCanTriggerAi,
 } from "@/lib/demo-safety";
@@ -53,6 +54,37 @@ describe("demo safety model", () => {
     expect(
       publicDemoMode({ killSwitch: false, spendUsd: 5.01, capUsd: 5 })
     ).toBe("replay");
+  });
+
+  it("hides demos from visitors unless Published and the public flag is on", () => {
+    expect(
+      canServePublicDemo({
+        enabled: true,
+        status: "draft",
+        demosPublicEnabled: false,
+      })
+    ).toBe(false);
+    expect(
+      canServePublicDemo({
+        enabled: true,
+        status: "published",
+        demosPublicEnabled: false,
+      })
+    ).toBe(false);
+    expect(
+      canServePublicDemo({
+        enabled: true,
+        status: "draft",
+        demosPublicEnabled: true,
+      })
+    ).toBe(false);
+    expect(
+      canServePublicDemo({
+        enabled: true,
+        status: "published",
+        demosPublicEnabled: true,
+      })
+    ).toBe(true);
   });
 
   it("allows admin generation under the cap with the kill switch off", () => {

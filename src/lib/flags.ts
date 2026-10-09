@@ -3,6 +3,7 @@ import { prisma } from "./prisma";
 export type SiteFlags = {
   foundationsUiEnabled: boolean;
   analyticsEnabled: boolean;
+  demosPublicEnabled: boolean;
   demoKillSwitch: boolean;
   demoDailySpendCapUsd: number;
   demoSpikeAlertThreshold: number;
@@ -12,6 +13,7 @@ export type SiteFlags = {
 export const DEFAULT_SITE_FLAGS: SiteFlags = {
   foundationsUiEnabled: false,
   analyticsEnabled: false,
+  demosPublicEnabled: false,
   demoKillSwitch: false,
   demoDailySpendCapUsd: Number(process.env.DEMO_DAILY_SPEND_CAP_USD || "5"),
   demoSpikeAlertThreshold: Number(
@@ -31,6 +33,7 @@ export async function getSiteFlags(): Promise<SiteFlags> {
     return {
       foundationsUiEnabled: row.foundationsUiEnabled,
       analyticsEnabled: row.analyticsEnabled,
+      demosPublicEnabled: Boolean(row.demosPublicEnabled),
       demoKillSwitch: row.demoKillSwitch,
       demoDailySpendCapUsd: row.demoDailySpendCapUsd,
       demoSpikeAlertThreshold: row.demoSpikeAlertThreshold,

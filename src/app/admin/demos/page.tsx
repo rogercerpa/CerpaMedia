@@ -39,7 +39,7 @@ export default async function AdminDemosPage() {
             <h3 className="text-lg font-semibold text-gray-900">{demo.title}</h3>
             <p className="text-sm text-gray-500 font-mono">{demo.slug}</p>
             <p className="text-sm text-gray-600 mt-2">
-              {demo.samples.length} samples ·{" "}
+              {demo.status} · {demo.samples.length} samples ·{" "}
               {demo.samples.filter((sample) => sample.cachedOutput).length} generated
             </p>
           </Link>

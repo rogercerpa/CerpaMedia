@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { getAdminActor } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { getPublicDemoPayload } from "@/lib/demo";
+import { getAdminDemoPayload } from "@/lib/demo";
 import AdminChrome from "@/components/admin/AdminChrome";
 import SignedNote from "@/components/SignedNote";
 import ReviewStamp from "@/components/ReviewStamp";
@@ -16,7 +16,7 @@ export default async function FoundationsPreviewPage() {
   const actor = await getAdminActor();
   if (!actor) redirect("/admin/login");
 
-  const demoPayload = await getPublicDemoPayload("inbox-rescue");
+  const demoPayload = await getAdminDemoPayload("inbox-rescue");
   const guide = await prisma.guide.findFirst({
     orderBy: { updatedAt: "desc" },
   });

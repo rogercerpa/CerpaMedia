@@ -11,9 +11,10 @@ export default async function WorkflowPage() {
   const actor = await getAdminActor();
   if (!actor) redirect("/admin/login");
 
-  const [guides, timeline] = await Promise.all([
+  const [guides, timeline, demos] = await Promise.all([
     prisma.guide.findMany({ orderBy: { updatedAt: "desc" } }),
     prisma.timelineEntry.findMany({ orderBy: { updatedAt: "desc" } }),
+    prisma.demo.findMany({ orderBy: { updatedAt: "desc" } }),
   ]);
 
   const rows = [
@@ -30,6 +31,13 @@ export default async function WorkflowPage() {
       title: item.title,
       status: item.status,
       href: `/admin/timeline/${item.id}`,
+    })),
+    ...demos.map((item) => ({
+      id: item.id,
+      type: "Demo",
+      title: item.title,
+      status: item.status,
+      href: `/admin/demos/${item.id}`,
     })),
   ];
 

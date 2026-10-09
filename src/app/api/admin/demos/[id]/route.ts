@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminActor, jsonError } from "@/lib/admin-api";
+import { assertPublishAllowed } from "@/lib/publishing";
 
 export async function PUT(
   request: NextRequest,
@@ -17,6 +18,7 @@ export async function PUT(
       title,
       description,
       enabled = true,
+      status = "draft",
       replayScript,
       restingMessage,
       samples = [],
@@ -38,7 +40,20 @@ export async function PUT(
       }
     }
 
+    const guard = assertPublishAllowed({
+      role: auth.actor.role,
+      nextStatus: status,
+    });
+    if (!guard.ok) return jsonError(guard.error, guard.status);
+
     await prisma.demoSample.deleteMany({ where: { demoId: id } });
+
+    let publishedAt = existing.publishedAt;
+    if (status === "published" && !existing.publishedAt) {
+      publishedAt = new Date();
+    } else if (status !== "published") {
+      publishedAt = null;
+    }
 
     const demo = await prisma.demo.update({
       where: { id },
@@ -47,6 +62,8 @@ export async function PUT(
         title,
         description,
         enabled: Boolean(enabled),
+        status,
+        publishedAt,
         replayScript,
         restingMessage: restingMessage || "Demo resting, back tomorrow.",
         samples: {
