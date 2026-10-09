@@ -1,6 +1,26 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { getPublishedServices, getServiceBySlug, fallbackServices, fallbackFeaturedService } from "@/lib/services";
+import { getSeoMeta } from "@/lib/seo";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeoMeta("/services");
+  
+  // Only override if there's a DB value, otherwise use layout default
+  if (!seo.title && !seo.description) {
+    return {};
+  }
+  
+  const metadata: Metadata = {};
+  if (seo.title) metadata.title = seo.title;
+  if (seo.description) metadata.description = seo.description;
+  if (seo.ogImageUrl) {
+    metadata.openGraph = { images: [seo.ogImageUrl] };
+  }
+  
+  return metadata;
+}
 
 export default async function ServicesPage() {
   // Fetch services from DB with fallback

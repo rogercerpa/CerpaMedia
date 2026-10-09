@@ -1,10 +1,39 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { getServiceBySlug, fallbackFeaturedService } from "@/lib/services";
+import { getHeroContent, getHowItWorksContent, getPublishedFaqs, getPublishedTestimonials } from "@/lib/content";
+import { getSeoMeta } from "@/lib/seo";
+import type { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeoMeta("/");
+  
+  // Only override if there's a DB value, otherwise use layout default
+  if (!seo.title && !seo.description) {
+    return {};
+  }
+  
+  const metadata: Metadata = {};
+  if (seo.title) metadata.title = seo.title;
+  if (seo.description) metadata.description = seo.description;
+  if (seo.ogImageUrl) {
+    metadata.openGraph = { images: [seo.ogImageUrl] };
+  }
+  
+  return metadata;
+}
 
 export default async function Home() {
   // Fetch AI Teammate Launch service from DB with fallback
   const featured = await getServiceBySlug("ai-teammate-launch") || fallbackFeaturedService;
+  
+  // Fetch editable content
+  const hero = await getHeroContent();
+  const howItWorks = await getHowItWorksContent();
+  const faqs = await getPublishedFaqs();
+  const testimonials = await getPublishedTestimonials();
+  const hasPrimaryCta = Boolean(hero.primaryCtaLabel?.trim() && hero.primaryCtaUrl?.trim());
+  const hasSecondaryCta = Boolean(hero.secondaryCtaLabel?.trim() && hero.secondaryCtaUrl?.trim());
   
   return (
     <div>
@@ -13,11 +42,35 @@ export default async function Home() {
           <Reveal>
             <div className="text-center">
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
-                Stop losing hours to tools that don't talk to each other.
+                {hero.headline}
               </h1>
-              <p className="text-xl md:text-2xl text-text-muted max-w-3xl mx-auto leading-relaxed">
-                CerpaMedia helps small businesses get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and <strong className="text-text">you own the accounts and code.</strong>
+              <p className={`text-xl md:text-2xl text-text-muted max-w-3xl mx-auto leading-relaxed${hasPrimaryCta || hasSecondaryCta ? " mb-12" : ""}`}>
+                {hero.subheadline.split("you own the accounts and code.").map((part, i, arr) => 
+                  i === arr.length - 1 ? part : (
+                    <span key={i}>{part}<strong className="text-text">you own the accounts and code.</strong></span>
+                  )
+                )}
               </p>
+              {hasPrimaryCta || hasSecondaryCta ? (
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  {hasPrimaryCta ? (
+                    <Link
+                      href={hero.primaryCtaUrl}
+                      className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                    >
+                      {hero.primaryCtaLabel}
+                    </Link>
+                  ) : null}
+                  {hasSecondaryCta ? (
+                    <a
+                      href={hero.secondaryCtaUrl}
+                      className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
+                    >
+                      {hero.secondaryCtaLabel}
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
               <div className="mt-8 pt-6 border-t border-border max-w-2xl mx-auto">
                 <p className="text-[15px] text-text-muted leading-relaxed">
                   <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href="/services/ai-teammate-launch" className="text-text hover:underline font-medium">AI Teammate Launch</Link> — $799 founding rate for the first 5 clients.
@@ -39,24 +92,18 @@ export default async function Home() {
           </Reveal>
           <Reveal stagger staggerDelay={60}>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <h3 className="text-[15px] font-medium text-text mb-2">Clarity before code</h3>
-                <p className="text-[15px] text-text-muted leading-relaxed">
-                  Paid discovery maps what to build (and what not to). Then a fixed statement of work with milestones — so you're not buying an open-ended project.
-                </p>
-              </div>
-              <div className="text-center">
-                <h3 className="text-[15px] font-medium text-text mb-2">You own the system</h3>
-                <p className="text-[15px] text-text-muted leading-relaxed">
-                  GitHub, hosting, domain, database, and third-party accounts stay in <em>your</em> name. We're a collaborator, not a landlord.
-                </p>
-              </div>
-              <div className="text-center">
-                <h3 className="text-[15px] font-medium text-text mb-2">Practical over trendy</h3>
-                <p className="text-[15px] text-text-muted leading-relaxed">
-                  We recommend what your business will actually use next quarter — not a slide deck of buzzwords.
-                </p>
-              </div>
+              {howItWorks.steps.map((step, i) => (
+                <div key={i} className="text-center">
+                  <h3 className="text-[15px] font-medium text-text mb-2">{step.title}</h3>
+                  <p className="text-[15px] text-text-muted leading-relaxed">
+                    {step.description.split("<em>").map((part, j) => 
+                      j === 0 ? part : (
+                        <span key={j}><em>{part.split("</em>")[0]}</em>{part.split("</em>")[1]}</span>
+                      )
+                    )}
+                  </p>
+                </div>
+              ))}
             </div>
           </Reveal>
         </div>
@@ -214,6 +261,75 @@ export default async function Home() {
           </Reveal>
         </div>
       </section>
+
+      {faqs.length > 0 && (
+        <section className="py-24 md:py-32 bg-bg-subtle border-y border-border">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Reveal delay={100}>
+              <h2 className="text-4xl md:text-5xl font-semibold text-text mb-12 tracking-tight text-center">
+                Frequently Asked Questions
+              </h2>
+            </Reveal>
+            <Reveal stagger staggerDelay={80}>
+              <div className="space-y-8">
+                {faqs.map((faq) => (
+                  <div key={faq.id} className="border-b border-border pb-6">
+                    <h3 className="text-lg font-medium text-text mb-3">
+                      {faq.question}
+                    </h3>
+                    <p className="text-[15px] text-text-muted leading-relaxed whitespace-pre-wrap">
+                      {faq.answer}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      )}
+
+      {testimonials.length > 0 && (
+        <section className="py-24 md:py-32">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Reveal delay={100}>
+              <h2 className="text-4xl md:text-5xl font-semibold text-text mb-12 tracking-tight text-center">
+                What clients say
+              </h2>
+            </Reveal>
+            <Reveal stagger staggerDelay={80}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {testimonials.map((testimonial) => (
+                  <div key={testimonial.id} className="border border-border p-8">
+                    <p className="text-[15px] text-text-muted leading-relaxed mb-6 italic">
+                      "{testimonial.quote}"
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-[15px] font-medium text-text">
+                          {testimonial.name}
+                        </p>
+                        <p className="text-[14px] text-text-muted">
+                          {testimonial.role}
+                        </p>
+                      </div>
+                      {testimonial.link && (
+                        <a
+                          href={testimonial.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[14px] text-text hover:underline"
+                        >
+                          Learn more →
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          </div>
+        </section>
+      )}
 
       <section className="py-24 md:py-32">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

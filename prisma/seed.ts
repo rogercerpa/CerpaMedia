@@ -335,6 +335,53 @@ AI automation isn't about replacing your team — it's about freeing them from t
   });
   console.log("✓ Created/updated sample insight post");
 
+  // Seed home page content (hero, how-it-works)
+  // Extracted from current page.tsx to ensure visual parity
+  await prisma.siteContent.upsert({
+    where: { key: "home-hero" },
+    update: {},
+    create: {
+      key: "home-hero",
+      value: {
+        headline: "Stop losing hours to tools that don't talk to each other.",
+        subheadline: "CerpaMedia helps small businesses get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and you own the accounts and code.",
+        primaryCtaLabel: "",
+        primaryCtaUrl: "",
+        secondaryCtaLabel: "",
+        secondaryCtaUrl: "",
+      },
+    },
+  });
+
+  await prisma.siteContent.upsert({
+    where: { key: "home-how-it-works" },
+    update: {},
+    create: {
+      key: "home-how-it-works",
+      value: {
+        steps: [
+          {
+            title: "Clarity before code",
+            description: "Paid discovery maps what to build (and what not to). Then a fixed statement of work with milestones — so you're not buying an open-ended project.",
+          },
+          {
+            title: "You own the system",
+            description: "GitHub, hosting, domain, database, and third-party accounts stay in <em>your</em> name. We're a collaborator, not a landlord.",
+          },
+          {
+            title: "Practical over trendy",
+            description: "We recommend what your business will actually use next quarter — not a slide deck of buzzwords.",
+          },
+        ],
+      },
+    },
+  });
+
+  console.log("✓ Created/updated home page site content");
+
+  // Note: FAQ and Testimonials are empty by default (per requirements)
+  // No seed data for these - admin must add them manually
+
   console.log("\n✅ Seeding completed!");
 }
 

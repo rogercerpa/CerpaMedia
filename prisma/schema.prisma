@@ -162,3 +162,55 @@ model InsightPost {
   @@index([status, publishedAt])
   @@index([slug])
 }
+
+model SiteContent {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+}
+
+model FaqItem {
+  id        String    @id @default(cuid())
+  question  String    @db.Text
+  answer    String    @db.Text
+  sortOrder Int       @default(0)
+  published Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([published, sortOrder])
+  @@index([deletedAt])
+}
+
+model Testimonial {
+  id        String    @id @default(cuid())
+  name      String
+  role      String
+  quote     String    @db.Text
+  link      String?
+  sortOrder Int       @default(0)
+  published Boolean   @default(false)
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([published, sortOrder])
+  @@index([deletedAt])
+}
+
+model SeoMeta {
+  id          String   @id @default(cuid())
+  path        String   @unique
+  title       String?
+  description String?  @db.Text
+  ogImageUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([path])
+}

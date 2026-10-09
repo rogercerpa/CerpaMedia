@@ -1,20 +1,29 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import type { Metadata } from "next";
+import { getSeoMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "AI Teammate Launch - CerpaMedia",
-  description: "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork — you own the accounts.",
-  alternates: {
-    canonical: "https://cerpamedia.com/services/ai-teammate-launch",
-  },
-  openGraph: {
-    title: "AI Teammate Launch - CerpaMedia",
-    description: "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork — you own the accounts.",
-    url: "https://cerpamedia.com/services/ai-teammate-launch",
-    type: "website",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSeoMeta("/services/ai-teammate-launch");
+  
+  const title = seo.title || "AI Teammate Launch - CerpaMedia";
+  const description = seo.description || "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork — you own the accounts.";
+  
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: "https://cerpamedia.com/services/ai-teammate-launch",
+    },
+    openGraph: {
+      title,
+      description,
+      url: "https://cerpamedia.com/services/ai-teammate-launch",
+      type: "website",
+      ...(seo.ogImageUrl && { images: [seo.ogImageUrl] }),
+    },
+  };
+}
 
 export default function AITeammateLaunchPage() {
   // TODO: Replace mailto with Stripe Payment Link when ready

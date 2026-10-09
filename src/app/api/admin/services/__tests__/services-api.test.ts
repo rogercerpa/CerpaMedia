@@ -23,6 +23,10 @@ vi.mock('@/lib/auth', () => ({
   getAdminSession: vi.fn(),
 }));
 
+vi.mock('next/cache', () => ({
+  revalidatePath: vi.fn(),
+}));
+
 describe('Service API Routes', () => {
   beforeEach(() => {
     vi.clearAllMocks();
