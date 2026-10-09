@@ -32,6 +32,8 @@ export default async function Home() {
   const howItWorks = await getHowItWorksContent();
   const faqs = await getPublishedFaqs();
   const testimonials = await getPublishedTestimonials();
+  const hasPrimaryCta = Boolean(hero.primaryCtaLabel?.trim() && hero.primaryCtaUrl?.trim());
+  const hasSecondaryCta = Boolean(hero.secondaryCtaLabel?.trim() && hero.secondaryCtaUrl?.trim());
   
   return (
     <div>
@@ -42,17 +44,16 @@ export default async function Home() {
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
                 {hero.headline}
               </h1>
-              <p className="text-xl md:text-2xl text-text-muted max-w-3xl mx-auto mb-12 leading-relaxed">
+              <p className={`text-xl md:text-2xl text-text-muted max-w-3xl mx-auto leading-relaxed${hasPrimaryCta || hasSecondaryCta ? " mb-12" : ""}`}>
                 {hero.subheadline.split("you own the accounts and code.").map((part, i, arr) => 
                   i === arr.length - 1 ? part : (
                     <span key={i}>{part}<strong className="text-text">you own the accounts and code.</strong></span>
                   )
                 )}
               </p>
-              {(hero.primaryCtaLabel?.trim() && hero.primaryCtaUrl?.trim()) ||
-              (hero.secondaryCtaLabel?.trim() && hero.secondaryCtaUrl?.trim()) ? (
+              {hasPrimaryCta || hasSecondaryCta ? (
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  {hero.primaryCtaLabel?.trim() && hero.primaryCtaUrl?.trim() ? (
+                  {hasPrimaryCta ? (
                     <Link
                       href={hero.primaryCtaUrl}
                       className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
@@ -60,7 +61,7 @@ export default async function Home() {
                       {hero.primaryCtaLabel}
                     </Link>
                   ) : null}
-                  {hero.secondaryCtaLabel?.trim() && hero.secondaryCtaUrl?.trim() ? (
+                  {hasSecondaryCta ? (
                     <a
                       href={hero.secondaryCtaUrl}
                       className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
