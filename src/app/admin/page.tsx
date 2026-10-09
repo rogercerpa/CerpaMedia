@@ -243,6 +243,98 @@ export default async function AdminDashboard() {
           </Link>
 
           <Link
+            href="/admin/workflow"
+            className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6"
+          >
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Workflow</h3>
+            <p className="text-gray-600 text-sm">Draft, review, approve, and publish new content</p>
+          </Link>
+
+          <Link
+            href="/admin/guides"
+            className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6"
+          >
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Guides</h3>
+            <p className="text-gray-600 text-sm">Evergreen guides with sections, sources, and Roger&apos;s note</p>
+          </Link>
+
+          <Link
+            href="/admin/timeline"
+            className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6"
+          >
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Timeline</h3>
+            <p className="text-gray-600 text-sm">Today / 2–5 years / 5–10 years entries with sources</p>
+          </Link>
+
+          <Link
+            href="/admin/sources"
+            className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6"
+          >
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Sources</h3>
+            <p className="text-gray-600 text-sm">Citation library. Defaults to to-verify</p>
+          </Link>
+
+          <Link
+            href="/admin/demos"
+            className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6"
+          >
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Demos</h3>
+            <p className="text-gray-600 text-sm">Replays, cached samples, kill switch, and daily cap</p>
+          </Link>
+
+          <Link
+            href="/admin/preview/foundations"
+            className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6"
+          >
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Foundations preview</h3>
+            <p className="text-gray-600 text-sm">Signed note, stamp, and badge — not live</p>
+          </Link>
+
+          <Link
             href="/admin/bookings"
             className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6"
           >
