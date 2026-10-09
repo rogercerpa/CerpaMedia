@@ -49,12 +49,6 @@ export default function Navigation() {
             <Link href="/contact" className="text-text-muted hover:text-text transition-colors text-[15px]">
               Contact
             </Link>
-            <Link
-              href="/consult"
-              className="bg-cta text-cta-text px-6 py-2 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
-            >
-              Book $99 call
-            </Link>
           </div>
 
           <div className="md:hidden flex items-center">
@@ -105,13 +99,6 @@ export default function Navigation() {
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact
-            </Link>
-            <Link
-              href="/consult"
-              className="block bg-cta text-cta-text px-6 py-2.5 font-medium hover:bg-cta-hover transition-colors text-center"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Book $99 call
             </Link>
           </div>
         </div>

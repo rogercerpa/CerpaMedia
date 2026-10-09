@@ -145,24 +145,18 @@ export default async function InsightPostPage({
         </div>
       </section>
 
-      <section className="py-12 md:py-16 border-t border-border bg-bg-subtle">
+      <section className="pb-12 md:pb-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal delay={100}>
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold text-text mb-4">
-                Need help with technology strategy?
-              </h2>
-              <p className="text-[15px] text-text-muted mb-6 leading-relaxed">
-                Book a consultation to discuss how we can help your business leverage technology and AI
-              </p>
-              <Link
-                href="/consult"
-                className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
-              >
-                Book $99 call
-              </Link>
-            </div>
-          </Reveal>
+          <p className="text-[15px] text-text-muted leading-relaxed">
+            Want a second opinion on your setup?{" "}
+            <Link
+              href="/consult"
+              className="text-text underline hover:text-text-muted transition-colors"
+            >
+              Book a Technology Strategy Call
+            </Link>
+            .
+          </p>
         </div>
       </section>
     </div>

@@ -19,12 +19,6 @@ export default async function Home() {
                 CerpaMedia helps small businesses get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and <strong className="text-text">you own the accounts and code.</strong>
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/consult"
-                  className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
-                >
-                  Book the $99 Strategy Call
-                </Link>
                 <a
                   href="mailto:cerpamedia@gmail.com"
                   className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
@@ -173,7 +167,7 @@ export default async function Home() {
                   <strong className="text-text">Outcome:</strong> fewer manual loops, fewer mistakes, and you're not the bottleneck.
                 </p>
                 <p className="text-[15px] text-text leading-relaxed">
-                  Want it set up right? We'll map your process, build the flows, and hand you the keys — <Link href="/consult" className="underline hover:text-text-muted">book the $99 Strategy Call</Link> to start.
+                  Want it set up right? We'll map your process, build the flows, and hand you the keys — book the $99 Strategy Call to start.
                 </p>
               </div>
 
@@ -186,7 +180,7 @@ export default async function Home() {
                   <strong className="text-text">Outcome:</strong> new hires onboard faster, answers live in one place, and you're not re-explaining the same process every week.
                 </p>
                 <p className="text-[15px] text-text leading-relaxed">
-                  Or let us structure it for you — from templates to integrations. <Link href="/consult" className="underline hover:text-text-muted">Start with the Strategy Call.</Link>
+                  Or let us structure it for you — from templates to integrations. Start with the Strategy Call.
                 </p>
               </div>
 
@@ -199,7 +193,7 @@ export default async function Home() {
                   <strong className="text-text">Outcome:</strong> less context-switching, more flow. The business doesn't stall when you're heads-down.
                 </p>
                 <p className="text-[15px] text-text leading-relaxed">
-                  We integrate agents into your workflow — connecting Slack, CRM, and task boards so they actually do the work. <Link href="/consult" className="underline hover:text-text-muted">Let's talk.</Link>
+                  We integrate agents into your workflow — connecting Slack, CRM, and task boards so they actually do the work. Let's talk.
                 </p>
               </div>
 
@@ -223,81 +217,6 @@ export default async function Home() {
                 >
                   Read tool guides in Insights
                 </Link>
-                <span className="hidden sm:inline text-text-muted">·</span>
-                <Link
-                  href="/consult"
-                  className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
-                >
-                  Book the $99 Technology Strategy Call
-                </Link>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      <section className="bg-charcoal py-24 md:py-32">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Reveal delay={100}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-              <div>
-                <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight">
-                  Get clear in one call — not another endless tech chat
-                </h2>
-                <p className="text-[15px] text-white/90 mb-8 leading-relaxed">
-                  For $99 you get a 30–45 minute Zoom or Teams session with Roger Cerpa, focused on <em>your</em> bottlenecks. Within 24–48 hours you receive a written summary: <strong>3–5 opportunities</strong>, a suggested priority order, and <strong>one recommended next step</strong>.
-                </p>
-                <Link
-                  href="/consult"
-                  className="inline-block bg-white text-charcoal px-8 py-3.5 text-[15px] font-medium hover:bg-gray-100 transition-all duration-200 hover:-translate-y-0.5"
-                >
-                  Pay $99 — Book Strategy Call
-                </Link>
-                <p className="text-[13px] text-white/70 mt-4 leading-relaxed">
-                  After payment, Roger emails or calls you to schedule
-                </p>
-              </div>
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-6 h-6 border border-white/40 flex items-center justify-center text-white text-xs font-medium mt-0.5">1</div>
-                  <div>
-                    <p className="text-[15px] text-white font-medium mb-1">Live strategy session</p>
-                    <p className="text-[14px] text-white/70 leading-relaxed">30–45 min, Zoom or Microsoft Teams</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-6 h-6 border border-white/40 flex items-center justify-center text-white text-xs font-medium mt-0.5">2</div>
-                  <div>
-                    <p className="text-[15px] text-white font-medium mb-1">Opportunity list</p>
-                    <p className="text-[14px] text-white/70 leading-relaxed">3–5 concrete ideas tied to your business</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-6 h-6 border border-white/40 flex items-center justify-center text-white text-xs font-medium mt-0.5">3</div>
-                  <div>
-                    <p className="text-[15px] text-white font-medium mb-1">Priority order</p>
-                    <p className="text-[14px] text-white/70 leading-relaxed">What to do first vs later</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-6 h-6 border border-white/40 flex items-center justify-center text-white text-xs font-medium mt-0.5">4</div>
-                  <div>
-                    <p className="text-[15px] text-white font-medium mb-1">Written summary email</p>
-                    <p className="text-[14px] text-white/70 leading-relaxed">Within 24–48 hours</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="flex-shrink-0 w-6 h-6 border border-white/40 flex items-center justify-center text-white text-xs font-medium mt-0.5">5</div>
-                  <div>
-                    <p className="text-[15px] text-white font-medium mb-1">Clear next step</p>
-                    <p className="text-[14px] text-white/70 leading-relaxed">Discovery, DIY, or "not now" — so you're not left guessing</p>
-                  </div>
-                </div>
-                <div className="border-t border-white/20 pt-6 mt-8">
-                  <p className="text-[13px] text-white/70 leading-relaxed">
-                    Prepaid standalone. <strong className="text-white/90">Not</strong> credited toward discovery or other project work. One exception: credited toward <Link href="/services/ai-teammate-launch" className="text-white/90 hover:underline">AI Teammate Launch</Link> if purchased within 30 days. No full SOW, no build, no follow-up call included.
-                  </p>
-                </div>
               </div>
             </div>
           </Reveal>
