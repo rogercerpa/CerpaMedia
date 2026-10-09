@@ -52,12 +52,6 @@ export default function AITeammateLaunchPage() {
                 You own the tool accounts and pay vendors directly. We pick the right platform, launch 2 teammates from a starter menu, set approval rules, and guarantee free fixes if your first teammate isn't saving at least 3 hours a week (60-day window).
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  href="/consult"
-                  className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
-                >
-                  Book the $99 Strategy Call
-                </Link>
                 <a
                   href={`mailto:${checkoutEmail}?subject=${encodeURIComponent(checkoutSubject)}`}
                   className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"

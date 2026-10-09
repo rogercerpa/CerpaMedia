@@ -28,8 +28,8 @@ interface Props {
 const defaultHero: HeroContent = {
   headline: "Stop losing hours to tools that don't talk to each other.",
   subheadline: "CerpaMedia helps small businesses get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and you own the accounts and code.",
-  primaryCtaLabel: "Book the $99 Strategy Call",
-  primaryCtaUrl: "/consult",
+  primaryCtaLabel: "",
+  primaryCtaUrl: "",
   secondaryCtaLabel: "Or email Roger",
   secondaryCtaUrl: "mailto:cerpamedia@gmail.com",
 };
@@ -146,6 +146,9 @@ export default function HomeContentEditor({ hero, howItWorks }: Props) {
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
+            <p className="md:col-span-2 text-xs text-gray-500">
+              Leave the primary CTA label or URL blank to hide that button on the public home page.
+            </p>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -65,6 +65,8 @@ describe('Content Queries', () => {
       const result = await getHeroContent();
 
       expect(result.headline).toBe("Stop losing hours to tools that don't talk to each other.");
+      expect(result.primaryCtaLabel).toBe("");
+      expect(result.primaryCtaUrl).toBe("");
     });
   });
 

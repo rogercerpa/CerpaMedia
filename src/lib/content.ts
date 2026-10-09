@@ -37,8 +37,8 @@ export interface Testimonial {
 const fallbackHero: HeroContent = {
   headline: "Stop losing hours to tools that don't talk to each other.",
   subheadline: "CerpaMedia helps small businesses get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and you own the accounts and code.",
-  primaryCtaLabel: "Book the $99 Strategy Call",
-  primaryCtaUrl: "/consult",
+  primaryCtaLabel: "",
+  primaryCtaUrl: "",
   secondaryCtaLabel: "Or email Roger",
   secondaryCtaUrl: "mailto:cerpamedia@gmail.com",
 };
