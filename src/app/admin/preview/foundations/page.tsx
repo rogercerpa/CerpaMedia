@@ -6,7 +6,6 @@ import AdminChrome from "@/components/admin/AdminChrome";
 import SignedNote from "@/components/SignedNote";
 import ReviewStamp from "@/components/ReviewStamp";
 import BuiltByBadge from "@/components/BuiltByBadge";
-import PhotoNeeded from "@/components/PhotoNeeded";
 import DemoPlayer from "@/components/DemoPlayer";
 import DraftPrivacySections from "@/components/DraftPrivacySections";
 
@@ -34,7 +33,6 @@ export default async function FoundationsPreviewPage() {
           </h2>
           <p className="text-gray-600">
             These components are OFF on live pages until Roger turns the CMS flag on.
-            Placeholder photos stay in this admin preview only.
           </p>
         </div>
 
@@ -54,17 +52,6 @@ export default async function FoundationsPreviewPage() {
             date={guide?.reviewedAt || new Date()}
             note={guide?.reviewStamp || "Checked the claims and cut anything we could not source."}
           />
-        </section>
-
-        <section className="bg-white border border-gray-200 p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Photo slots (admin preview only)
-          </h3>
-          <div className="grid md:grid-cols-3 gap-4">
-            <PhotoNeeded label="Roger, headshot" />
-            <PhotoNeeded label="Workspace" />
-            <PhotoNeeded label="Woodstock, GA" />
-          </div>
         </section>
 
         <section className="bg-white border border-gray-200 p-6 space-y-4">

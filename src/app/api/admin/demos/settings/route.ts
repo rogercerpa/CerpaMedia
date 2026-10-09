@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminActor, jsonError } from "@/lib/admin-api";
 import { getSiteFlags } from "@/lib/flags";
-import { getUsageForToday } from "@/lib/demo";
 
 export async function GET() {
   const auth = await requireAdminActor();
   if ("response" in auth) return auth.response;
-  const [flags, usage] = await Promise.all([getSiteFlags(), getUsageForToday()]);
-  return NextResponse.json({ flags, usage, role: auth.actor.role });
+  const flags = await getSiteFlags();
+  return NextResponse.json({ flags, role: auth.actor.role });
 }
 
 export async function PUT(request: NextRequest) {
@@ -29,21 +28,16 @@ export async function PUT(request: NextRequest) {
         analyticsEnabled: Boolean(body.analyticsEnabled),
         demosPublicEnabled: Boolean(body.demosPublicEnabled),
         demoKillSwitch: Boolean(body.demoKillSwitch),
-        demoDailySpendCapUsd: Number(body.demoDailySpendCapUsd ?? 5),
-        demoSpikeAlertThreshold: Number(body.demoSpikeAlertThreshold ?? 8),
       },
       update: {
         foundationsUiEnabled: Boolean(body.foundationsUiEnabled),
         analyticsEnabled: Boolean(body.analyticsEnabled),
         demosPublicEnabled: Boolean(body.demosPublicEnabled),
         demoKillSwitch: Boolean(body.demoKillSwitch),
-        demoDailySpendCapUsd: Number(body.demoDailySpendCapUsd ?? 5),
-        demoSpikeAlertThreshold: Number(body.demoSpikeAlertThreshold ?? 8),
       },
     });
 
-    const usage = await getUsageForToday();
-    return NextResponse.json({ flags, usage });
+    return NextResponse.json({ flags });
   } catch (error) {
     console.error("Error updating demo settings:", error);
     return jsonError("Failed to update settings.", 500);

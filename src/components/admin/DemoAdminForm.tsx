@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { promptForDemo } from "@/lib/demo-prompts";
 import type { ReplayScript } from "@/lib/demo-safety";
 import type { AdminRole } from "@/lib/roles";
 import type { PublishStatus } from "@/lib/publishing";
@@ -14,14 +13,12 @@ type Sample = {
   label: string;
   inputText: string;
   cachedOutput: string;
-  generatedAt: string | null;
 };
 
 export default function DemoAdminForm({
   isOwner,
   role,
   flags,
-  usage,
   initialData,
 }: {
   isOwner: boolean;
@@ -31,10 +28,7 @@ export default function DemoAdminForm({
     analyticsEnabled: boolean;
     demosPublicEnabled: boolean;
     demoKillSwitch: boolean;
-    demoDailySpendCapUsd: number;
-    demoSpikeAlertThreshold: number;
   };
-  usage: { date: string; spendUsd: number; generationCount: number };
   initialData: {
     id: string;
     slug: string;
@@ -49,12 +43,9 @@ export default function DemoAdminForm({
 }) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [killSwitch, setKillSwitch] = useState(flags.demoKillSwitch);
-  const [cap, setCap] = useState(String(flags.demoDailySpendCapUsd));
-  const [threshold, setThreshold] = useState(String(flags.demoSpikeAlertThreshold));
   const [foundationsUiEnabled, setFoundationsUiEnabled] = useState(
     flags.foundationsUiEnabled
   );
@@ -63,7 +54,6 @@ export default function DemoAdminForm({
     flags.demosPublicEnabled
   );
   const [demo, setDemo] = useState(initialData);
-  const prompt = promptForDemo(demo.slug);
 
   const saveSettings = async () => {
     if (!isOwner) {
@@ -78,8 +68,6 @@ export default function DemoAdminForm({
         analyticsEnabled,
         demosPublicEnabled,
         demoKillSwitch: killSwitch,
-        demoDailySpendCapUsd: Number(cap),
-        demoSpikeAlertThreshold: Number(threshold),
       }),
     });
     const data = await response.json();
@@ -118,42 +106,6 @@ export default function DemoAdminForm({
     }
   };
 
-  const generate = async (sample: Sample, index: number) => {
-    if (!sample.id) {
-      setError("Save the demo first so this sample has an id, then Generate.");
-      return;
-    }
-    setGeneratingId(sample.id);
-    setError(null);
-    setMessage(null);
-    try {
-      const response = await fetch(
-        `/api/admin/demos/samples/${sample.id}/generate`,
-        { method: "POST" }
-      );
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Generate failed");
-      setDemo((prev) => ({
-        ...prev,
-        samples: prev.samples.map((item, i) =>
-          i === index
-            ? {
-                ...item,
-                cachedOutput: data.sample.cachedOutput,
-                generatedAt: data.sample.generatedAt,
-              }
-            : item
-        ),
-      }));
-      setMessage("Sample generated and cached.");
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Generate failed");
-    } finally {
-      setGeneratingId(null);
-    }
-  };
-
   return (
     <form onSubmit={handleSave} className="space-y-8">
       {error ? (
@@ -169,10 +121,6 @@ export default function DemoAdminForm({
 
       <section className="border border-gray-200 p-4 space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">Safety controls</h3>
-        <p className="text-sm text-gray-600">
-          Today: {usage.date} · spent ${usage.spendUsd.toFixed(3)} of ${cap} ·{" "}
-          {usage.generationCount} admin generations
-        </p>
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -180,32 +128,8 @@ export default function DemoAdminForm({
             onChange={(e) => setKillSwitch(e.target.checked)}
             disabled={!isOwner}
           />
-          Kill switch (falls public UI back to replays and blocks generation)
+          Kill switch (public UI shows the recorded replay only)
         </label>
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Daily spend cap (USD)
-            </label>
-            <input
-              value={cap}
-              onChange={(e) => setCap(e.target.value)}
-              disabled={!isOwner}
-              className="w-full px-4 py-2 border border-gray-300"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Spike alert threshold (generations / day)
-            </label>
-            <input
-              value={threshold}
-              onChange={(e) => setThreshold(e.target.value)}
-              disabled={!isOwner}
-              className="w-full px-4 py-2 border border-gray-300"
-            />
-          </div>
-        </div>
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -290,12 +214,12 @@ export default function DemoAdminForm({
             href="/admin/preview/demo-fallback"
             className="text-gray-900 underline"
           >
-            Cap-hit fallback preview
+            Kill-switch fallback preview
           </Link>
         </p>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Resting message
+            Kill-switch message
           </label>
           <input
             value={demo.restingMessage}
@@ -308,7 +232,7 @@ export default function DemoAdminForm({
       </section>
 
       <section className="space-y-3">
-        <h3 className="text-lg font-semibold text-gray-900">Recorded replay JSON</h3>
+        <h3 className="text-lg font-semibold text-gray-900">Recorded replay</h3>
         {(["inputLabel", "outputLabel", "before", "after"] as const).map((key) => (
           <div key={key}>
             <label className="block text-sm font-medium text-gray-700 mb-1">{key}</label>
@@ -327,20 +251,11 @@ export default function DemoAdminForm({
         ))}
       </section>
 
-      <section>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Prompt (view only)</h3>
-        <pre className="text-xs bg-gray-50 border border-gray-200 p-3 whitespace-pre-wrap">
-{prompt.system}
-
-{prompt.userPrefix}[sample input]
-        </pre>
-        <p className="text-xs text-gray-500 mt-1">
-          Prompts change only in code (`src/lib/demo-prompts.ts`), not in this form.
-        </p>
-      </section>
-
       <section className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">Curated samples</h3>
+        <p className="text-sm text-gray-600">
+          Outputs are pre-written text Roger edits here. Nothing on this site calls a model.
+        </p>
         {demo.samples.map((sample, index) => (
           <div key={sample.id || index} className="border border-gray-200 p-4 space-y-3">
             <input
@@ -354,6 +269,7 @@ export default function DemoAdminForm({
                 }))
               }
               className="w-full px-4 py-2 border border-gray-300"
+              placeholder="Sample label"
             />
             <textarea
               rows={3}
@@ -367,18 +283,22 @@ export default function DemoAdminForm({
                 }))
               }
               className="w-full px-4 py-2 border border-gray-300"
+              placeholder="Sample input"
             />
-            <pre className="text-sm bg-gray-50 p-3 whitespace-pre-wrap min-h-[80px]">
-              {sample.cachedOutput || "Not generated yet."}
-            </pre>
-            <button
-              type="button"
-              onClick={() => generate(sample, index)}
-              disabled={generatingId === sample.id}
-              className="bg-gray-900 text-white px-4 py-2 text-sm hover:bg-gray-800 disabled:bg-gray-400"
-            >
-              {generatingId === sample.id ? "Generating…" : "Generate"}
-            </button>
+            <textarea
+              rows={5}
+              value={sample.cachedOutput}
+              onChange={(e) =>
+                setDemo((prev) => ({
+                  ...prev,
+                  samples: prev.samples.map((item, i) =>
+                    i === index ? { ...item, cachedOutput: e.target.value } : item
+                  ),
+                }))
+              }
+              className="w-full px-4 py-2 border border-gray-300"
+              placeholder="Pre-written output"
+            />
           </div>
         ))}
       </section>

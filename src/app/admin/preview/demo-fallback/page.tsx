@@ -21,19 +21,19 @@ export default async function AdminDemoFallbackPreviewPage() {
       role={actor.role}
       crumbs={[
         { href: "/admin/demos", label: "Demos" },
-        { label: "Cap-hit fallback preview" },
+        { label: "Kill-switch fallback preview" },
       ]}
     >
       <div className="space-y-4">
         <div>
           <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
-            Cap-hit fallback preview
+            Kill-switch fallback preview
           </p>
           <h2 className="text-2xl font-bold text-gray-900">
             Replay-only fallback
           </h2>
           <p className="text-gray-600">
-            This is what visitors would see when the daily cap is hit. It is
+            This is what visitors would see when the kill switch is on. It is
             admin-only until demos are Published and the public flag is on.
           </p>
         </div>
@@ -41,8 +41,7 @@ export default async function AdminDemoFallbackPreviewPage() {
           {...payload}
           mode="replay"
           samples={[]}
-          capHit
-          killSwitch={false}
+          killSwitch
         />
       </div>
     </AdminChrome>

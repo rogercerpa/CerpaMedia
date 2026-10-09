@@ -3,7 +3,6 @@ import Link from "next/link";
 import { getAdminActor } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getSiteFlags } from "@/lib/flags";
-import { getUsageForToday } from "@/lib/demo";
 import AdminChrome from "@/components/admin/AdminChrome";
 
 export const dynamic = "force-dynamic";
@@ -11,13 +10,12 @@ export const dynamic = "force-dynamic";
 export default async function AdminDemosPage() {
   const actor = await getAdminActor();
   if (!actor) redirect("/admin/login");
-  const [demos, flags, usage] = await Promise.all([
+  const [demos, flags] = await Promise.all([
     prisma.demo.findMany({
       orderBy: { title: "asc" },
       include: { samples: true },
     }),
     getSiteFlags(),
-    getUsageForToday(),
   ]);
 
   return (
@@ -25,8 +23,8 @@ export default async function AdminDemosPage() {
       <div className="mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Demos</h2>
         <p className="text-gray-600">
-          Kill switch {flags.demoKillSwitch ? "ON" : "off"} · cap ${flags.demoDailySpendCapUsd}/day ·
-          today ${usage.spendUsd.toFixed(3)} · {usage.generationCount} generations
+          Kill switch {flags.demoKillSwitch ? "ON" : "off"} · public{" "}
+          {flags.demosPublicEnabled ? "flag on" : "flag off"}
         </p>
       </div>
       <div className="grid gap-4">
@@ -40,7 +38,7 @@ export default async function AdminDemosPage() {
             <p className="text-sm text-gray-500 font-mono">{demo.slug}</p>
             <p className="text-sm text-gray-600 mt-2">
               {demo.status} · {demo.samples.length} samples ·{" "}
-              {demo.samples.filter((sample) => sample.cachedOutput).length} generated
+              {demo.samples.filter((sample) => sample.cachedOutput).length} with output
             </p>
           </Link>
         ))}

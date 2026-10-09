@@ -65,7 +65,8 @@ export async function PUT(
         status,
         publishedAt,
         replayScript,
-        restingMessage: restingMessage || "Demo resting, back tomorrow.",
+        restingMessage:
+          restingMessage || "This demo is paused. Showing the recorded replay.",
         samples: {
           create: (samples as Array<Record<string, string | number>>).map(
             (sample, index) => ({
@@ -73,9 +74,6 @@ export async function PUT(
               inputText: String(sample.inputText || ""),
               cachedOutput: sample.cachedOutput
                 ? String(sample.cachedOutput)
-                : null,
-              generatedAt: sample.generatedAt
-                ? new Date(String(sample.generatedAt))
                 : null,
               sortOrder: Number(sample.sortOrder ?? index),
             })

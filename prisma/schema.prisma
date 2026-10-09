@@ -244,16 +244,13 @@ model AdminUser {
 }
 
 model SiteSetting {
-  id                      String    @id @default("default")
-  foundationsUiEnabled    Boolean   @default(false)
-  analyticsEnabled        Boolean   @default(false)
-  demosPublicEnabled      Boolean   @default(false)
-  demoKillSwitch          Boolean   @default(false)
-  demoDailySpendCapUsd    Float     @default(5)
-  demoSpikeAlertThreshold Int       @default(8)
-  demoLastAlertSentAt     DateTime?
-  createdAt               DateTime  @default(now())
-  updatedAt               DateTime  @updatedAt
+  id                   String   @id @default("default")
+  foundationsUiEnabled Boolean  @default(false)
+  analyticsEnabled     Boolean  @default(false)
+  demosPublicEnabled   Boolean  @default(false)
+  demoKillSwitch       Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 }
 
 model Source {
@@ -352,7 +349,7 @@ model Demo {
   status         PublishStatus @default(draft)
   publishedAt    DateTime?
   replayScript   Json
-  restingMessage String        @default("Demo resting, back tomorrow.")
+  restingMessage String        @default("This demo is paused. Showing the recorded replay.")
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   samples        DemoSample[]
@@ -362,27 +359,17 @@ model Demo {
 }
 
 model DemoSample {
-  id           String    @id @default(cuid())
+  id           String   @id @default(cuid())
   demoId       String
-  demo         Demo      @relation(fields: [demoId], references: [id], onDelete: Cascade)
+  demo         Demo     @relation(fields: [demoId], references: [id], onDelete: Cascade)
   label        String
-  inputText    String    @db.Text
-  cachedOutput String?   @db.Text
-  generatedAt  DateTime?
-  sortOrder    Int       @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  inputText    String   @db.Text
+  cachedOutput String?  @db.Text
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@index([demoId, sortOrder])
-}
-
-model DemoUsageDay {
-  id              String   @id @default(cuid())
-  date            String   @unique
-  spendUsd        Float    @default(0)
-  generationCount Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 }
 
 model AnalyticsDailyCount {

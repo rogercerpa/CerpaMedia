@@ -7,7 +7,6 @@ import { getSiteFlags } from "@/lib/flags";
 vi.mock("@/lib/prisma", () => ({
   prisma: {
     demo: { findUnique: vi.fn() },
-    demoUsageDay: { findUnique: vi.fn() },
   },
 }));
 
@@ -48,7 +47,6 @@ const seededDemo = {
 describe("public demo payload gate", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(prisma.demoUsageDay.findUnique).mockResolvedValue(null);
     vi.mocked(prisma.demo.findUnique).mockResolvedValue(seededDemo as never);
   });
 

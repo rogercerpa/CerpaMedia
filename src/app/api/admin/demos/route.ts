@@ -2,26 +2,23 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdminActor, jsonError } from "@/lib/admin-api";
 import { getSiteFlags } from "@/lib/flags";
-import { getUsageForToday } from "@/lib/demo";
 import { assertPublishAllowed } from "@/lib/publishing";
 
 export async function GET() {
   const auth = await requireAdminActor();
   if ("response" in auth) return auth.response;
 
-  const [demos, flags, usage] = await Promise.all([
+  const [demos, flags] = await Promise.all([
     prisma.demo.findMany({
       orderBy: { title: "asc" },
       include: { samples: { orderBy: { sortOrder: "asc" } } },
     }),
     getSiteFlags(),
-    getUsageForToday(),
   ]);
 
   return NextResponse.json({
     demos,
     flags,
-    usage,
     role: auth.actor.role,
   });
 }
@@ -67,12 +64,16 @@ export async function POST(request: NextRequest) {
         status,
         publishedAt: status === "published" ? new Date() : null,
         replayScript,
-        restingMessage: restingMessage || "Demo resting, back tomorrow.",
+        restingMessage:
+          restingMessage || "This demo is paused. Showing the recorded replay.",
         samples: {
           create: (samples as Array<Record<string, string | number>>).map(
             (sample, index) => ({
               label: String(sample.label || `Sample ${index + 1}`),
               inputText: String(sample.inputText || ""),
+              cachedOutput: sample.cachedOutput
+                ? String(sample.cachedOutput)
+                : null,
               sortOrder: Number(sample.sortOrder ?? index),
             })
           ),

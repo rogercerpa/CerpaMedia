@@ -35,9 +35,6 @@ CREATE TABLE IF NOT EXISTS "SiteSetting" (
     "analyticsEnabled" BOOLEAN NOT NULL DEFAULT false,
     "demosPublicEnabled" BOOLEAN NOT NULL DEFAULT false,
     "demoKillSwitch" BOOLEAN NOT NULL DEFAULT false,
-    "demoDailySpendCapUsd" DOUBLE PRECISION NOT NULL DEFAULT 5,
-    "demoSpikeAlertThreshold" INTEGER NOT NULL DEFAULT 8,
-    "demoLastAlertSentAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "SiteSetting_pkey" PRIMARY KEY ("id")
@@ -144,7 +141,7 @@ CREATE TABLE IF NOT EXISTS "Demo" (
     "status" "PublishStatus" NOT NULL DEFAULT 'draft',
     "publishedAt" TIMESTAMP(3),
     "replayScript" JSONB NOT NULL,
-    "restingMessage" TEXT NOT NULL DEFAULT 'Demo resting, back tomorrow.',
+    "restingMessage" TEXT NOT NULL DEFAULT 'This demo is paused. Showing the recorded replay.',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "Demo_pkey" PRIMARY KEY ("id")
@@ -162,7 +159,6 @@ CREATE TABLE IF NOT EXISTS "DemoSample" (
     "label" TEXT NOT NULL,
     "inputText" TEXT NOT NULL,
     "cachedOutput" TEXT,
-    "generatedAt" TIMESTAMP(3),
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -170,18 +166,6 @@ CREATE TABLE IF NOT EXISTS "DemoSample" (
 );
 
 CREATE INDEX IF NOT EXISTS "DemoSample_demoId_sortOrder_idx" ON "DemoSample"("demoId", "sortOrder");
-
-CREATE TABLE IF NOT EXISTS "DemoUsageDay" (
-    "id" TEXT NOT NULL,
-    "date" TEXT NOT NULL,
-    "spendUsd" DOUBLE PRECISION NOT NULL DEFAULT 0,
-    "generationCount" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    CONSTRAINT "DemoUsageDay_pkey" PRIMARY KEY ("id")
-);
-
-CREATE UNIQUE INDEX IF NOT EXISTS "DemoUsageDay_date_key" ON "DemoUsageDay"("date");
 
 CREATE TABLE IF NOT EXISTS "AnalyticsDailyCount" (
     "id" TEXT NOT NULL,

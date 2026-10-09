@@ -5,7 +5,6 @@ import { getPublicDemoPayload } from "@/lib/demo";
 
 vi.mock("@/lib/demo", () => ({
   getPublicDemoPayload: vi.fn(),
-  generateSampleOutput: vi.fn(),
 }));
 
 vi.mock("@/lib/analytics", () => ({
@@ -21,8 +20,7 @@ describe("public demo API never triggers AI", () => {
       description: "Watch a reply appear.",
       mode: "samples",
       killSwitch: false,
-      capHit: false,
-      restingMessage: "Demo resting, back tomorrow.",
+      restingMessage: "This demo is paused. Showing the recorded replay.",
       replayScript: {
         inputLabel: "Email",
         outputLabel: "Draft",

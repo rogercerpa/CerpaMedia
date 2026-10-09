@@ -5,9 +5,6 @@ export type SiteFlags = {
   analyticsEnabled: boolean;
   demosPublicEnabled: boolean;
   demoKillSwitch: boolean;
-  demoDailySpendCapUsd: number;
-  demoSpikeAlertThreshold: number;
-  demoLastAlertSentAt: Date | null;
 };
 
 export const DEFAULT_SITE_FLAGS: SiteFlags = {
@@ -15,11 +12,6 @@ export const DEFAULT_SITE_FLAGS: SiteFlags = {
   analyticsEnabled: false,
   demosPublicEnabled: false,
   demoKillSwitch: false,
-  demoDailySpendCapUsd: Number(process.env.DEMO_DAILY_SPEND_CAP_USD || "5"),
-  demoSpikeAlertThreshold: Number(
-    process.env.DEMO_SPIKE_ALERT_THRESHOLD || "8"
-  ),
-  demoLastAlertSentAt: null,
 };
 
 export async function getSiteFlags(): Promise<SiteFlags> {
@@ -35,9 +27,6 @@ export async function getSiteFlags(): Promise<SiteFlags> {
       analyticsEnabled: row.analyticsEnabled,
       demosPublicEnabled: Boolean(row.demosPublicEnabled),
       demoKillSwitch: row.demoKillSwitch,
-      demoDailySpendCapUsd: row.demoDailySpendCapUsd,
-      demoSpikeAlertThreshold: row.demoSpikeAlertThreshold,
-      demoLastAlertSentAt: row.demoLastAlertSentAt,
     };
   } catch (error) {
     console.error("Failed to load site flags:", error);

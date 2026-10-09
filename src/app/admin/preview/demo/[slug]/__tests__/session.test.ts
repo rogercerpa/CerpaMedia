@@ -38,8 +38,7 @@ describe("admin demo preview requires a session", () => {
       description: "Watch a reply appear.",
       mode: "samples",
       killSwitch: false,
-      capHit: false,
-      restingMessage: "Demo resting, back tomorrow.",
+      restingMessage: "This demo is paused. Showing the recorded replay.",
       replayScript: {
         inputLabel: "Email",
         outputLabel: "Draft",

@@ -17,7 +17,6 @@ export default function DemoPlayer({
   restingMessage,
   replayScript,
   samples,
-  capHit,
   killSwitch,
 }: {
   title: string;
@@ -26,7 +25,6 @@ export default function DemoPlayer({
   restingMessage: string;
   replayScript: ReplayScript;
   samples: DemoSampleView[];
-  capHit?: boolean;
   killSwitch?: boolean;
 }) {
   const [playing, setPlaying] = useState(false);
@@ -56,11 +54,7 @@ export default function DemoPlayer({
     return () => clearInterval(timer);
   }, [playing, replayScript.after, replayScript.durationMs]);
 
-  const fallbackNote = killSwitch
-    ? "This demo is paused from the admin kill switch. Showing the recorded replay."
-    : capHit
-      ? restingMessage
-      : null;
+  const fallbackNote = killSwitch ? restingMessage : null;
 
   return (
     <div className="border border-border p-6 md:p-8 bg-white">
@@ -87,7 +81,7 @@ export default function DemoPlayer({
           </p>
           <pre className="whitespace-pre-wrap text-sm text-text bg-bg-subtle p-4 min-h-[160px]">
             {selected
-              ? selected.cachedOutput || "Sample output has not been generated yet."
+              ? selected.cachedOutput || "No output written yet."
               : playing
                 ? typed
                 : replayScript.after}
@@ -127,7 +121,7 @@ export default function DemoPlayer({
         ) : null}
       </div>
       <p className="mt-4 text-xs text-text-muted">
-        No free-text box. Visitors never trigger an AI call. We don&apos;t keep what you paste — and this demo doesn&apos;t ask you to paste anything.
+        No free-text box. Sample outputs are pre-written. This page never calls a model. We don&apos;t keep what you paste — and this demo doesn&apos;t ask you to paste anything.
       </p>
     </div>
   );

@@ -41,9 +41,6 @@ CREATE TABLE IF NOT EXISTS "SiteSetting" (
     "analyticsEnabled" BOOLEAN NOT NULL DEFAULT false,
     "demosPublicEnabled" BOOLEAN NOT NULL DEFAULT false,
     "demoKillSwitch" BOOLEAN NOT NULL DEFAULT false,
-    "demoDailySpendCapUsd" DOUBLE PRECISION NOT NULL DEFAULT 5,
-    "demoSpikeAlertThreshold" INTEGER NOT NULL DEFAULT 8,
-    "demoLastAlertSentAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "SiteSetting_pkey" PRIMARY KEY ("id")
@@ -151,7 +148,7 @@ CREATE TABLE IF NOT EXISTS "Demo" (
     "status" "PublishStatus" NOT NULL DEFAULT 'draft',
     "publishedAt" TIMESTAMP(3),
     "replayScript" JSONB NOT NULL,
-    "restingMessage" TEXT NOT NULL DEFAULT 'Demo resting, back tomorrow.',
+    "restingMessage" TEXT NOT NULL DEFAULT 'This demo is paused. Showing the recorded replay.',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     CONSTRAINT "Demo_pkey" PRIMARY KEY ("id")
@@ -169,7 +166,6 @@ CREATE TABLE IF NOT EXISTS "DemoSample" (
     "label" TEXT NOT NULL,
     "inputText" TEXT NOT NULL,
     "cachedOutput" TEXT,
-    "generatedAt" TIMESTAMP(3),
     "sortOrder" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -177,18 +173,6 @@ CREATE TABLE IF NOT EXISTS "DemoSample" (
 );
 
 CREATE INDEX IF NOT EXISTS "DemoSample_demoId_sortOrder_idx" ON "DemoSample"("demoId", "sortOrder");
-
-CREATE TABLE IF NOT EXISTS "DemoUsageDay" (
-    "id" TEXT NOT NULL,
-    "date" TEXT NOT NULL,
-    "spendUsd" DOUBLE PRECISION NOT NULL DEFAULT 0,
-    "generationCount" INTEGER NOT NULL DEFAULT 0,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-    CONSTRAINT "DemoUsageDay_pkey" PRIMARY KEY ("id")
-);
-
-CREATE UNIQUE INDEX IF NOT EXISTS "DemoUsageDay_date_key" ON "DemoUsageDay"("date");
 
 CREATE TABLE IF NOT EXISTS "AnalyticsDailyCount" (
     "id" TEXT NOT NULL,
@@ -226,9 +210,9 @@ ON CONFLICT ("email") DO NOTHING;
 
 INSERT INTO "SiteSetting" (
   "id", "foundationsUiEnabled", "analyticsEnabled", "demosPublicEnabled", "demoKillSwitch",
-  "demoDailySpendCapUsd", "demoSpikeAlertThreshold", "createdAt", "updatedAt"
+  "createdAt", "updatedAt"
 ) VALUES (
-  'default', false, false, false, false, 5, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+  'default', false, false, false, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
 ) ON CONFLICT ("id") DO NOTHING;
 
 INSERT INTO "Source" ("id", "title", "publisher", "publishedDate", "url", "notes", "status", "createdAt", "updatedAt")
@@ -303,17 +287,17 @@ INSERT INTO "Demo" (
   'demo-inbox-rescue',
   'inbox-rescue',
   'Inbox Rescue',
-  'Watch a customer email turn into a calm draft reply. Recorded replay first. Pick a sample for a cached output. No free-text box.',
+  'Watch a customer email turn into a calm draft reply. Recorded replay first. Pick a sample to see a pre-written output. No free-text box.',
   true,
   'draft',
   '{"inputLabel":"Customer email","outputLabel":"Draft reply","before":"Hi — I called twice yesterday about the leak under the kitchen sink. Nobody called back. If I don''t hear from you today I''m calling someone else.","after":"Hi — sorry you had to wait. I have you flagged for a same-day look this afternoon. I''ll confirm the window as soon as we lock the route. If the leak is active, shut the valve under the sink and text is not needed — email or call is enough.","durationMs":4200}'::jsonb,
-  'Demo resting, back tomorrow.',
+  'This demo is paused. Showing the recorded replay.',
   CURRENT_TIMESTAMP,
   CURRENT_TIMESTAMP
 ) ON CONFLICT ("slug") DO NOTHING;
 
 INSERT INTO "DemoSample" (
-  "id", "demoId", "label", "inputText", "cachedOutput", "generatedAt", "sortOrder", "createdAt", "updatedAt"
+  "id", "demoId", "label", "inputText", "cachedOutput", "sortOrder", "createdAt", "updatedAt"
 ) VALUES
 (
   'sample-angry',
@@ -321,7 +305,6 @@ INSERT INTO "DemoSample" (
   'Angry customer',
   'This is the third time the job ran long and nobody told me. Do not send a cheerful template.',
   'You are right to be frustrated. The job ran long and we did not update you. I own that. Here is the next step: I will call you before 10am with a firm window, and I will not mark it done until you say the site is as agreed.',
-  CURRENT_TIMESTAMP,
   0,
   CURRENT_TIMESTAMP,
   CURRENT_TIMESTAMP
@@ -332,7 +315,6 @@ INSERT INTO "DemoSample" (
   'Quote request',
   'Can you quote replacing two bathroom exhaust fans this week? Second floor, 1998 house.',
   'Thanks for the details. I can look at two bathroom exhaust fans on a 1998 second floor this week. I will walk the site, then send a line-item quote with [your price] blanks filled in after I see access and wiring. I will not invent a number in this email.',
-  CURRENT_TIMESTAMP,
   1,
   CURRENT_TIMESTAMP,
   CURRENT_TIMESTAMP
@@ -343,7 +325,6 @@ INSERT INTO "DemoSample" (
   'Reschedule',
   'Need to move Thursday 2pm. Earliest I can do is Friday morning.',
   'Got it — Thursday 2pm is released. I have Friday morning held on the board and will send the confirmed window once the route is set. If Friday morning fills, I will email you the next open slot instead of leaving you hanging.',
-  CURRENT_TIMESTAMP,
   2,
   CURRENT_TIMESTAMP,
   CURRENT_TIMESTAMP
@@ -354,7 +335,6 @@ INSERT INTO "DemoSample" (
   'After hours',
   'It is 9:40pm. The breaker keeps tripping when the AC kicks on. Are you open?',
   'We are closed for new visits tonight. If you smell burning or see sparks, stay clear and call emergency services. Otherwise flip the AC breaker off until morning. I will have this at the top of the board when we open and will email the first window we can take.',
-  CURRENT_TIMESTAMP,
   3,
   CURRENT_TIMESTAMP,
   CURRENT_TIMESTAMP
@@ -395,12 +375,16 @@ SELECT * FROM (
   SELECT 'Demo samples', 4, COUNT(*)::int, (COUNT(*) = 4)
   FROM "DemoSample" WHERE "demoId" = 'demo-inbox-rescue'
   UNION ALL
-  SELECT 'Phase0 tables present', 11, COUNT(*)::int, (COUNT(*) = 11)
+  SELECT 'Phase0 tables present', 10, COUNT(*)::int, (COUNT(*) = 10)
   FROM information_schema.tables
   WHERE table_schema = 'public'
     AND table_name IN (
       'AdminUser','SiteSetting','Source','SourceLink','Guide','GuideSection',
-      'TimelineEntry','Demo','DemoSample','DemoUsageDay','AnalyticsDailyCount'
+      'TimelineEntry','Demo','DemoSample','AnalyticsDailyCount'
     )
+  UNION ALL
+  SELECT 'No usage table', 0, COUNT(*)::int, (COUNT(*) = 0)
+  FROM information_schema.tables
+  WHERE table_schema = 'public' AND table_name = 'DemoUsageDay'
 ) checks
 ORDER BY object;

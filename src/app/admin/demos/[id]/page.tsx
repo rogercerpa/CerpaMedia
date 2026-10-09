@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getAdminActor } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getSiteFlags } from "@/lib/flags";
-import { getUsageForToday, parseReplayScript } from "@/lib/demo";
+import { parseReplayScript } from "@/lib/demo";
 import AdminChrome from "@/components/admin/AdminChrome";
 import DemoAdminForm from "@/components/admin/DemoAdminForm";
 
@@ -16,13 +16,12 @@ export default async function EditDemoPage({
   const actor = await getAdminActor();
   if (!actor) redirect("/admin/login");
   const { id } = await params;
-  const [demo, flags, usage] = await Promise.all([
+  const [demo, flags] = await Promise.all([
     prisma.demo.findUnique({
       where: { id },
       include: { samples: { orderBy: { sortOrder: "asc" } } },
     }),
     getSiteFlags(),
-    getUsageForToday(),
   ]);
   if (!demo) notFound();
 
@@ -41,7 +40,6 @@ export default async function EditDemoPage({
           isOwner={actor.role === "owner"}
           role={actor.role}
           flags={flags}
-          usage={usage}
           initialData={{
             id: demo.id,
             slug: demo.slug,
@@ -56,7 +54,6 @@ export default async function EditDemoPage({
               label: sample.label,
               inputText: sample.inputText,
               cachedOutput: sample.cachedOutput ?? "",
-              generatedAt: sample.generatedAt?.toISOString() ?? null,
             })),
           }}
         />
