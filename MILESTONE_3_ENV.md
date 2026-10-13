@@ -43,9 +43,14 @@ Resend API key for sending confirmation emails.
 - Already configured for magic links and contact form
 
 #### `CONTACT_FROM_EMAIL` (Optional)
-Email address to send from.
-- Default: `onboarding@resend.dev`
-- Recommended: Use verified domain email
+Sender for every Resend email.
+- Default: `CerpaMedia <info@cerpamedia.com>`
+- cerpamedia.com is verified in Resend
+
+#### `EMAIL_REPLY_TO` (Optional)
+Reply-To on customer-facing emails.
+- Default: `cerpamedia@gmail.com`
+- Contact-form notices to Roger reply to the submitter instead
 
 #### `CONTACT_TO_EMAIL` (Optional)
 Admin email address for booking notifications.
@@ -90,7 +95,8 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 
 # Email (existing)
 RESEND_API_KEY=re_...
-CONTACT_FROM_EMAIL=onboarding@resend.dev
+CONTACT_FROM_EMAIL=CerpaMedia <info@cerpamedia.com>
+EMAIL_REPLY_TO=cerpamedia@gmail.com
 CONTACT_TO_EMAIL=cerpamedia@gmail.com
 
 # Database (existing)

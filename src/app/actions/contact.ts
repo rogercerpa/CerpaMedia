@@ -2,6 +2,7 @@
 
 import { Resend } from "resend";
 import { headers } from "next/headers";
+import { getEmailFrom, getEmailReplyTo } from "@/lib/email";
 import {
   checkRateLimit,
   validateTextInput,
@@ -132,7 +133,6 @@ export async function submitContactForm(formData: ContactFormData) {
 
   const resend = new Resend(resendApiKey);
   const toEmail = process.env.CONTACT_TO_EMAIL || "cerpamedia@gmail.com";
-  const fromEmail = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
 
   const sanitizedName = nameValidation.sanitized;
   const sanitizedEmail = email.trim().slice(0, 254);
@@ -142,10 +142,10 @@ export async function submitContactForm(formData: ContactFormData) {
 
   try {
     await resend.emails.send({
-      from: fromEmail,
+      from: getEmailFrom(),
       to: toEmail,
       subject: `New Contact Form Submission from ${sanitizedName}`,
-      replyTo: sanitizedEmail,
+      replyTo: sanitizedEmail || getEmailReplyTo(),
       html: `
         <h2>New Contact Form Submission</h2>
         <p><strong>Name:</strong> ${sanitizedName}</p>
