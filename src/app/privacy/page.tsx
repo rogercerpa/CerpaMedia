@@ -1,6 +1,8 @@
 import { Metadata } from "next";
 import { Reveal } from "@/components/Reveal";
 import { getSeoMeta } from "@/lib/seo";
+import { isFoundationsUiEnabled } from "@/lib/flags";
+import DraftPrivacySections from "@/components/DraftPrivacySections";
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSeoMeta("/privacy");
@@ -12,7 +14,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  let showDraft = false;
+  try {
+    showDraft = await isFoundationsUiEnabled();
+  } catch {
+    showDraft = false;
+  }
+
   return (
     <div>
       <section className="bg-bg py-24 md:py-32">
@@ -230,6 +239,8 @@ export default function PrivacyPage() {
                   </p>
                 </div>
               </div>
+
+              {showDraft ? <DraftPrivacySections /> : null}
             </div>
           </Reveal>
         </div>

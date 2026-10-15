@@ -1,11 +1,46 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { prisma } from "./prisma";
+import { OWNER_EMAIL, resolveRole, type AdminRole } from "./roles";
 
 const AUTH_SECRET = process.env.AUTH_SECRET || "default-secret-change-in-production";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "cerpamedia@gmail.com";
+const ADMIN_EMAIL = OWNER_EMAIL;
 
 const secret = new TextEncoder().encode(AUTH_SECRET);
+
+export type AdminActor = {
+  email: string;
+  role: AdminRole;
+};
+
+export async function isAllowedAdminEmail(email: string): Promise<boolean> {
+  const normalized = email.toLowerCase();
+  if (normalized === OWNER_EMAIL) {
+    return true;
+  }
+  try {
+    const user = await prisma.adminUser.findUnique({
+      where: { email: normalized },
+    });
+    return Boolean(user);
+  } catch (error) {
+    console.error("AdminUser lookup failed:", error);
+    return false;
+  }
+}
+
+export async function getRoleForEmail(email: string): Promise<AdminRole> {
+  const normalized = email.toLowerCase();
+  try {
+    const user = await prisma.adminUser.findUnique({
+      where: { email: normalized },
+    });
+    return resolveRole(normalized, user?.role ?? null);
+  } catch (error) {
+    console.error("AdminUser role lookup failed:", error);
+    return resolveRole(normalized, null);
+  }
+}
 
 export async function createMagicLinkToken(email: string): Promise<string> {
   const token = crypto.randomUUID();
@@ -39,7 +74,7 @@ export async function verifyMagicLinkToken(token: string): Promise<string | null
     return null;
   }
 
-  if (magicLink.email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+  if (!(await isAllowedAdminEmail(magicLink.email))) {
     return null;
   }
 
@@ -52,7 +87,8 @@ export async function verifyMagicLinkToken(token: string): Promise<string | null
 }
 
 export async function createAdminSession(email: string): Promise<string> {
-  const token = await new SignJWT({ email })
+  const normalized = email.toLowerCase();
+  const token = await new SignJWT({ email: normalized })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
@@ -62,7 +98,7 @@ export async function createAdminSession(email: string): Promise<string> {
 
   await prisma.adminSession.create({
     data: {
-      email,
+      email: normalized,
       token,
       expiresAt,
     },
@@ -76,7 +112,7 @@ export async function verifyAdminSession(token: string): Promise<string | null> 
     const { payload } = await jwtVerify(token, secret);
     const email = payload.email as string;
 
-    if (!email || email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    if (!email || !(await isAllowedAdminEmail(email))) {
       return null;
     }
 
@@ -88,7 +124,7 @@ export async function verifyAdminSession(token: string): Promise<string | null> 
       return null;
     }
 
-    return email;
+    return email.toLowerCase();
   } catch {
     return null;
   }
@@ -103,6 +139,15 @@ export async function getAdminSession(): Promise<string | null> {
   }
 
   return verifyAdminSession(token);
+}
+
+export async function getAdminActor(): Promise<AdminActor | null> {
+  const email = await getAdminSession();
+  if (!email) {
+    return null;
+  }
+  const role = await getRoleForEmail(email);
+  return { email, role };
 }
 
 export async function setAdminSessionCookie(token: string): Promise<void> {
