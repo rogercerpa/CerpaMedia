@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createMagicLinkToken, isAdminEmail } from "@/lib/auth";
+import { getEmailFrom } from "@/lib/email";
 import { Resend } from "resend";
 import { checkRateLimit, validateEmail } from "@/lib/security";
 
@@ -62,10 +63,9 @@ export async function POST(request: NextRequest) {
     }
 
     const resend = getResendClient();
-    const fromEmail = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
-    
+
     const { data, error } = await resend.emails.send({
-      from: fromEmail,
+      from: getEmailFrom(),
       to: email,
       subject: "Your CerpaMedia Admin Login Link",
       html: `

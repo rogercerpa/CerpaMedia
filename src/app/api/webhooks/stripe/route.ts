@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
 import { Resend } from "resend";
 import { toConsultBrief, formatConsultBriefForAdmin } from "@/lib/consult-brief";
+import { getEmailFrom, getEmailReplyTo } from "@/lib/email";
 
 function getStripeClient() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -154,7 +155,7 @@ async function sendConfirmationEmails(booking: any) {
   }
   
   const resend = new Resend(resendKey);
-  const fromEmail = process.env.CONTACT_FROM_EMAIL || "onboarding@resend.dev";
+  const fromEmail = getEmailFrom();
   const adminEmail = process.env.CONTACT_TO_EMAIL || "cerpamedia@gmail.com";
 
   const formattedStartTime = booking.startTime.toLocaleString("en-US", {
@@ -183,6 +184,7 @@ async function sendConfirmationEmails(booking: any) {
     await resend.emails.send({
         from: fromEmail,
         to: booking.customerEmail,
+        replyTo: getEmailReplyTo(),
         subject: "Your Technology Strategy Call is Confirmed",
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">

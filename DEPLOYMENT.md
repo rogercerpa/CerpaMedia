@@ -39,14 +39,15 @@ RESEND_API_KEY=your_resend_api_key_here
 Optional (have sensible defaults):
 ```
 CONTACT_TO_EMAIL=cerpamedia@gmail.com
-CONTACT_FROM_EMAIL=onboarding@resend.dev
+CONTACT_FROM_EMAIL=CerpaMedia <info@cerpamedia.com>
+EMAIL_REPLY_TO=cerpamedia@gmail.com
 ```
 
 **Note**: Without `RESEND_API_KEY`, the contact form will show users a friendly error message directing them to email cerpamedia@gmail.com directly.
 
 ## Getting Resend API Key
 1. Sign up at https://resend.com
-2. Verify your sending domain (or use onboarding@resend.dev for testing)
+2. Verify your sending domain (cerpamedia.com is already verified; the default sender is info@cerpamedia.com)
 3. Create API key in dashboard
 4. Add to Vercel environment variables
 

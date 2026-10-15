@@ -42,7 +42,8 @@ RESEND_API_KEY=your_resend_api_key_here
 
 # Optional - defaults shown below
 CONTACT_TO_EMAIL=cerpamedia@gmail.com
-CONTACT_FROM_EMAIL=onboarding@resend.dev
+CONTACT_FROM_EMAIL=CerpaMedia <info@cerpamedia.com>
+EMAIL_REPLY_TO=cerpamedia@gmail.com
 
 # Optional - for Technology Strategy Call payment
 NEXT_PUBLIC_STRIPE_PAYMENT_LINK=your_stripe_payment_link_here
@@ -51,7 +52,8 @@ NEXT_PUBLIC_STRIPE_PAYMENT_LINK=your_stripe_payment_link_here
 **Important**: 
 - The contact form will show an error message to users if `RESEND_API_KEY` is not configured
 - Get your Resend API key from [resend.com](https://resend.com)
-- `CONTACT_FROM_EMAIL` must be a verified domain in your Resend account or use the default `onboarding@resend.dev` for testing
+- `CONTACT_FROM_EMAIL` is optional and defaults to `CerpaMedia <info@cerpamedia.com>` (cerpamedia.com is verified in Resend)
+- `EMAIL_REPLY_TO` is optional and defaults to `cerpamedia@gmail.com` on customer-facing emails
 - `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` is optional. If set, the Technology Strategy Call page will show a "Pay $99" button. If not set, it will display contact information instead.
 
 ### Running Locally
@@ -78,7 +80,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 3. Add environment variables in Vercel dashboard (Settings → Environment Variables):
    - `RESEND_API_KEY` - Required for contact form
    - `CONTACT_TO_EMAIL` - Optional, defaults to cerpamedia@gmail.com
-   - `CONTACT_FROM_EMAIL` - Optional, defaults to onboarding@resend.dev
+   - `CONTACT_FROM_EMAIL` - Optional, defaults to CerpaMedia <info@cerpamedia.com>
+   - `EMAIL_REPLY_TO` - Optional, defaults to cerpamedia@gmail.com
    - `NEXT_PUBLIC_STRIPE_PAYMENT_LINK` - Optional, enables the "Pay $99" button on the `/consult` page
 4. Deploy
 
