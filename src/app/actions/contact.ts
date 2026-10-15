@@ -2,6 +2,8 @@
 
 import { Resend } from "resend";
 import { headers } from "next/headers";
+import { renderContactConfirmation, renderContactNotice } from "@/emails/messages";
+import { formatEasternTimestamp } from "@/emails/format";
 import { getEmailFrom, getEmailReplyTo } from "@/lib/email";
 import {
   checkRateLimit,
@@ -140,27 +142,33 @@ export async function submitContactForm(formData: ContactFormData) {
   const sanitizedService = serviceValidation.sanitized;
   const sanitizedMessage = messageValidation.sanitized;
 
+  const receivedAt = formatEasternTimestamp(new Date());
+
   try {
-    await resend.emails.send({
+    const notice = await renderContactNotice({
+      name: sanitizedName,
+      email: sanitizedEmail,
+      company: sanitizedCompany,
+      service: sanitizedService,
+      message: sanitizedMessage,
+      receivedAt,
+    });
+    const noticeResult = await resend.emails.send({
       from: getEmailFrom(),
       to: toEmail,
-      subject: `New Contact Form Submission from ${sanitizedName}`,
+      subject: notice.subject,
       replyTo: sanitizedEmail || getEmailReplyTo(),
-      html: `
-        <h2>New Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${sanitizedName}</p>
-        <p><strong>Email:</strong> ${sanitizedEmail}</p>
-        <p><strong>Company:</strong> ${sanitizedCompany || "Not provided"}</p>
-        <p><strong>Service Interest:</strong> ${sanitizedService || "Not specified"}</p>
-        <p><strong>Message:</strong></p>
-        <p>${sanitizedMessage.replace(/\n/g, "<br>")}</p>
-      `,
+      html: notice.html,
+      text: notice.text,
     });
 
-    return {
-      success: true,
-      message: "Thank you for your message. We'll get back to you soon!",
-    };
+    if (noticeResult.error) {
+      console.error("Error sending email:", noticeResult.error);
+      return {
+        success: false,
+        error: "There was an error sending your message. Please try again or email us directly at cerpamedia@gmail.com.",
+      };
+    }
   } catch (error) {
     console.error("Error sending email:", error);
     return {
@@ -168,4 +176,33 @@ export async function submitContactForm(formData: ContactFormData) {
       error: "There was an error sending your message. Please try again or email us directly at cerpamedia@gmail.com.",
     };
   }
+
+  try {
+    const confirmation = await renderContactConfirmation({
+      name: sanitizedName,
+      email: sanitizedEmail,
+      company: sanitizedCompany,
+      service: sanitizedService,
+      message: sanitizedMessage,
+    });
+    const confirmationResult = await resend.emails.send({
+      from: getEmailFrom(),
+      to: sanitizedEmail,
+      subject: confirmation.subject,
+      replyTo: getEmailReplyTo(),
+      html: confirmation.html,
+      text: confirmation.text,
+    });
+
+    if (confirmationResult.error) {
+      console.error("Failed to send contact confirmation email:", confirmationResult.error);
+    }
+  } catch (error) {
+    console.error("Failed to send contact confirmation email:", error);
+  }
+
+  return {
+    success: true,
+    message: "Thank you for your message. We'll get back to you soon!",
+  };
 }
