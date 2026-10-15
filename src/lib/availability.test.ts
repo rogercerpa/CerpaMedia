@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { getAvailableSlots } from './availability';
 
 // Mock Prisma client
@@ -43,6 +43,10 @@ describe('getAvailableSlots', () => {
     ]);
   });
 
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('returns 0 slots when no DateAvailability records exist (empty config)', async () => {
     const startDate = new Date('2026-10-15T00:00:00Z');
     const endDate = new Date('2026-10-16T00:00:00Z');
@@ -68,6 +72,11 @@ describe('getAvailableSlots', () => {
   });
 
   it('returns slots in ET timezone when a date is opened', async () => {
+    // Oct 15 2026 is the fixture day. Freeze "now" before it so lead-time
+    // filtering does not drop every slot once that day is no longer in the future.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-01T12:00:00Z"));
+
     const startDate = new Date('2026-10-15T00:00:00Z');
     const endDate = new Date('2026-10-16T00:00:00Z');
 
@@ -181,6 +190,9 @@ describe('getAvailableSlots', () => {
   });
 
   it('filters out slots that overlap with confirmed bookings', async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-01T12:00:00Z"));
+
     const startDate = new Date('2026-10-15T00:00:00Z');
     const endDate = new Date('2026-10-16T00:00:00Z');
 

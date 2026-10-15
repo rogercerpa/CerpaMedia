@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireAdminActor, jsonError } from "@/lib/admin-api";
 import { getSiteFlags } from "@/lib/flags";
@@ -36,6 +37,10 @@ export async function PUT(request: NextRequest) {
         demoKillSwitch: Boolean(body.demoKillSwitch),
       },
     });
+
+    // AnalyticsGate and other flag readers live in the root layout, which
+    // static pages cache until this layout is revalidated.
+    revalidatePath("/", "layout");
 
     return NextResponse.json({ flags });
   } catch (error) {
