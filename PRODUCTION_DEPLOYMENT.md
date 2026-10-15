@@ -64,13 +64,14 @@ RESEND_API_KEY=<your-resend-api-key>
 **Optional (have defaults):**
 ```
 CONTACT_TO_EMAIL=cerpamedia@gmail.com
-CONTACT_FROM_EMAIL=onboarding@resend.dev
+CONTACT_FROM_EMAIL=CerpaMedia <info@cerpamedia.com>
+EMAIL_REPLY_TO=cerpamedia@gmail.com
 ```
 
 ### Getting Resend API Key
 
 1. Sign up at https://resend.com (free tier available)
-2. Verify your domain (or use `onboarding@resend.dev` for testing)
+2. Verify your domain (cerpamedia.com is already verified; the default sender is info@cerpamedia.com)
 3. Go to API Keys → Create API Key
 4. Copy the key and add to Vercel
 

@@ -12,6 +12,7 @@ if (typeof window === "undefined" && !cleanupInterval) {
       }
     }
   }, RATE_LIMIT_CLEANUP_INTERVAL);
+  cleanupInterval.unref();
 }
 
 export interface RateLimitConfig {
