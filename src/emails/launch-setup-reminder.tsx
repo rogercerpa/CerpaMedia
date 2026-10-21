@@ -1,5 +1,5 @@
 import { firstNameFrom, oneLine } from "./format";
-import { LAUNCH_WELCOME_CLOSING } from "./launch-welcome";
+import { LAUNCH_INTAKE_BUTTON, LAUNCH_WELCOME_CLOSING } from "./launch-welcome";
 import { EmailLayout, Paragraph, PrimaryButton } from "./layout";
 
 export const LAUNCH_REMINDER_SUBJECT = "Your AI Teammate Launch setup session is still open";
@@ -19,14 +19,14 @@ export function LaunchSetupReminderEmail({
 
   return (
     <EmailLayout
-      preview="Your setup session is still open. Pick a time whenever you're ready."
+      preview="Your intake and setup session are still open."
       title="Your setup session is still open"
     >
       <Paragraph>{`Hi ${name},`}</Paragraph>
       <Paragraph>
-        Your AI Teammate Launch is paid. The setup session is still open whenever you&apos;re ready. It takes a couple of minutes to pick a time.
+        Your AI Teammate Launch is paid. If you haven&apos;t filled out your intake and picked a setup time, you can still do that from the same private link.
       </Paragraph>
-      {href ? <PrimaryButton href={href} label="Choose a date and time" /> : null}
+      {href ? <PrimaryButton href={href} label={LAUNCH_INTAKE_BUTTON} /> : null}
       <Paragraph>Roger will review your intake before the session.</Paragraph>
       <Paragraph>{LAUNCH_WELCOME_CLOSING}</Paragraph>
     </EmailLayout>

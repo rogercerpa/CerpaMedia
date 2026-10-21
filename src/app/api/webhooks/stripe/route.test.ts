@@ -41,7 +41,6 @@ const originalEnv = {
   CONTACT_TO_EMAIL: process.env.CONTACT_TO_EMAIL,
   CONTACT_FROM_EMAIL: process.env.CONTACT_FROM_EMAIL,
   NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
-  ATL_INTAKE_FORM_URL: process.env.ATL_INTAKE_FORM_URL,
   EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO,
 };
 
@@ -60,7 +59,6 @@ beforeEach(() => {
   process.env.CONTACT_TO_EMAIL = "cerpamedia@gmail.com";
   delete process.env.CONTACT_FROM_EMAIL;
   process.env.NEXT_PUBLIC_BASE_URL = "https://cerpamedia.com";
-  process.env.ATL_INTAKE_FORM_URL = "https://docs.google.com/forms/d/e/example/viewform";
   delete process.env.EMAIL_REPLY_TO;
 });
 
@@ -71,7 +69,6 @@ afterEach(() => {
   restore("CONTACT_TO_EMAIL", originalEnv.CONTACT_TO_EMAIL);
   restore("CONTACT_FROM_EMAIL", originalEnv.CONTACT_FROM_EMAIL);
   restore("NEXT_PUBLIC_BASE_URL", originalEnv.NEXT_PUBLIC_BASE_URL);
-  restore("ATL_INTAKE_FORM_URL", originalEnv.ATL_INTAKE_FORM_URL);
   restore("EMAIL_REPLY_TO", originalEnv.EMAIL_REPLY_TO);
 });
 
@@ -107,7 +104,8 @@ describe("Stripe webhook launch purchases", () => {
     expect(welcome.html).toContain("founding");
     expect(welcome.html).toContain("$799");
     expect(welcome.html).toContain("about 15 minutes");
-    expect(welcome.html).toContain("https://docs.google.com/forms/d/e/example/viewform");
+    expect(welcome.html).toContain("Fill out your intake and pick your setup time");
+    expect(welcome.html).not.toContain("docs.google.com");
     expect(welcome.html).toContain("https://cerpamedia.com/launch/setup/");
     expect(welcome.text).toContain("Reply to this email or call (943) 248-7410.");
     expect(welcome.html).not.toMatch(/\$99|sms|text message/i);
@@ -228,8 +226,7 @@ describe("Stripe webhook launch purchases", () => {
     });
   });
 
-  it("tells Roger to send the intake link by hand when the form URL is missing", async () => {
-    delete process.env.ATL_INTAKE_FORM_URL;
+  it("puts the intake and the setup time on the buyer's private link", async () => {
     prismaMock.launchPurchase.findUnique.mockResolvedValue(null);
     prismaMock.launchPurchase.create.mockImplementation(async ({ data }) => ({
       id: "lp_4",
@@ -244,10 +241,12 @@ describe("Stripe webhook launch purchases", () => {
     expect(response.status).toBe(200);
     const welcome = sendMock.mock.calls.map((call) => call[0]).find((email) => email.to === "avery@example.com");
     const admin = sendMock.mock.calls.map((call) => call[0]).find((email) => email.to === "cerpamedia@gmail.com");
-    expect(welcome.html).not.toContain("Fill out the intake form");
+    expect(welcome.html).toContain("Fill out your intake and pick your setup time");
+    expect(welcome.html).not.toContain("docs.google.com");
     expect(welcome.text).toContain("Reply to this email or call (943) 248-7410.");
-    expect(admin.html).toContain("The intake link must be sent by hand.");
-    expect(admin.text).toContain("Send the intake form within 1 business day.");
+    expect(admin.html).not.toContain("sent by hand");
+    expect(admin.html).not.toContain("ATL_INTAKE_FORM_URL");
+    expect(admin.text).toContain("private link to fill out the intake");
   });
 
   it("retries only the buyer welcome after the admin alert already went out", async () => {

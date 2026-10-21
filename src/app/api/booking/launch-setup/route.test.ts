@@ -9,6 +9,9 @@ const prismaMock = vi.hoisted(() => {
       findUnique: vi.fn(),
       updateMany: vi.fn(),
     },
+    launchIntake: {
+      findUnique: vi.fn(),
+    },
     launchSetupSettings: {
       findUnique: vi.fn(),
     },
@@ -45,6 +48,7 @@ beforeEach(() => {
   slotsMock.mockReset();
   prismaMock.launchPurchase.findUnique.mockReset();
   prismaMock.launchPurchase.updateMany.mockReset();
+  prismaMock.launchIntake.findUnique.mockReset();
   prismaMock.launchSetupSettings.findUnique.mockReset();
   prismaMock.booking.findFirst.mockReset();
   prismaMock.booking.create.mockReset();
@@ -68,13 +72,34 @@ describe("gated launch setup booking", () => {
     expect(prismaMock.booking.create).not.toHaveBeenCalled();
   });
 
+  it("rejects booking until the intake is submitted", async () => {
+    prismaMock.launchPurchase.findUnique.mockResolvedValue({
+      id: "lp_1",
+      createdAt: new Date("2026-10-21T12:00:00.000Z"),
+      bookingId: null,
+      buyerEmail: "avery@example.com",
+      tier: "founding",
+    });
+    prismaMock.launchIntake.findUnique.mockResolvedValue(null);
+    const response = await post({});
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(body.error).toMatch(/intake/i);
+    expect(prismaMock.booking.create).not.toHaveBeenCalled();
+  });
+
   it("confirms a paid client's setup session without charging again", async () => {
     prismaMock.launchPurchase.findUnique.mockResolvedValue({
       id: "lp_1",
+      createdAt: new Date("2026-10-21T12:00:00.000Z"),
       bookingId: null,
       buyerEmail: "avery@example.com",
       buyerName: "Avery Buyer",
       tier: "founding",
+    });
+    prismaMock.launchIntake.findUnique.mockResolvedValue({
+      submittedAt: new Date("2026-10-21T15:00:00.000Z"),
+      answers: submittedIntakeAnswers(),
     });
     prismaMock.launchSetupSettings.findUnique.mockResolvedValue({ slotLengthMin: 90 });
     slotsMock.mockResolvedValue([{ start: new Date(START), end: new Date(END) }]);
@@ -116,7 +141,10 @@ describe("gated launch setup booking", () => {
     expect(admin.to).toBe("cerpamedia@gmail.com");
     expect(admin.subject).toContain("New Launch Setup:");
     expect(admin.html).toContain("AI Teammate Launch");
-    expect(admin.html).not.toMatch(/\$99/);
+    expect(admin.html).toContain("Business name");
+    expect(admin.html).toContain("Buyer Co");
+    expect(admin.html).toContain("We repair roofs for homeowners.");
+    expect(admin.html).not.toMatch(/Continue to Payment|Pay \$99/);
   });
 
   it("does not book a second session for the same purchase", async () => {
@@ -131,6 +159,25 @@ describe("gated launch setup booking", () => {
     expect(sendMock).not.toHaveBeenCalled();
   });
 });
+
+function submittedIntakeAnswers() {
+  return {
+    q1: "Buyer Co",
+    q2: "Avery Buyer",
+    q3: "avery@example.com",
+    q4: "4045550199",
+    q5: "Email",
+    q6: "We repair roofs for homeowners.",
+    q7: "Only me",
+    q9: "Writing quotes · 6 times a week · 20 minutes each",
+    q12: "Google Workspace / Gmail",
+    q17a: "No",
+    q19: "No",
+    q21: "In person (one 2-hour visit, if you're within 60 minutes of Woodstock, GA)",
+    q24: "No",
+    q25: "Please start with invoice reminders.",
+  };
+}
 
 function post(overrides: Record<string, unknown>) {
   const payload = {

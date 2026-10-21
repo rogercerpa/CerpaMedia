@@ -7,6 +7,7 @@ import {
   durationMinutesLabel,
   type BookingKind,
 } from "@/lib/launch-booking-shared";
+import { LAUNCH_INTAKE_CONFIRMATION } from "@/lib/launch-intake";
 
 // Convert a Date to YYYY-MM-DD using its local date components (no timezone conversion)
 export function toLocalDateKey(date: Date): string {
@@ -51,6 +52,8 @@ export interface LaunchBookingPrefill {
   customerEmail?: string;
   customerPhone?: string;
   customerCompany?: string;
+  notes?: string;
+  platformPref?: string;
 }
 
 export function CalendarBookingFlow({
@@ -59,12 +62,14 @@ export function CalendarBookingFlow({
   durationMinutes = 90,
   prefill,
   emailLocked = false,
+  confirmOnly = false,
 }: {
   mode?: BookingKind;
   launchToken?: string;
   durationMinutes?: number;
   prefill?: LaunchBookingPrefill;
   emailLocked?: boolean;
+  confirmOnly?: boolean;
 } = {}) {
   const isLaunch = mode === "launch_setup";
   const [step, setStep] = useState<"calendar" | "slots" | "intake" | "loading" | "confirmed">("calendar");
@@ -104,6 +109,8 @@ export function CalendarBookingFlow({
       customerEmail: prefill.customerEmail || current.customerEmail,
       customerPhone: prefill.customerPhone || current.customerPhone,
       customerCompany: prefill.customerCompany || current.customerCompany,
+      notes: prefill.notes || current.notes,
+      platformPref: prefill.platformPref || current.platformPref,
       serviceInterest: isLaunch ? "launch_setup" : current.serviceInterest,
     }));
   }, [prefill, isLaunch]);
@@ -165,6 +172,10 @@ export function CalendarBookingFlow({
   };
 
   const validateForm = () => {
+    if (confirmOnly) {
+      setValidationErrors({});
+      return Boolean(formData.customerName.trim() && formData.customerEmail.trim() && formData.platformPref);
+    }
     const errors: { [key: string]: string } = {};
 
     if (!formData.customerName.trim()) {
@@ -399,9 +410,16 @@ export function CalendarBookingFlow({
           {durationMinutesLabel(durationMinutes)} · {formData.platformPref}
         </p>
         <p className="text-[15px] text-text-muted leading-relaxed">
-          A confirmation email is on its way. Roger will send the meeting details by email.
-          We email or call; we don&apos;t text.
+          {isLaunch
+            ? LAUNCH_INTAKE_CONFIRMATION
+            : "A confirmation email is on its way. Roger will send the meeting details by email. We email or call; we don't text."}
         </p>
+        {isLaunch ? (
+          <p className="text-[15px] text-text-muted leading-relaxed mt-4">
+            A confirmation email is on its way. Roger will send the meeting details by email.
+            We email or call; we don&apos;t text.
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -587,6 +605,80 @@ export function CalendarBookingFlow({
           timeZoneName: "short",
         })
       : "";
+
+    if (confirmOnly) {
+      return (
+        <div>
+          <Reveal>
+            <div className="text-center mb-8">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-text-muted mb-3">
+                Step 3 of 3
+              </p>
+              <h2 className="text-3xl md:text-4xl font-semibold text-text mb-4">
+                Confirm your setup session
+              </h2>
+              <p className="text-text-muted text-sm mb-4">
+                {durationMinutesLabel(durationMinutes)} · included with your purchase
+              </p>
+              <div className="border border-border inline-block px-6 py-3 mb-6">
+                <p className="text-text font-medium">Selected time</p>
+                <p className="text-text-muted text-[15px]">{selectedSlotFormatted}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setStep("calendar");
+                  setSelectedSlot(null);
+                  setSelectedDate(null);
+                }}
+                className="text-text-muted hover:text-text text-sm underline"
+              >
+                Change time
+              </button>
+            </div>
+          </Reveal>
+          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto border border-border bg-white p-6 sm:p-8 space-y-4">
+            {error ? (
+              <div className="border border-red-500 bg-red-50 p-4 text-red-900 text-sm">{error}</div>
+            ) : null}
+            <dl className="space-y-3 text-[15px]">
+              <div>
+                <dt className="text-[11px] uppercase tracking-wider text-text-muted">Name</dt>
+                <dd className="text-text">{formData.customerName}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] uppercase tracking-wider text-text-muted">Email</dt>
+                <dd className="text-text break-all">{formData.customerEmail}</dd>
+              </div>
+              {formData.customerPhone ? (
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wider text-text-muted">Phone</dt>
+                  <dd className="text-text">{formData.customerPhone}</dd>
+                </div>
+              ) : null}
+              <div>
+                <dt className="text-[11px] uppercase tracking-wider text-text-muted">Business</dt>
+                <dd className="text-text">{formData.customerCompany || "Not provided"}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] uppercase tracking-wider text-text-muted">How you'll meet</dt>
+                <dd className="text-text">{formData.platformPref}</dd>
+              </div>
+            </dl>
+            <p className="text-sm text-text-muted leading-relaxed">
+              This setup session is included with your AI Teammate Launch. No additional payment.
+              We email or call; we don&apos;t text, and we don&apos;t publish a street address.
+            </p>
+            <button
+              type="submit"
+              className="w-full min-h-11 bg-cta text-cta-text px-8 py-4 text-[15px] font-medium hover:bg-cta-hover"
+            >
+              Confirm setup session
+            </button>
+          </form>
+        </div>
+      );
+    }
 
     const serviceOptions = [
       { value: "general", label: "Technology Strategy Call (general)" },

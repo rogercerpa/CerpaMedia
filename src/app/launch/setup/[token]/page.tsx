@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { CalendarBookingFlow } from "@/components/CalendarBookingFlow";
+import { LaunchSetupExperience } from "@/components/LaunchSetupExperience";
 import { formatEasternTimestamp } from "@/emails/format";
 import { prisma } from "@/lib/prisma";
 import { isMissingRelationError } from "@/lib/db-errors";
@@ -9,6 +9,7 @@ import {
   LAUNCH_SETUP_LABEL,
   isPlausibleBookingToken,
 } from "@/lib/launch-booking-shared";
+import { asIntakeAnswers, clientReferenceFor, LAUNCH_INTAKE_CONFIRMATION } from "@/lib/launch-intake";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,8 @@ export default async function LaunchSetupPage({
   if (!isPlausibleBookingToken(token)) notFound();
 
   let purchase: {
+    id: string;
+    createdAt: Date;
     buyerName: string | null;
     buyerEmail: string | null;
     buyerPhone: string | null;
@@ -41,12 +44,18 @@ export default async function LaunchSetupPage({
       platformPref: string;
       status: string;
     } | null;
+    intake: {
+      answers: unknown;
+      submittedAt: Date | null;
+    } | null;
   } | null;
 
   try {
     purchase = await prisma.launchPurchase.findUnique({
       where: { bookingToken: token },
       select: {
+        id: true,
+        createdAt: true,
         buyerName: true,
         buyerEmail: true,
         buyerPhone: true,
@@ -57,6 +66,12 @@ export default async function LaunchSetupPage({
             endTime: true,
             platformPref: true,
             status: true,
+          },
+        },
+        intake: {
+          select: {
+            answers: true,
+            submittedAt: true,
           },
         },
       },
@@ -76,7 +91,7 @@ export default async function LaunchSetupPage({
 
   return (
     <div>
-      <section className="bg-bg py-16 md:py-24">
+      <section className="bg-bg py-10 md:py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-block border border-border px-3 py-1 mb-6">
             <span className="text-[11px] font-medium text-text uppercase tracking-wider">
@@ -84,11 +99,13 @@ export default async function LaunchSetupPage({
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-semibold mb-4 text-text tracking-tight leading-tight">
-            {LAUNCH_SETUP_LABEL}
+            {alreadyBooked ? LAUNCH_SETUP_LABEL : "AI Teammate Launch: Intake"}
           </h1>
           <p className="text-lg text-text-muted max-w-2xl mx-auto leading-relaxed">
             {firstName ? `${firstName}, your` : "Your"} {purchase.tier} purchase is already paid.
-            Pick a {duration}-minute setup session on Roger&apos;s calendar.
+            {alreadyBooked
+              ? " Your setup session is on the calendar."
+              : " Fill out a short intake, then pick a setup time."}
           </p>
           <p className="text-[15px] text-text-muted mt-4 max-w-2xl mx-auto leading-relaxed">
             Zoom, Microsoft Teams, or in person in the Woodstock, GA area. We email or call; we don&apos;t text, and we don&apos;t publish a street address.
@@ -96,7 +113,7 @@ export default async function LaunchSetupPage({
         </div>
       </section>
 
-      <section className="py-16 border-t border-border bg-bg-subtle">
+      <section className="py-10 border-t border-border bg-bg-subtle">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {alreadyBooked && purchase.booking ? (
             <AlreadyBooked
@@ -105,16 +122,15 @@ export default async function LaunchSetupPage({
               duration={duration}
             />
           ) : (
-            <CalendarBookingFlow
-              mode="launch_setup"
-              launchToken={token}
+            <LaunchSetupExperience
+              token={token}
               durationMinutes={duration}
-              emailLocked={Boolean(purchase.buyerEmail)}
-              prefill={{
-                customerName: purchase.buyerName ?? "",
-                customerEmail: purchase.buyerEmail ?? "",
-                customerPhone: purchase.buyerPhone ?? "",
-              }}
+              clientReference={clientReferenceFor(purchase)}
+              buyerEmail={purchase.buyerEmail}
+              buyerName={purchase.buyerName}
+              buyerPhone={purchase.buyerPhone}
+              initialAnswers={asIntakeAnswers(purchase.intake?.answers)}
+              intakeSubmitted={Boolean(purchase.intake?.submittedAt)}
             />
           )}
         </div>
@@ -137,6 +153,7 @@ function AlreadyBooked({
       <h2 className="text-2xl font-semibold text-text mb-3">You&apos;re booked</h2>
       <p className="text-text mb-2">{formatEasternTimestamp(startTime)}</p>
       <p className="text-text-muted mb-2">{duration} minutes · {platformPref}</p>
+      <p className="text-[15px] text-text leading-relaxed mt-4">{LAUNCH_INTAKE_CONFIRMATION}</p>
       <p className="text-[15px] text-text-muted leading-relaxed mt-4">
         Roger will email you the meeting details. To reschedule, email{" "}
         <a className="text-text underline" href="mailto:cerpamedia@gmail.com">

@@ -399,12 +399,26 @@ model LaunchPurchase {
   livemode        Boolean   @default(false)
   bookingId       String?   @unique
   booking         Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  intake          LaunchIntake?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
   @@index([buyerEmail])
   @@index([tier])
   @@index([createdAt])
+}
+
+// Answers from the private intake on /launch/setup/[token].
+// Additive: the $99 booking tables are unchanged. Linked to the purchase,
+// and copied onto Booking.intakeAnswers when the setup session is confirmed.
+model LaunchIntake {
+  id          String    @id @default(cuid())
+  purchaseId  String    @unique
+  purchase    LaunchPurchase @relation(fields: [purchaseId], references: [id], onDelete: Cascade)
+  answers     Json
+  submittedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 // Duration for the private Launch setup session. Default 90 minutes.

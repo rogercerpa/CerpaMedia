@@ -6,7 +6,6 @@ import { getEmailFrom, getEmailReplyTo } from "./email";
 import { renderLaunchPurchaseNotice, renderLaunchSetupReminder, renderLaunchWelcome } from "@/emails/messages";
 import type { LaunchWelcomeDelivery } from "@/emails/launch-purchase-notice";
 import { purchasesNeedingReminder } from "./business-days";
-import { getIntakeFormUrl } from "./intake-form-url";
 import {
   classifyLaunchCheckout,
   extractBuyer,
@@ -99,7 +98,6 @@ export async function notifyLaunchPurchase(
     row.amountTotal ?? session.amount_total,
     row.currency || session.currency || "usd"
   );
-  const intakeConfigured = Boolean(getIntakeFormUrl());
   let welcomeDelivery: LaunchWelcomeDelivery = row.welcomeSentAt
     ? "sent"
     : row.buyerEmail
@@ -150,7 +148,6 @@ export async function notifyLaunchPurchase(
           dashboardUrl: stripeDashboardSessionUrl(session.id, livemode),
           schedulingUrl: launchSetupUrl(row.bookingToken),
           welcomeDelivery,
-          intakeConfigured,
         });
       } catch (error) {
         await prisma.launchPurchase.update({
@@ -299,7 +296,6 @@ async function deliverLaunchWelcome(purchase: {
     buyerName: purchase.buyerName || "",
     tier: purchase.tier,
     amountDisplay: formatPurchaseAmount(purchase.amountTotal, purchase.currency),
-    intakeFormUrl: getIntakeFormUrl(),
     schedulingUrl: launchSetupUrl(purchase.bookingToken),
   });
 
@@ -355,7 +351,6 @@ async function sendLaunchAdminEmail(input: {
   dashboardUrl: string;
   schedulingUrl: string;
   welcomeDelivery: LaunchWelcomeDelivery;
-  intakeConfigured: boolean;
 }) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) {
@@ -374,7 +369,6 @@ async function sendLaunchAdminEmail(input: {
     dashboardUrl: input.dashboardUrl,
     schedulingUrl: input.schedulingUrl,
     welcomeDelivery: input.welcomeDelivery,
-    intakeConfigured: input.intakeConfigured,
   });
 
   const result = await resend.emails.send({

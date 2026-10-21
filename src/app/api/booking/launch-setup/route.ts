@@ -10,6 +10,12 @@ import {
   isLaunchSetupPlatform,
   isPlausibleBookingToken,
 } from "@/lib/launch-booking-shared";
+import {
+  bookingFieldsFromIntake,
+  clientReferenceFor,
+  labeledIntakeRecord,
+  reviewIntake,
+} from "@/lib/launch-intake";
 import { sendBookingEmails } from "@/lib/send-booking-emails";
 import {
   checkHoneypot,
@@ -42,8 +48,6 @@ export async function POST(request: NextRequest) {
       customerName,
       customerEmail,
       customerPhone,
-      customerCompany,
-      notes,
       platformPref,
       website,
     } = body ?? {};
@@ -91,7 +95,7 @@ export async function POST(request: NextRequest) {
     const nameValidation = validateTextInput({
       value: customerName,
       minLength: 2,
-      maxLength: 100,
+      maxLength: 200,
       fieldName: "Name",
       required: true,
     });
@@ -107,41 +111,6 @@ export async function POST(request: NextRequest) {
     const phone = customerPhone ? String(customerPhone).trim().slice(0, 20) : "";
     if (phone && !validatePhone(phone)) {
       return NextResponse.json({ error: "Please enter a valid phone number" }, { status: 400 });
-    }
-
-    let company = "Not provided";
-    if (customerCompany && String(customerCompany).trim()) {
-      const companyValidation = validateTextInput({
-        value: customerCompany,
-        minLength: 1,
-        maxLength: 200,
-        fieldName: "Company",
-        required: true,
-      });
-      if (!companyValidation.valid) {
-        return NextResponse.json({ error: companyValidation.error }, { status: 400 });
-      }
-      company = companyValidation.sanitized;
-    }
-
-    let sanitizedNotes: string | null = null;
-    if (notes && String(notes).trim()) {
-      if (looksLikeSpam(String(notes))) {
-        return NextResponse.json(
-          { error: "Please enter a clear note for Roger" },
-          { status: 400 }
-        );
-      }
-      const notesValidation = validateTextInput({
-        value: notes,
-        maxLength: 500,
-        fieldName: "Notes",
-        required: false,
-      });
-      if (!notesValidation.valid) {
-        return NextResponse.json({ error: notesValidation.error }, { status: 400 });
-      }
-      sanitizedNotes = notesValidation.sanitized || null;
     }
 
     const start = new Date(startTime);
@@ -185,6 +154,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    let intake;
+    try {
+      intake = await prisma.launchIntake.findUnique({
+        where: { purchaseId: purchase.id },
+      });
+    } catch (error) {
+      if (isMissingRelationError(error)) {
+        return NextResponse.json(
+          { error: "Scheduling is not available yet." },
+          { status: 503 }
+        );
+      }
+      throw error;
+    }
+
+    if (!intake?.submittedAt) {
+      return NextResponse.json(
+        { error: "Finish the intake before choosing a time." },
+        { status: 400 }
+      );
+    }
+
+    const reviewed = reviewIntake({
+      answers: intake.answers,
+      mode: "submit",
+      clientReference: clientReferenceFor({ id: purchase.id, createdAt: purchase.createdAt }),
+      buyerEmail: purchase.buyerEmail,
+    });
+    if (Object.keys(reviewed.errors).length > 0) {
+      return NextResponse.json(
+        { error: "Please review your intake and submit it again." },
+        { status: 400 }
+      );
+    }
+
+    const fromIntake = bookingFieldsFromIntake(reviewed.answers);
+    const meetingPlatform = fromIntake.platformPref;
+    if (!meetingPlatform || !fromIntake.customerName || !fromIntake.customerEmail) {
+      return NextResponse.json(
+        { error: "Finish the intake before choosing a time." },
+        { status: 400 }
+      );
+    }
+
     const lengthMin = await getLaunchSetupLengthMin();
     const windowStart = new Date(start.getTime() - 24 * 60 * 60 * 1000);
     const windowEnd = new Date(end.getTime() + 24 * 60 * 60 * 1000);
@@ -216,18 +229,17 @@ export async function POST(request: NextRequest) {
           startTime: start,
           endTime: end,
           status: "confirmed",
-          customerName: nameValidation.sanitized,
-          customerEmail: email,
-          customerPhone: phone,
-          customerCompany: company,
+          customerName: fromIntake.customerName,
+          customerEmail: fromIntake.customerEmail,
+          customerPhone: fromIntake.customerPhone,
+          customerCompany: fromIntake.customerCompany,
           serviceInterest: LAUNCH_SETUP_SERVICE,
-          platformPref,
-          notes: sanitizedNotes,
-          intakeAnswers: {
-            bookingType: LAUNCH_SETUP_LABEL,
-            tier: purchase.tier,
-            launchPurchaseId: purchase.id,
-          },
+          platformPref: meetingPlatform,
+          notes: fromIntake.notes,
+          intakeAnswers: labeledIntakeRecord(reviewed.answers, {
+            "Booking type": LAUNCH_SETUP_LABEL,
+            Tier: purchase.tier,
+          }),
         },
       });
 

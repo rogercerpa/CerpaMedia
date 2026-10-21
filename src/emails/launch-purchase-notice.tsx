@@ -14,7 +14,6 @@ export interface LaunchPurchaseNoticeProps {
   dashboardUrl: string;
   schedulingUrl: string;
   welcomeDelivery: LaunchWelcomeDelivery;
-  intakeConfigured: boolean;
 }
 
 export function LaunchPurchaseNoticeEmail({
@@ -28,7 +27,6 @@ export function LaunchPurchaseNoticeEmail({
   dashboardUrl,
   schedulingUrl,
   welcomeDelivery,
-  intakeConfigured,
 }: LaunchPurchaseNoticeProps) {
   const name = oneLine(buyerName) || "buyer";
   const email = oneLine(buyerEmail);
@@ -63,11 +61,6 @@ export function LaunchPurchaseNoticeEmail({
         <Paragraph>
           <strong>{welcomeSentence(welcomeDelivery, email)}</strong>
         </Paragraph>
-        {!intakeConfigured ? (
-          <Paragraph>
-            The intake link must be sent by hand. ATL_INTAKE_FORM_URL is not set, so the welcome email does not include the form.
-          </Paragraph>
-        ) : null}
         {welcomeDelivery === "failed" ? (
           <Paragraph>
             Stripe will retry the welcome email. You can also resend it from Admin → Bookings.
@@ -78,7 +71,7 @@ export function LaunchPurchaseNoticeEmail({
       <Subheading>Next step</Subheading>
       <DetailBox>
         <Paragraph>
-          <strong>{nextStepSentence(welcomeDelivery, intakeConfigured)}</strong>
+          <strong>{nextStepSentence(welcomeDelivery)}</strong>
         </Paragraph>
       </DetailBox>
       <Field label="Setup session link" value={scheduling} />
@@ -97,9 +90,12 @@ function welcomeSentence(delivery: LaunchWelcomeDelivery, email: string): string
   return "Welcome email not sent. This checkout had no customer email.";
 }
 
-function nextStepSentence(delivery: LaunchWelcomeDelivery, intakeConfigured: boolean): string {
-  if (!intakeConfigured || delivery !== "sent") {
-    return "Send the intake form within 1 business day.";
+function nextStepSentence(delivery: LaunchWelcomeDelivery): string {
+  if (delivery === "sent") {
+    return "The buyer has a private link to fill out the intake and pick a setup time. Review the intake before the session.";
   }
-  return "The buyer has the intake form and the private scheduling link. Review the intake before the setup session.";
+  if (delivery === "failed") {
+    return "The welcome email did not go out. Resend it from Admin → Bookings so the buyer can fill out the intake and pick a time.";
+  }
+  return "This checkout had no customer email. Contact the buyer and send their private setup link by hand.";
 }

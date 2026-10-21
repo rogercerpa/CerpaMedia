@@ -6,7 +6,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { isMissingRelationError } from "@/lib/db-errors";
 import { formatPurchaseAmount, stripeDashboardSessionUrl } from "@/lib/launch-checkout";
-import { getIntakeFormUrl } from "@/lib/intake-form-url";
+import { labeledIntakeLines } from "@/lib/launch-intake";
 import {
   LAUNCH_SETUP_LABEL,
   LAUNCH_SETUP_SERVICE,
@@ -49,6 +49,7 @@ export default async function AdminBookingsPage({
     welcomeSentAt: Date | null;
     welcomeReminderSentAt: Date | null;
     booking: { id: string; startTime: Date; status: string; platformPref: string } | null;
+    intake: { answers: unknown; submittedAt: Date | null } | null;
   }> = [];
   let launchTableReady = true;
   try {
@@ -59,11 +60,28 @@ export default async function AdminBookingsPage({
         booking: {
           select: { id: true, startTime: true, status: true, platformPref: true },
         },
+        intake: {
+          select: { answers: true, submittedAt: true },
+        },
       },
     });
   } catch (error) {
     if (!isMissingRelationError(error)) throw error;
-    launchTableReady = false;
+    try {
+      const purchases = await prisma.launchPurchase.findMany({
+        orderBy: { createdAt: "desc" },
+        take: 50,
+        include: {
+          booking: {
+            select: { id: true, startTime: true, status: true, platformPref: true },
+          },
+        },
+      });
+      launchPurchases = purchases.map((purchase) => ({ ...purchase, intake: null }));
+    } catch (inner) {
+      if (!isMissingRelationError(inner)) throw inner;
+      launchTableReady = false;
+    }
   }
   
   const bookings = await prisma.booking.findMany({
@@ -175,7 +193,6 @@ export default async function AdminBookingsPage({
           purchases={launchPurchases}
           origin={origin}
           formatDateTime={formatDateTime}
-          intakeConfigured={Boolean(getIntakeFormUrl())}
         />
 
         {bookings.length === 0 ? (
@@ -286,7 +303,7 @@ export default async function AdminBookingsPage({
                         {Object.entries(booking.intakeAnswers as Record<string, any>).filter(([_, value]) => value).map(([key, value]) => (
                           <div key={key} className="text-sm">
                             <span className="font-medium text-gray-700">{key.replace(/_/g, ' ')}:</span>{" "}
-                            <span className="text-gray-900">{String(value)}</span>
+                            <span className="text-gray-900 whitespace-pre-wrap">{String(value)}</span>
                           </div>
                         ))}
                       </div>
@@ -307,7 +324,6 @@ function LaunchClients({
   purchases,
   origin,
   formatDateTime,
-  intakeConfigured,
 }: {
   ready: boolean;
   purchases: Array<{
@@ -326,19 +342,16 @@ function LaunchClients({
     welcomeSentAt: Date | null;
     welcomeReminderSentAt: Date | null;
     booking: { id: string; startTime: Date; status: string; platformPref: string } | null;
+    intake: { answers: unknown; submittedAt: Date | null } | null;
   }>;
   origin: string;
   formatDateTime: (date: Date) => string;
-  intakeConfigured: boolean;
 }) {
   return (
     <div className="mb-10">
       <h3 className="text-lg font-semibold text-gray-900 mb-1">AI Teammate Launch clients</h3>
       <p className="text-sm text-gray-600 mb-4">
-        Purchases from the founding and regular payment links. Scheduling links stay off the public site.
-        {!intakeConfigured
-          ? " ATL_INTAKE_FORM_URL is not set, so welcome emails leave out the intake form. Send that link by hand."
-          : ""}
+        Purchases from the founding and regular payment links. The private link includes the intake and the setup time. Scheduling links stay off the public site.
       </p>
       {!ready ? (
         <div className="bg-white shadow rounded-lg p-6 text-sm text-gray-600">
@@ -428,10 +441,44 @@ function LaunchClients({
                     {scheduleUrl}
                   </a>
                 </p>
+                <IntakeAnswers intake={purchase.intake} />
               </div>
             );
           })}
         </div>
+      )}
+    </div>
+  );
+}
+
+function IntakeAnswers({
+  intake,
+}: {
+  intake: { answers: unknown; submittedAt: Date | null } | null;
+}) {
+  const lines = labeledIntakeLines(intake?.answers);
+  const status = !intake
+    ? "Not started"
+    : intake.submittedAt
+      ? "Submitted"
+      : "In progress";
+
+  return (
+    <div className="mt-4 border-t border-gray-200 pt-4">
+      <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+        Intake · {status}
+      </h5>
+      {lines.length === 0 ? (
+        <p className="text-sm text-gray-500">No answers saved yet.</p>
+      ) : (
+        <dl className="bg-gray-50 rounded p-4 space-y-3">
+          {lines.map((line) => (
+            <div key={line.label}>
+              <dt className="text-sm font-medium text-gray-700">{line.label}</dt>
+              <dd className="text-sm text-gray-900 whitespace-pre-wrap">{line.value}</dd>
+            </div>
+          ))}
+        </dl>
       )}
     </div>
   );
