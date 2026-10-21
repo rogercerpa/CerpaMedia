@@ -1,8 +1,16 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { getAdminSession } from "@/lib/auth";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
+import { isMissingRelationError } from "@/lib/db-errors";
+import { formatPurchaseAmount, stripeDashboardSessionUrl } from "@/lib/launch-checkout";
+import {
+  LAUNCH_SETUP_LABEL,
+  LAUNCH_SETUP_SERVICE,
+  launchSetupPath,
+} from "@/lib/launch-booking-shared";
 
 export default async function AdminBookingsPage() {
   const email = await getAdminSession();
@@ -12,6 +20,42 @@ export default async function AdminBookingsPage() {
   }
 
   const now = new Date();
+  const headerList = await headers();
+  const host = headerList.get("x-forwarded-host") || headerList.get("host") || "cerpamedia.com";
+  const proto = headerList.get("x-forwarded-proto") || "https";
+  const origin = `${proto}://${host}`;
+
+  let launchPurchases: Array<{
+    id: string;
+    tier: string;
+    amountTotal: number | null;
+    currency: string;
+    buyerName: string | null;
+    buyerEmail: string | null;
+    buyerPhone: string | null;
+    promoCode: string | null;
+    stripeSessionId: string;
+    bookingToken: string;
+    livemode: boolean;
+    createdAt: Date;
+    adminNotifiedAt: Date | null;
+    booking: { id: string; startTime: Date; status: string; platformPref: string } | null;
+  }> = [];
+  let launchTableReady = true;
+  try {
+    launchPurchases = await prisma.launchPurchase.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 50,
+      include: {
+        booking: {
+          select: { id: true, startTime: true, status: true, platformPref: true },
+        },
+      },
+    });
+  } catch (error) {
+    if (!isMissingRelationError(error)) throw error;
+    launchTableReady = false;
+  }
   
   const bookings = await prisma.booking.findMany({
     where: {
@@ -65,6 +109,7 @@ export default async function AdminBookingsPage() {
     automation: "Automation & process improvement",
     strategy: "Strategy / architecture / roadmap",
     not_sure: "Not sure yet",
+    [LAUNCH_SETUP_SERVICE]: LAUNCH_SETUP_LABEL,
   };
 
   return (
@@ -100,6 +145,13 @@ export default async function AdminBookingsPage() {
           </p>
         </div>
 
+        <LaunchClients
+          ready={launchTableReady}
+          purchases={launchPurchases}
+          origin={origin}
+          formatDateTime={formatDateTime}
+        />
+
         {bookings.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -131,8 +183,13 @@ export default async function AdminBookingsPage() {
                 <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
                   <div className="flex justify-between items-start">
                     <div>
-                      <div className="flex items-center gap-3 mb-2">
+                      <div className="flex items-center gap-3 mb-2 flex-wrap">
                         {getStatusBadge(booking.status)}
+                        {booking.serviceInterest === LAUNCH_SETUP_SERVICE && (
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            {LAUNCH_SETUP_LABEL}
+                          </span>
+                        )}
                         <span className="text-sm text-gray-500">ID: {booking.id}</span>
                       </div>
                       <h3 className="text-xl font-semibold text-gray-900">{booking.customerName}</h3>
@@ -162,14 +219,16 @@ export default async function AdminBookingsPage() {
                             {booking.customerEmail}
                           </a>
                         </p>
-                        <p className="text-sm text-gray-900">
-                          <a
-                            href={`tel:${booking.customerPhone}`}
-                            className="text-blue-600 hover:underline"
-                          >
-                            {booking.customerPhone}
-                          </a>
-                        </p>
+                        {booking.customerPhone ? (
+                          <p className="text-sm text-gray-900">
+                            <a
+                              href={`tel:${booking.customerPhone}`}
+                              className="text-blue-600 hover:underline"
+                            >
+                              {booking.customerPhone}
+                            </a>
+                          </p>
+                        ) : null}
                       </div>
                     </div>
 
@@ -213,6 +272,114 @@ export default async function AdminBookingsPage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function LaunchClients({
+  ready,
+  purchases,
+  origin,
+  formatDateTime,
+}: {
+  ready: boolean;
+  purchases: Array<{
+    id: string;
+    tier: string;
+    amountTotal: number | null;
+    currency: string;
+    buyerName: string | null;
+    buyerEmail: string | null;
+    buyerPhone: string | null;
+    promoCode: string | null;
+    stripeSessionId: string;
+    bookingToken: string;
+    livemode: boolean;
+    createdAt: Date;
+    booking: { id: string; startTime: Date; status: string; platformPref: string } | null;
+  }>;
+  origin: string;
+  formatDateTime: (date: Date) => string;
+}) {
+  return (
+    <div className="mb-10">
+      <h3 className="text-lg font-semibold text-gray-900 mb-1">AI Teammate Launch clients</h3>
+      <p className="text-sm text-gray-600 mb-4">
+        Purchases from the founding and regular payment links. Scheduling links stay off the public site.
+      </p>
+      {!ready ? (
+        <div className="bg-white shadow rounded-lg p-6 text-sm text-gray-600">
+          Launch purchases will show here after the database migration is applied.
+        </div>
+      ) : purchases.length === 0 ? (
+        <div className="bg-white shadow rounded-lg p-6 text-sm text-gray-600">
+          No Launch purchases yet.
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {purchases.map((purchase) => {
+            const scheduleUrl = `${origin}${launchSetupPath(purchase.bookingToken)}`;
+            const dashboardUrl = stripeDashboardSessionUrl(purchase.stripeSessionId, purchase.livemode);
+            const scheduled = purchase.booking && purchase.booking.status !== "cancelled";
+            return (
+              <div key={purchase.id} className="bg-white shadow rounded-lg p-6">
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                    {LAUNCH_SETUP_LABEL}
+                  </span>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    {purchase.tier} · {formatPurchaseAmount(purchase.amountTotal, purchase.currency)}
+                  </span>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${scheduled ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}`}>
+                    {scheduled ? "Setup session booked" : "Needs scheduling"}
+                  </span>
+                </div>
+                <h4 className="text-lg font-semibold text-gray-900">
+                  {purchase.buyerName || "Name not provided"}
+                </h4>
+                <p className="text-sm text-gray-600">{purchase.buyerEmail || "Email not provided"}</p>
+                {purchase.buyerPhone ? (
+                  <p className="text-sm text-gray-600">{purchase.buyerPhone}</p>
+                ) : null}
+                <dl className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <dt className="text-gray-500">Purchased</dt>
+                    <dd className="text-gray-900">{formatDateTime(purchase.createdAt)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500">Promo code</dt>
+                    <dd className="text-gray-900">{purchase.promoCode || "None"}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500">Stripe session</dt>
+                    <dd>
+                      <a href={dashboardUrl} className="text-blue-600 hover:underline break-all">
+                        {purchase.stripeSessionId}
+                      </a>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500">Setup session</dt>
+                    <dd className="text-gray-900">
+                      {scheduled && purchase.booking
+                        ? `${formatDateTime(purchase.booking.startTime)} · ${purchase.booking.platformPref}`
+                        : "Not scheduled"}
+                    </dd>
+                  </div>
+                </dl>
+                <p className="mt-4 text-sm text-gray-700">
+                  Next step: Send the intake form within 1 business day.
+                </p>
+                <p className="mt-2 text-sm break-all">
+                  <a href={scheduleUrl} className="text-blue-600 hover:underline">
+                    {scheduleUrl}
+                  </a>
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -9,6 +9,7 @@ import {
   renderBookingNotice,
   renderContactConfirmation,
   renderContactNotice,
+  renderLaunchPurchaseNotice,
 } from "./messages";
 import { FOOTER_ADDRESS, SITE_URL } from "./theme";
 
@@ -210,6 +211,56 @@ describe("branded email rendering", () => {
     expect(email.html).not.toContain("Additional Context");
     expect(email.html).toContain("(not provided)");
     expect(email.html).toContain("Not provided");
+  });
+
+  it("words the setup-session confirmation for a paid launch client", async () => {
+    const email = await renderBookingConfirmation({
+      customerName: "Avery Buyer",
+      formattedStartTime: SESSION,
+      platformPref: "In person (Woodstock, GA area)",
+      adminEmail: "cerpamedia@gmail.com",
+      kind: "launch_setup",
+      durationLabel: "90 minutes",
+    });
+
+    expect(email.subject).toBe("Your AI Teammate Launch setup session is confirmed");
+    expectBranded(email.html, email.text);
+    expect(email.html).toContain("Hi Avery Buyer");
+    expect(email.html).toContain("included with your purchase");
+    expect(email.html).toContain("90 minutes");
+    expect(email.html).toContain("Woodstock, GA area");
+    expect(email.html).toContain("don&#x27;t publish a street address");
+    expect(email.html).toContain("we don&#x27;t text");
+    expect(email.text).toContain("90 minutes");
+    expect(email.html).not.toMatch(/\$99|sms|text message/i);
+    expect(email.text).not.toMatch(/\$99|sms|text message/i);
+  });
+
+  it("builds the admin-only launch purchase notice", async () => {
+    const email = await renderLaunchPurchaseNotice({
+      buyerName: "Avery Buyer",
+      buyerEmail: "avery@example.com",
+      buyerPhone: "+14045550199",
+      amountDisplay: "$799",
+      tier: "founding",
+      promoCode: "None",
+      stripeSessionId: "cs_test_launch_1",
+      dashboardUrl: "https://dashboard.stripe.com/test/checkout/sessions/cs_test_launch_1",
+      schedulingUrl: "https://cerpamedia.com/launch/setup/token",
+    });
+
+    expect(email.subject).toBe("New AI Teammate Launch purchase — founding $799");
+    expectBranded(email.html, email.text);
+    expect(email.html).toContain("Avery Buyer");
+    expect(email.html).toContain("avery@example.com");
+    expect(email.html).toContain("+14045550199");
+    expect(email.html).toContain("None");
+    expect(email.html).toContain("cs_test_launch_1");
+    expect(email.html).toContain("https://dashboard.stripe.com/test/checkout/sessions/cs_test_launch_1");
+    expect(email.html).toContain("https://cerpamedia.com/launch/setup/token");
+    expect(email.html).toContain("Send the intake form within 1 business day");
+    expect(email.text).toContain("Send the intake form within 1 business day");
+    expect(email.html).not.toMatch(/\$99/);
   });
 
   it("renders the admin magic link in plain text and refuses a non-http link", async () => {

@@ -23,6 +23,7 @@ interface BookingSettings {
   slotLengthMin: number;
   bufferMin: number;
   minLeadTimeHrs: number;
+  launchSetupLengthMin?: number;
 }
 
 interface DayState {
@@ -70,6 +71,7 @@ export default function UnifiedAvailabilityManager() {
     slotLengthMin: 60,
     bufferMin: 15,
     minLeadTimeHrs: 24,
+    launchSetupLengthMin: 90,
   });
 
   useEffect(() => {
@@ -82,6 +84,7 @@ export default function UnifiedAvailabilityManager() {
         slotLengthMin: settings.slotLengthMin,
         bufferMin: settings.bufferMin,
         minLeadTimeHrs: settings.minLeadTimeHrs,
+        launchSetupLengthMin: settings.launchSetupLengthMin ?? 90,
       });
     }
   }, [settings]);
@@ -310,9 +313,11 @@ export default function UnifiedAvailabilityManager() {
       });
 
       if (res.ok) {
+        const data = await res.json();
         await loadData();
         setShowSettings(false);
         showSuccess("Settings saved!");
+        if (data.warning) alert(data.warning);
       } else {
         const error = await res.json();
         alert(error.error || "Failed to save settings");
@@ -754,7 +759,24 @@ export default function UnifiedAvailabilityManager() {
                   max="480"
                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
                 />
-                <p className="text-xs text-gray-500 mt-1">Duration of each booking slot</p>
+                <p className="text-xs text-gray-500 mt-1">Duration of each strategy-call slot</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  AI Teammate Launch setup session (minutes)
+                </label>
+                <input
+                  type="number"
+                  value={settingsForm.launchSetupLengthMin}
+                  onChange={(e) => setSettingsForm({ ...settingsForm, launchSetupLengthMin: parseInt(e.target.value) })}
+                  min="15"
+                  max="480"
+                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Private setup sessions use the same open dates. Default is 90 minutes.
+                </p>
               </div>
 
               <div>

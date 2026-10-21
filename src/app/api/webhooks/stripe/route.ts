@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import Stripe from "stripe";
-import { Resend } from "resend";
-import { formatEasternTimestamp } from "@/emails/format";
-import { createBookingEmails } from "@/emails/messages";
-import { toConsultBrief, formatConsultBriefForAdmin } from "@/lib/consult-brief";
-import { getEmailFrom } from "@/lib/email";
+import { isLaunchCheckout } from "@/lib/launch-checkout";
+import { notifyLaunchPurchase } from "@/lib/launch-purchase";
+import { sendBookingEmails } from "@/lib/send-booking-emails";
 
 function getStripeClient() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -52,10 +50,24 @@ export async function POST(request: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
+
+    if (isLaunchCheckout(session)) {
+      try {
+        await notifyLaunchPurchase(session, event.id);
+      } catch (error) {
+        console.error("Launch purchase webhook failed:", session.id, error);
+        return NextResponse.json(
+          { error: "Failed to process webhook" },
+          { status: 500 }
+        );
+      }
+      return NextResponse.json({ received: true });
+    }
+
     const holdId = session.metadata?.holdId;
 
     if (!holdId) {
-      console.error("No holdId in session metadata");
+      console.info("Ignoring checkout.session.completed without a booking hold:", session.id);
       return NextResponse.json({ received: true });
     }
 
@@ -132,11 +144,7 @@ export async function POST(request: NextRequest) {
         where: { id: holdId },
       });
 
-      const consultBrief = toConsultBrief(booking, "confirmed");
-      
-      console.log("[Consult Secretary Hook] Booking confirmed:", JSON.stringify(consultBrief, null, 2));
-
-      await sendConfirmationEmails(booking);
+      await sendBookingEmails(booking);
     } catch (error) {
       console.error("Error processing webhook:", error);
       return NextResponse.json(
@@ -147,72 +155,4 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ received: true });
-}
-
-async function sendConfirmationEmails(booking: any) {
-  const resendKey = process.env.RESEND_API_KEY;
-  if (!resendKey) {
-    console.error("RESEND_API_KEY not configured, skipping emails");
-    return;
-  }
-  
-  const resend = new Resend(resendKey);
-  const fromEmail = getEmailFrom();
-  const adminEmail = process.env.CONTACT_TO_EMAIL || "cerpamedia@gmail.com";
-
-  const formattedStartTime = formatEasternTimestamp(booking.startTime);
-
-  const consultBrief = toConsultBrief(booking, "confirmed");
-  const serviceLabels: Record<string, string> = {
-    general: "Technology Strategy Call (general)",
-    web_mobile: "Web & mobile applications",
-    ai: "AI integration / AI consulting",
-    automation: "Automation & process improvement",
-    strategy: "Strategy / architecture / roadmap",
-    not_sure: "Not sure yet",
-  };
-  const serviceLabel = serviceLabels[booking.serviceInterest] || booking.serviceInterest;
-
-  try {
-    const messages = await createBookingEmails({
-      customerName: booking.customerName,
-      customerEmail: booking.customerEmail,
-      customerPhone: booking.customerPhone,
-      customerCompany: booking.customerCompany,
-      formattedStartTime,
-      platformPref: booking.platformPref,
-      serviceLabel,
-      bookingId: booking.id,
-      notes: booking.notes,
-      intakeAnswers: booking.intakeAnswers,
-      consultBrief: formatConsultBriefForAdmin(consultBrief),
-      adminEmail,
-    });
-
-    const customerResult = await resend.emails.send({
-      from: fromEmail,
-      to: messages.customer.to,
-      replyTo: messages.customer.replyTo,
-      subject: messages.customer.subject,
-      html: messages.customer.html,
-      text: messages.customer.text,
-    });
-    if (customerResult.error) {
-      console.error("Error sending confirmation emails:", customerResult.error);
-    }
-
-    const adminResult = await resend.emails.send({
-      from: fromEmail,
-      to: messages.admin.to,
-      replyTo: messages.admin.replyTo,
-      subject: messages.admin.subject,
-      html: messages.admin.html,
-      text: messages.admin.text,
-    });
-    if (adminResult.error) {
-      console.error("Error sending confirmation emails:", adminResult.error);
-    }
-  } catch (error) {
-    console.error("Error sending confirmation emails:", error);
-  }
 }

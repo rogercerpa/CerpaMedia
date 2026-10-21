@@ -24,6 +24,7 @@ const SERVICE_LABELS: Record<string, string> = {
   automation: "Automation & process improvement",
   strategy: "Strategy / architecture / roadmap",
   not_sure: "Not sure yet",
+  launch_setup: "AI Teammate Launch — setup session",
 };
 
 export function toConsultBrief(
@@ -61,7 +62,11 @@ export function formatConsultBriefForAdmin(brief: ConsultBrief): string {
     timeZoneName: "short",
   });
 
-  let text = `=== Technology Strategy Call Brief ===
+  const heading = brief.serviceInterest === "launch_setup"
+    ? "=== AI Teammate Launch Setup Session ==="
+    : "=== Technology Strategy Call Brief ===";
+
+  let text = `${heading}
 
 Customer: ${brief.customerName}
 Company: ${brief.customerCompany}

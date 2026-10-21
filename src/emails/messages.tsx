@@ -5,8 +5,11 @@ import { BookingConfirmationEmail, type BookingConfirmationProps } from "./booki
 import { BookingNoticeEmail, type BookingNoticeProps } from "./booking-notice";
 import { ContactConfirmationEmail, type ContactConfirmationProps } from "./contact-confirmation";
 import { ContactNoticeEmail, type ContactNoticeProps } from "./contact-notice";
+import { LaunchPurchaseNoticeEmail, type LaunchPurchaseNoticeProps } from "./launch-purchase-notice";
 import { firstNameFrom, oneLine } from "./format";
 import { getEmailReplyTo } from "@/lib/email";
+import { launchPurchaseSubject } from "@/lib/launch-checkout";
+import type { BookingKind } from "@/lib/launch-booking-shared";
 
 export interface RenderedEmail {
   subject: string;
@@ -30,8 +33,18 @@ export function contactConfirmationSubject(name: string): string {
 
 export const BOOKING_CONFIRMATION_SUBJECT = "Your Technology Strategy Call is Confirmed";
 
-export function bookingNoticeSubject(customerName: string, formattedStartTime: string): string {
-  return `New Booking: ${oneLine(customerName)} - ${oneLine(formattedStartTime)}`;
+export function bookingConfirmationSubject(kind?: BookingKind): string {
+  if (kind === "launch_setup") return "Your AI Teammate Launch setup session is confirmed";
+  return BOOKING_CONFIRMATION_SUBJECT;
+}
+
+export function bookingNoticeSubject(
+  customerName: string,
+  formattedStartTime: string,
+  kind?: BookingKind
+): string {
+  const prefix = kind === "launch_setup" ? "New Launch Setup" : "New Booking";
+  return `${prefix}: ${oneLine(customerName)} - ${oneLine(formattedStartTime)}`;
 }
 
 export const ADMIN_LOGIN_SUBJECT = "Your CerpaMedia Admin Login Link";
@@ -52,13 +65,23 @@ export async function renderBookingConfirmation(
   props: BookingConfirmationProps
 ): Promise<RenderedEmail> {
   const rendered = await renderEmail(<BookingConfirmationEmail {...props} />);
-  return { subject: BOOKING_CONFIRMATION_SUBJECT, ...rendered };
+  return { subject: bookingConfirmationSubject(props.kind), ...rendered };
 }
 
 export async function renderBookingNotice(props: BookingNoticeProps): Promise<RenderedEmail> {
   const rendered = await renderEmail(<BookingNoticeEmail {...props} />);
   return {
-    subject: bookingNoticeSubject(props.customerName, props.formattedStartTime),
+    subject: bookingNoticeSubject(props.customerName, props.formattedStartTime, props.kind),
+    ...rendered,
+  };
+}
+
+export async function renderLaunchPurchaseNotice(
+  props: LaunchPurchaseNoticeProps
+): Promise<RenderedEmail> {
+  const rendered = await renderEmail(<LaunchPurchaseNoticeEmail {...props} />);
+  return {
+    subject: launchPurchaseSubject(props.tier, props.amountDisplay),
     ...rendered,
   };
 }
@@ -78,6 +101,8 @@ export async function createBookingEmails(input: BookingEmailInput) {
     formattedStartTime: input.formattedStartTime,
     platformPref: input.platformPref,
     adminEmail: input.adminEmail,
+    kind: input.kind,
+    durationLabel: input.durationLabel,
   });
   const admin = await renderBookingNotice(input);
 

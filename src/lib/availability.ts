@@ -227,9 +227,14 @@ function generateDaySlots(
  * @param endDate - End of the date range
  * @returns Array of available time slots
  */
+export interface SlotLengthOverride {
+  slotLengthMin?: number;
+}
+
 export async function getAvailableSlots(
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  override?: SlotLengthOverride
 ): Promise<TimeSlot[]> {
   let dateAvailabilities: DateAvailability[];
   let blockedDates: BlockedDate[];
@@ -363,17 +368,16 @@ export async function getAvailableSlots(
     }
   }
 
-  const settings: BookingSettings = settingsArray.length > 0
-    ? {
-        slotLengthMin: settingsArray[0].slotLengthMin,
-        bufferMin: settingsArray[0].bufferMin,
-        minLeadTimeHrs: settingsArray[0].minLeadTimeHrs,
-      }
-    : {
-        slotLengthMin: 60,
-        bufferMin: 15,
-        minLeadTimeHrs: 24,
-      };
+  const stored = settingsArray[0];
+  const overrideLength = override?.slotLengthMin;
+  const settings: BookingSettings = {
+    slotLengthMin:
+      overrideLength && overrideLength >= 15 && overrideLength <= 480
+        ? overrideLength
+        : stored?.slotLengthMin ?? 60,
+    bufferMin: stored?.bufferMin ?? 15,
+    minLeadTimeHrs: stored?.minLeadTimeHrs ?? 24,
+  };
 
   const allSlots: TimeSlot[] = [];
   const timezone = dateAvailabilities[0]?.timezone || "America/New_York";

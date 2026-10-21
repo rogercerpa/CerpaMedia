@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin", "/api", "/try"],
+        disallow: ["/admin", "/api", "/try", "/launch"],
       },
     ],
     sitemap: "https://cerpamedia.com/sitemap.xml",

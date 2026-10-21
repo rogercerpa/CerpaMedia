@@ -76,6 +76,8 @@ model Booking {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
+  launchPurchase LaunchPurchase?
+
   @@index([status, startTime])
   @@index([customerEmail])
   @@index([serviceInterest])
@@ -370,6 +372,44 @@ model DemoSample {
   updatedAt    DateTime @updatedAt
 
   @@index([demoId, sortOrder])
+}
+
+// AI Teammate Launch purchases. Additive: the $99 booking tables are unchanged.
+// bookingId points at a setup-session Booking after the buyer schedules.
+model LaunchPurchase {
+  id              String    @id @default(cuid())
+  stripeSessionId String    @unique
+  stripeEventId   String?   @unique
+  paymentLinkId   String?
+  tier            String
+  offer           String    @default("ai-teammate-launch")
+  amountTotal     Int?
+  currency        String    @default("usd")
+  buyerName       String?
+  buyerEmail      String?
+  buyerPhone      String?
+  promoCode       String?
+  bookingToken    String    @unique
+  adminNotifiedAt DateTime?
+  notifyClaimedAt DateTime?
+  livemode        Boolean   @default(false)
+  bookingId       String?   @unique
+  booking         Booking?  @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([buyerEmail])
+  @@index([tier])
+  @@index([createdAt])
+}
+
+// Duration for the private Launch setup session. Default 90 minutes.
+// Kept off BookingSettings so the strategy-call slot length stays independent.
+model LaunchSetupSettings {
+  id            String   @id @default("default")
+  slotLengthMin Int      @default(90)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model AnalyticsDailyCount {

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAvailableSlots, AvailabilityError } from "@/lib/availability";
+import { prisma } from "@/lib/prisma";
+import { isMissingRelationError } from "@/lib/db-errors";
+import { getLaunchSetupLengthMin } from "@/lib/launch-booking";
+import { isPlausibleBookingToken } from "@/lib/launch-booking-shared";
 
 // Force dynamic rendering to prevent stale cached availability
 export const dynamic = 'force-dynamic';
@@ -41,7 +45,50 @@ export async function GET(request: NextRequest) {
       endDate.setDate(endDate.getDate() + 21);
     }
 
-    const slots = await getAvailableSlots(startDate, endDate);
+    let slots;
+    if (searchParams.get("kind") === "launch_setup") {
+      const token = searchParams.get("token") || "";
+      if (!isPlausibleBookingToken(token)) {
+        return NextResponse.json(
+          { error: "This scheduling link is not valid." },
+          { status: 404 }
+        );
+      }
+
+      let purchase: { id: string; bookingId: string | null } | null;
+      try {
+        purchase = await prisma.launchPurchase.findUnique({
+          where: { bookingToken: token },
+          select: { id: true, bookingId: true },
+        });
+      } catch (error) {
+        if (isMissingRelationError(error)) {
+          return NextResponse.json(
+            { error: "Scheduling is not available yet." },
+            { status: 503 }
+          );
+        }
+        throw error;
+      }
+
+      if (!purchase) {
+        return NextResponse.json(
+          { error: "This scheduling link is not valid." },
+          { status: 404 }
+        );
+      }
+      if (purchase.bookingId) {
+        return NextResponse.json(
+          { error: "This setup session is already scheduled." },
+          { status: 409 }
+        );
+      }
+
+      const length = await getLaunchSetupLengthMin();
+      slots = await getAvailableSlots(startDate, endDate, { slotLengthMin: length });
+    } else {
+      slots = await getAvailableSlots(startDate, endDate);
+    }
 
     return NextResponse.json({
       count: slots.length,
