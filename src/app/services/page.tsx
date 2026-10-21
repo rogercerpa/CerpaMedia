@@ -2,7 +2,11 @@ import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { getPublishedServices, getServiceBySlug, fallbackServices, fallbackFeaturedService } from "@/lib/services";
 import { getSeoMeta } from "@/lib/seo";
+import { getLaunchOffer } from "@/lib/get-launch-offer";
+import { launchServiceCard } from "@/lib/launch-offer";
 import type { Metadata } from "next";
+
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSeoMeta("/services");
@@ -32,7 +36,14 @@ export default async function ServicesPage() {
     ? dbServices.filter(s => !s.featured && s.slug !== "technology-strategy-call")
     : fallbackServices;
   
-  const featured = featuredService || fallbackFeaturedService;
+  const launchOffer = await getLaunchOffer();
+  const launchCard = launchServiceCard(launchOffer);
+  const featuredBase = featuredService || fallbackFeaturedService;
+  const featured = {
+    ...featuredBase,
+    priceLabel: launchCard.priceLabel,
+    badgeText: launchCard.badgeText ?? undefined,
+  };
 
   return (
     <div>

@@ -218,6 +218,7 @@ async function main() {
       seoDescription: "Comprehensive review and optimization of your business processes. Drive efficiency with process improvement and automation.",
     },
     {
+      // Stored defaults. Public pages overlay price and badge from the Stripe founding payment link.
       slug: "ai-teammate-launch",
       title: "AI Teammate Launch",
       shortDesc: "Two AI teammates set up and saving you hours every week",

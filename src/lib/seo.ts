@@ -1,5 +1,6 @@
 import { prisma } from "./prisma";
 import type { Metadata } from "next";
+import { fallbackLaunchOffer, launchMetaDescription } from "./launch-offer";
 
 export interface SeoMetaData {
   title?: string;
@@ -22,7 +23,7 @@ export const defaultSeoMeta: Record<string, SeoMetaData> = {
   },
   "/services/ai-teammate-launch": {
     title: "AI Teammate Launch - CerpaMedia",
-    description: "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork — you own the accounts.",
+    description: launchMetaDescription(fallbackLaunchOffer()),
   },
   "/insights": {
     title: "CerpaMedia - Technology Services for Small Business",

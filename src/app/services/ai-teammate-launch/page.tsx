@@ -2,12 +2,27 @@ import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import type { Metadata } from "next";
 import { getSeoMeta } from "@/lib/seo";
+import { getLaunchOffer } from "@/lib/get-launch-offer";
+import {
+  launchBadge,
+  launchBottomHeading,
+  launchBottomSubline,
+  launchPageDescription,
+  launchPaymentPhrase,
+  launchPriceLine,
+  launchSpotLine,
+} from "@/lib/launch-offer";
+
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getSeoMeta("/services/ai-teammate-launch");
+  const [seo, offer] = await Promise.all([
+    getSeoMeta("/services/ai-teammate-launch"),
+    getLaunchOffer(),
+  ]);
   
   const title = seo.title || "AI Teammate Launch - CerpaMedia";
-  const description = seo.description || "Your first two AI employees working in 14 days. $799 founding rate for the first 5 clients. We set up Grok Bot, OpenAI Dots, Meta Muse, or Claude Cowork — you own the accounts.";
+  const description = launchPageDescription(offer, seo.description);
   
   return {
     title,
@@ -25,8 +40,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function AITeammateLaunchPage() {
-  const foundingSpotUrl = "https://buy.stripe.com/7sY7sM3Ts2iofl9cXL4Vy01";
+export default async function AITeammateLaunchPage() {
+  const offer = await getLaunchOffer();
+  const badge = launchBadge(offer);
+  const spotLine = launchSpotLine(offer);
+  const bottomSubline = launchBottomSubline(offer);
+  const paymentPhrase = launchPaymentPhrase(offer);
   const checkoutEmail = "cerpamedia@gmail.com";
   const checkoutSubject = "AI Teammate Launch";
 
@@ -36,15 +55,20 @@ export default function AITeammateLaunchPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal>
             <div className="text-center">
-              <div className="inline-block border border-border px-3 py-1 mb-6">
-                <span className="text-[11px] font-medium text-text uppercase tracking-wider">First 5 clients · $799 founding rate</span>
-              </div>
+              {badge ? (
+                <div className="inline-block border border-border px-3 py-1 mb-6">
+                  <span className="text-[11px] font-medium text-text uppercase tracking-wider">{badge}</span>
+                </div>
+              ) : null}
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
                 Your first two AI employees working in 14 days
               </h1>
               <p className="text-2xl md:text-3xl font-medium mb-4 text-text">
-                $799 founding rate · Regular $1,199
+                {launchPriceLine(offer)}
               </p>
+              {spotLine ? (
+                <p className="text-[13px] text-text-muted mb-6">{spotLine}</p>
+              ) : null}
               <p className="text-lg text-text-muted mb-6 max-w-2xl mx-auto leading-relaxed">
                 For small business owners (usually solo or teams of 1–4) ready to hand real work to AI — without DIY guesswork or wasted tool subscriptions.
               </p>
@@ -53,10 +77,10 @@ export default function AITeammateLaunchPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <a
-                  href={foundingSpotUrl}
+                  href={offer.checkoutUrl}
                   className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5 text-center"
                 >
-                  Reserve my founding spot — $799
+                  {offer.buttonLabel}
                 </a>
                 <a
                   href={`mailto:${checkoutEmail}?subject=${encodeURIComponent(checkoutSubject)}`}
@@ -333,7 +357,7 @@ export default function AITeammateLaunchPage() {
 
               <div className="border-t border-border pt-6">
                 <p className="text-[13px] text-text-muted leading-relaxed">
-                  <strong className="text-text">No refunds.</strong> The $799 founding rate is for setup, configuration, and the 60-day guarantee period. If you decide AI isn't for your business, you keep the accounts and the setup — but the fee isn't refundable.
+                  <strong className="text-text">No refunds.</strong> The {offer.status === "regular" ? `${offer.priceDisplay} fee` : `${offer.priceDisplay} founding rate`} is for setup, configuration, and the 60-day guarantee period. If you decide AI isn't for your business, you keep the accounts and the setup — but the fee isn't refundable.
                 </p>
               </div>
             </div>
@@ -440,7 +464,7 @@ export default function AITeammateLaunchPage() {
               <div className="border border-border p-8 bg-bg">
                 <h3 className="text-lg font-medium mb-3 text-text">When do I pay?</h3>
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  Full payment ($799 founding rate) is due before the intake form is sent. Once payment clears, Roger contacts you to schedule, and you receive the intake form link.
+                  Full payment ({paymentPhrase}) is due before the intake form is sent. Once payment clears, Roger contacts you to schedule, and you receive the intake form link.
                 </p>
               </div>
 
@@ -472,12 +496,14 @@ export default function AITeammateLaunchPage() {
                 </p>
               </div>
 
-              <div className="border border-border p-8 bg-bg">
-                <h3 className="text-lg font-medium mb-3 text-text">What's the founding rate, and how long does it last?</h3>
-                <p className="text-[15px] text-text-muted leading-relaxed">
-                  $799 for the first 5 clients (regular price $1,199 afterward). We're limiting to 4 launch slots per month while we refine the process. Once the first 5 are launched, the price goes up.
-                </p>
-              </div>
+              {offer.status === "regular" ? null : (
+                <div className="border border-border p-8 bg-bg">
+                  <h3 className="text-lg font-medium mb-3 text-text">What's the founding rate, and how long does it last?</h3>
+                  <p className="text-[15px] text-text-muted leading-relaxed">
+                    $799 for the first 5 clients (regular price $1,199 afterward).{spotLine ? ` ${spotLine}` : ""} We're limiting to 4 launch slots per month while we refine the process. Once the first 5 are launched, the price goes up.
+                  </p>
+                </div>
+              )}
             </div>
           </Reveal>
         </div>
@@ -487,11 +513,13 @@ export default function AITeammateLaunchPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Reveal delay={100}>
             <h2 className="text-4xl md:text-5xl font-semibold text-white mb-6 tracking-tight">
-              Claim your $799 founding rate
+              {launchBottomHeading(offer)}
             </h2>
-            <p className="text-lg text-white/90 mb-4 leading-relaxed">
-              First 5 clients only. 4 launch slots per month.
-            </p>
+            {bottomSubline ? (
+              <p className="text-lg text-white/90 mb-4 leading-relaxed">
+                {bottomSubline}
+              </p>
+            ) : null}
             <p className="text-[15px] text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
               After checkout, Roger emails you within 1 business day to send the intake form and schedule your setup session. You own the accounts, we set up the teammates, and if your first teammate isn't saving at least 3 hours a week, we keep fixing it free (60-day window).
             </p>
