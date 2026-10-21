@@ -47,7 +47,7 @@ describe("PUT /api/admin/guides/[id] publish guard", () => {
     const request = new NextRequest("http://localhost:3000/api/admin/guides/guide-1", {
       method: "PUT",
       body: JSON.stringify({
-        title: "How any small business runs on AI",
+        title: "How an owner-led business runs on AI",
         slug: "run-on-ai",
         industry: "general",
         summaryBox: "Summary",
@@ -79,7 +79,7 @@ describe("PUT /api/admin/guides/[id] publish guard", () => {
     const request = new NextRequest("http://localhost:3000/api/admin/guides/guide-1", {
       method: "PUT",
       body: JSON.stringify({
-        title: "How any small business runs on AI",
+        title: "How an owner-led business runs on AI",
         slug: "run-on-ai",
         industry: "general",
         summaryBox: "Summary",

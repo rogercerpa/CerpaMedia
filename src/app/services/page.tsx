@@ -55,7 +55,7 @@ export default async function ServicesPage() {
                 Technology that removes friction from how you operate
               </h1>
               <p className="text-xl text-text-muted max-w-3xl mx-auto leading-relaxed">
-                Custom web apps, practical AI, and automation for small businesses — with paid discovery first, fixed scope when you build, and ownership that stays yours.
+                Custom web apps, practical AI, and automation for owner-led businesses — with paid discovery first, fixed scope when you build, and ownership that stays yours.
               </p>
             </div>
           </Reveal>

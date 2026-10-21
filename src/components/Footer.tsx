@@ -16,7 +16,7 @@ export default async function Footer() {
           <div className="md:col-span-3">
             <h3 className="text-[15px] font-medium mb-2 text-white">CerpaMedia</h3>
             <p className="text-[14px] text-gray-400 leading-relaxed">
-              Technology services for small business operations
+              Technology services for owner-led businesses
             </p>
           </div>
           

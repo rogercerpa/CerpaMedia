@@ -1,6 +1,7 @@
 import { prisma } from "./prisma";
 import type { Metadata } from "next";
 import { fallbackLaunchOffer, launchMetaDescription } from "./launch-offer";
+import { presentSeoText, SEO_DESCRIPTION, SEO_TITLE } from "./reword-small-business";
 
 export interface SeoMetaData {
   title?: string;
@@ -10,28 +11,28 @@ export interface SeoMetaData {
 
 export const defaultSeoMeta: Record<string, SeoMetaData> = {
   "/": {
-    title: "CerpaMedia - Technology Services for Small Business",
-    description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
+    title: "CerpaMedia - Technology Services for Business Owners",
+    description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
   },
   "/services": {
-    title: "CerpaMedia - Technology Services for Small Business",
-    description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
+    title: "CerpaMedia - Technology Services for Business Owners",
+    description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
   },
   "/consult": {
-    title: "CerpaMedia - Technology Services for Small Business",
-    description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
+    title: "CerpaMedia - Technology Services for Business Owners",
+    description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
   },
   "/services/ai-teammate-launch": {
     title: "AI Teammate Launch - CerpaMedia",
     description: launchMetaDescription(fallbackLaunchOffer()),
   },
   "/insights": {
-    title: "CerpaMedia - Technology Services for Small Business",
-    description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
+    title: "CerpaMedia - Technology Services for Business Owners",
+    description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
   },
   "/contact": {
-    title: "CerpaMedia - Technology Services for Small Business",
-    description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
+    title: "CerpaMedia - Technology Services for Business Owners",
+    description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
   },
   "/privacy": {
     title: "Privacy Policy - CerpaMedia",
@@ -64,8 +65,8 @@ export async function getSeoMeta(path: string): Promise<SeoMetaData> {
     }
 
     return {
-      title: meta.title || undefined,
-      description: meta.description || undefined,
+      title: meta.title ? presentSeoText(meta.title, SEO_TITLE) : undefined,
+      description: meta.description ? presentSeoText(meta.description, SEO_DESCRIPTION) : undefined,
       ogImageUrl: meta.ogImageUrl || undefined,
     };
   } catch (error) {

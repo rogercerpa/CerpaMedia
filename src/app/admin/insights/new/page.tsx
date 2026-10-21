@@ -47,7 +47,7 @@ export default async function NewInsightPage() {
             Create New Insight Post
           </h2>
           <p className="text-gray-600">
-            Draft a new AI/tech insight with SMB business angles
+            Draft a new AI/tech insight with practical angles for owner-led businesses
           </p>
         </div>
 

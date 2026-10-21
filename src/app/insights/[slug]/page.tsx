@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
+import { presentInsight } from "@/lib/reword-small-business";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,8 @@ export default async function InsightPostPage({
     notFound();
   }
 
+  const article = presentInsight(post);
+
   return (
     <div className="bg-bg">
       <section className="py-12 md:py-16 border-b border-border">
@@ -42,21 +45,21 @@ export default async function InsightPostPage({
               </Link>
             </div>
             <div>
-              {post.publishedAt && (
+              {article.publishedAt && (
                 <time className="text-sm text-text-muted block mb-3">
-                  {format(new Date(post.publishedAt), "MMMM d, yyyy")}
+                  {format(new Date(article.publishedAt), "MMMM d, yyyy")}
                 </time>
               )}
               <h1 className="text-4xl md:text-5xl font-semibold text-text mb-4 tracking-tight leading-tight">
-                {post.title}
+                {article.title}
               </h1>
               <p className="text-lg text-text-muted leading-relaxed">
-                {post.summary}
+                {article.summary}
               </p>
             </div>
-            {post.tags && post.tags.length > 0 && (
+            {article.tags && article.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-6">
-                {post.tags.map((tag) => (
+                {article.tags.map((tag) => (
                   <span
                     key={tag}
                     className="inline-block text-xs px-2 py-1 border border-border text-text-muted"
@@ -138,7 +141,7 @@ export default async function InsightPostPage({
                   ),
                 }}
               >
-                {post.body}
+                {article.body}
               </ReactMarkdown>
             </article>
           </Reveal>

@@ -1,4 +1,5 @@
 import { prisma } from "./prisma";
+import { presentHeroSubheadline } from "./reword-small-business";
 
 export interface HeroContent {
   headline: string;
@@ -36,7 +37,7 @@ export interface Testimonial {
 
 const fallbackHero: HeroContent = {
   headline: "Stop losing hours to tools that don't talk to each other.",
-  subheadline: "CerpaMedia helps small businesses get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and you own the accounts and code.",
+  subheadline: "CerpaMedia helps business owners get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and you own the accounts and code.",
   primaryCtaLabel: "",
   primaryCtaUrl: "",
   secondaryCtaLabel: "",
@@ -70,7 +71,11 @@ export async function getHeroContent(): Promise<HeroContent> {
       return fallbackHero;
     }
 
-    return content.value as unknown as HeroContent;
+    const hero = content.value as unknown as HeroContent;
+    return {
+      ...hero,
+      subheadline: presentHeroSubheadline(hero.subheadline),
+    };
   } catch (error) {
     console.error("Failed to fetch hero content from DB:", error);
     return fallbackHero;

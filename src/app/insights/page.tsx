@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { format } from "date-fns";
 import { getSeoMeta } from "@/lib/seo";
+import { presentInsight } from "@/lib/reword-small-business";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function InsightsPage() {
-  const posts = await prisma.insightPost.findMany({
+  const rows = await prisma.insightPost.findMany({
     where: {
       status: "published",
       publishedAt: {
@@ -45,6 +46,7 @@ export default async function InsightsPage() {
       publishedAt: true,
     },
   });
+  const posts = rows.map((post) => presentInsight(post));
 
   return (
     <div className="bg-bg">
@@ -56,7 +58,7 @@ export default async function InsightsPage() {
                 Insights
               </h1>
               <p className="text-lg md:text-xl text-text-muted max-w-2xl mx-auto leading-relaxed">
-                AI and technology news with practical business applications for SMBs
+                AI and technology news with practical applications for owner-led businesses
               </p>
             </div>
           </Reveal>
