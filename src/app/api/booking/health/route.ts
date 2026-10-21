@@ -59,11 +59,20 @@ export async function GET() {
     tables.bookingSettings = false;
   }
 
+  let launchPurchase = false;
+  try {
+    await prisma.launchPurchase.findMany({ take: 1 });
+    launchPurchase = true;
+  } catch {
+    launchPurchase = false;
+  }
+
   const allTablesExist = Object.values(tables).every((exists) => exists);
 
   return NextResponse.json({
     ok: allTablesExist,
     tables,
+    launchPurchase,
     dbHost,
     timestamp: new Date().toISOString(),
   });

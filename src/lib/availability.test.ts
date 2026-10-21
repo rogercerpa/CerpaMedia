@@ -312,4 +312,33 @@ describe('getAvailableSlots', () => {
       expect(dateStr).toBe('2026-10-25');
     });
   });
+
+  it('uses a longer slot length for launch setup sessions without changing strategy-call settings', async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-01T12:00:00Z"));
+
+    const startDate = new Date('2026-10-15T00:00:00Z');
+    const endDate = new Date('2026-10-16T00:00:00Z');
+
+    (prisma.dateAvailability.findMany as any).mockResolvedValue([
+      {
+        id: 'avail1',
+        date: new Date('2026-10-15T12:00:00.000Z'),
+        startTime: '10:00',
+        endTime: '16:00',
+        timezone: 'America/New_York',
+      },
+    ]);
+    (prisma.bookingSettings.findMany as any).mockResolvedValue([
+      { id: 'settings1', slotLengthMin: 60, bufferMin: 15, minLeadTimeHrs: 0 },
+    ]);
+
+    const slots = await getAvailableSlots(startDate, endDate, { slotLengthMin: 90 });
+
+    expect(slots).toHaveLength(3);
+    for (const slot of slots) {
+      const duration = (slot.end.getTime() - slot.start.getTime()) / (1000 * 60);
+      expect(duration).toBe(90);
+    }
+  });
 });

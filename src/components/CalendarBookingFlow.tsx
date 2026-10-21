@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { Reveal } from "./Reveal";
+import {
+  LAUNCH_SETUP_PLATFORMS,
+  durationMinutesLabel,
+  type BookingKind,
+} from "@/lib/launch-booking-shared";
+import { LAUNCH_INTAKE_CONFIRMATION } from "@/lib/launch-intake";
 
 // Convert a Date to YYYY-MM-DD using its local date components (no timezone conversion)
 export function toLocalDateKey(date: Date): string {
@@ -34,14 +40,39 @@ type ServiceInterest =
   | "ai"
   | "automation"
   | "strategy"
-  | "not_sure";
+  | "not_sure"
+  | "launch_setup";
 
 interface IntakeAnswers {
   [key: string]: string;
 }
 
-export function CalendarBookingFlow() {
-  const [step, setStep] = useState<"calendar" | "slots" | "intake" | "loading">("calendar");
+export interface LaunchBookingPrefill {
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  customerCompany?: string;
+  notes?: string;
+  platformPref?: string;
+}
+
+export function CalendarBookingFlow({
+  mode = "strategy_call",
+  launchToken,
+  durationMinutes = 90,
+  prefill,
+  emailLocked = false,
+  confirmOnly = false,
+}: {
+  mode?: BookingKind;
+  launchToken?: string;
+  durationMinutes?: number;
+  prefill?: LaunchBookingPrefill;
+  emailLocked?: boolean;
+  confirmOnly?: boolean;
+} = {}) {
+  const isLaunch = mode === "launch_setup";
+  const [step, setStep] = useState<"calendar" | "slots" | "intake" | "loading" | "confirmed">("calendar");
   const [slots, setSlots] = useState<SlotsByDay>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +88,7 @@ export function CalendarBookingFlow() {
     customerEmail: "",
     customerPhone: "",
     customerCompany: "",
-    serviceInterest: "" as ServiceInterest | "",
+    serviceInterest: (isLaunch ? "launch_setup" : "") as ServiceInterest | "",
     notes: "",
     platformPref: "Zoom",
     website: "",
@@ -71,22 +102,46 @@ export function CalendarBookingFlow() {
   });
 
   useEffect(() => {
+    if (!prefill) return;
+    setFormData((current) => ({
+      ...current,
+      customerName: prefill.customerName || current.customerName,
+      customerEmail: prefill.customerEmail || current.customerEmail,
+      customerPhone: prefill.customerPhone || current.customerPhone,
+      customerCompany: prefill.customerCompany || current.customerCompany,
+      notes: prefill.notes || current.notes,
+      platformPref: prefill.platformPref || current.platformPref,
+      serviceInterest: isLaunch ? "launch_setup" : current.serviceInterest,
+    }));
+  }, [prefill, isLaunch]);
+
+  useEffect(() => {
     fetchSlots();
-  }, []);
+    // The token and mode decide which calendar this page loads.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLaunch, launchToken]);
 
   const fetchSlots = async () => {
     try {
       setLoading(true);
+      setError(null);
       const start = new Date();
       const end = new Date();
       end.setDate(end.getDate() + 60);
+      const params = new URLSearchParams({
+        start: start.toISOString(),
+        end: end.toISOString(),
+      });
+      if (isLaunch) {
+        params.set("kind", "launch_setup");
+        params.set("token", launchToken || "");
+      }
 
-      const response = await fetch(
-        `/api/booking/slots?start=${start.toISOString()}&end=${end.toISOString()}`
-      );
+      const response = await fetch(`/api/booking/slots?${params.toString()}`);
 
       if (!response.ok) {
-        throw new Error("Failed to load available slots");
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || "Failed to load available slots");
       }
 
       const data = await response.json();
@@ -117,6 +172,10 @@ export function CalendarBookingFlow() {
   };
 
   const validateForm = () => {
+    if (confirmOnly) {
+      setValidationErrors({});
+      return Boolean(formData.customerName.trim() && formData.customerEmail.trim() && formData.platformPref);
+    }
     const errors: { [key: string]: string } = {};
 
     if (!formData.customerName.trim()) {
@@ -125,25 +184,29 @@ export function CalendarBookingFlow() {
     if (!formData.customerEmail.trim()) {
       errors.customerEmail = "Email is required";
     }
-    if (!formData.customerCompany.trim()) {
+    if (!isLaunch && !formData.customerCompany.trim()) {
       errors.customerCompany = "Company name is required";
     }
-    if (!formData.serviceInterest) {
+    if (!isLaunch && !formData.serviceInterest) {
       errors.serviceInterest = "Please select a service interest";
     }
-    if (!formData.notes.trim()) {
-      errors.notes = "Please describe your challenge";
-    } else if (formData.notes.trim().length < 40) {
-      errors.notes = "Please provide at least 40 characters";
+    if (!isLaunch) {
+      if (!formData.notes.trim()) {
+        errors.notes = "Please describe your challenge";
+      } else if (formData.notes.trim().length < 40) {
+        errors.notes = "Please provide at least 40 characters";
+      } else if (formData.notes.trim().length > 500) {
+        errors.notes = "Please keep your challenge under 500 characters";
+      }
     } else if (formData.notes.trim().length > 500) {
-      errors.notes = "Please keep your challenge under 500 characters";
+      errors.notes = "Please keep your note under 500 characters";
     }
     if (!formData.platformPref) {
       errors.platformPref = "Please select a platform";
     }
 
     // Validate branch questions are filled for the selected service
-    if (formData.serviceInterest) {
+    if (!isLaunch && formData.serviceInterest) {
       const branchQuestions = getBranchQuestions();
       if (branchQuestions) {
         for (const question of branchQuestions) {
@@ -178,7 +241,7 @@ export function CalendarBookingFlow() {
         ),
       };
 
-      const response = await fetch("/api/booking/checkout", {
+      const response = await fetch(isLaunch ? "/api/booking/launch-setup" : "/api/booking/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -190,11 +253,12 @@ export function CalendarBookingFlow() {
           customerEmail: formData.customerEmail,
           customerPhone: formData.customerPhone || "",
           customerCompany: formData.customerCompany,
-          serviceInterest: formData.serviceInterest,
+          serviceInterest: isLaunch ? "launch_setup" : formData.serviceInterest,
           notes: formData.notes,
           platformPref: formData.platformPref,
-          intakeAnswers: combinedIntakeAnswers,
+          intakeAnswers: isLaunch ? undefined : combinedIntakeAnswers,
           website: formData.website,
+          ...(isLaunch ? { token: launchToken } : {}),
         }),
       });
 
@@ -202,6 +266,11 @@ export function CalendarBookingFlow() {
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to create booking");
+      }
+
+      if (isLaunch && data.confirmed) {
+        setStep("confirmed");
+        return;
       }
 
       if (data.url) {
@@ -316,7 +385,41 @@ export function CalendarBookingFlow() {
   if (step === "loading") {
     return (
       <div className="text-center py-12">
-        <p className="text-text-muted">Creating your booking session...</p>
+        <p className="text-text-muted">
+          {isLaunch ? "Confirming your setup session..." : "Creating your booking session..."}
+        </p>
+      </div>
+    );
+  }
+
+  if (step === "confirmed" && selectedSlot) {
+    const when = new Date(selectedSlot.start).toLocaleString("en-US", {
+      timeZone: "America/New_York",
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short",
+    });
+    return (
+      <div className="max-w-2xl mx-auto border border-border bg-white p-6 sm:p-8 text-center">
+        <h2 className="text-2xl font-semibold text-text mb-3">Setup session confirmed</h2>
+        <p className="text-text mb-2">{when}</p>
+        <p className="text-text-muted mb-4">
+          {durationMinutesLabel(durationMinutes)} · {formData.platformPref}
+        </p>
+        <p className="text-[15px] text-text-muted leading-relaxed">
+          {isLaunch
+            ? LAUNCH_INTAKE_CONFIRMATION
+            : "A confirmation email is on its way. Roger will send the meeting details by email. We email or call; we don't text."}
+        </p>
+        {isLaunch ? (
+          <p className="text-[15px] text-text-muted leading-relaxed mt-4">
+            A confirmation email is on its way. Roger will send the meeting details by email.
+            We email or call; we don&apos;t text.
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -332,9 +435,11 @@ export function CalendarBookingFlow() {
     if (!hasAnySlots) {
       return (
         <div className="text-center py-12 border border-border p-8">
-          <h3 className="text-xl font-medium mb-4 text-text">No Available Slots</h3>
+          <h3 className="text-xl font-medium mb-4 text-text">
+            {error ? "Scheduling unavailable" : "No Available Slots"}
+          </h3>
           <p className="text-text-muted mb-6">
-            There are currently no available time slots. Please check back later or contact us directly.
+            {error || "There are currently no available time slots. Please check back later or contact us directly."}
           </p>
           <a
             href="mailto:cerpamedia@gmail.com"
@@ -349,9 +454,16 @@ export function CalendarBookingFlow() {
     return (
       <div>
         <Reveal>
-          <h2 className="text-3xl md:text-4xl font-semibold text-text mb-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-semibold text-text mb-3 text-center">
             Select a Date
           </h2>
+          {isLaunch ? (
+            <p className="text-center text-text-muted mb-8">
+              Each setup session is {durationMinutesLabel(durationMinutes)}. Times are Eastern.
+            </p>
+          ) : (
+            <div className="mb-8" />
+          )}
         </Reveal>
         
         <Reveal delay={100}>
@@ -494,6 +606,80 @@ export function CalendarBookingFlow() {
         })
       : "";
 
+    if (confirmOnly) {
+      return (
+        <div>
+          <Reveal>
+            <div className="text-center mb-8">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-text-muted mb-3">
+                Step 3 of 3
+              </p>
+              <h2 className="text-3xl md:text-4xl font-semibold text-text mb-4">
+                Confirm your setup session
+              </h2>
+              <p className="text-text-muted text-sm mb-4">
+                {durationMinutesLabel(durationMinutes)} · included with your purchase
+              </p>
+              <div className="border border-border inline-block px-6 py-3 mb-6">
+                <p className="text-text font-medium">Selected time</p>
+                <p className="text-text-muted text-[15px]">{selectedSlotFormatted}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setStep("calendar");
+                  setSelectedSlot(null);
+                  setSelectedDate(null);
+                }}
+                className="text-text-muted hover:text-text text-sm underline"
+              >
+                Change time
+              </button>
+            </div>
+          </Reveal>
+          <form onSubmit={handleSubmit} className="max-w-2xl mx-auto border border-border bg-white p-6 sm:p-8 space-y-4">
+            {error ? (
+              <div className="border border-red-500 bg-red-50 p-4 text-red-900 text-sm">{error}</div>
+            ) : null}
+            <dl className="space-y-3 text-[15px]">
+              <div>
+                <dt className="text-[11px] uppercase tracking-wider text-text-muted">Name</dt>
+                <dd className="text-text">{formData.customerName}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] uppercase tracking-wider text-text-muted">Email</dt>
+                <dd className="text-text break-all">{formData.customerEmail}</dd>
+              </div>
+              {formData.customerPhone ? (
+                <div>
+                  <dt className="text-[11px] uppercase tracking-wider text-text-muted">Phone</dt>
+                  <dd className="text-text">{formData.customerPhone}</dd>
+                </div>
+              ) : null}
+              <div>
+                <dt className="text-[11px] uppercase tracking-wider text-text-muted">Business</dt>
+                <dd className="text-text">{formData.customerCompany || "Not provided"}</dd>
+              </div>
+              <div>
+                <dt className="text-[11px] uppercase tracking-wider text-text-muted">How you'll meet</dt>
+                <dd className="text-text">{formData.platformPref}</dd>
+              </div>
+            </dl>
+            <p className="text-sm text-text-muted leading-relaxed">
+              This setup session is included with your AI Teammate Launch. No additional payment.
+              We email or call; we don&apos;t text, and we don&apos;t publish a street address.
+            </p>
+            <button
+              type="submit"
+              className="w-full min-h-11 bg-cta text-cta-text px-8 py-4 text-[15px] font-medium hover:bg-cta-hover"
+            >
+              Confirm setup session
+            </button>
+          </form>
+        </div>
+      );
+    }
+
     const serviceOptions = [
       { value: "general", label: "Technology Strategy Call (general)" },
       { value: "web_mobile", label: "Web & mobile applications" },
@@ -510,9 +696,13 @@ export function CalendarBookingFlow() {
         <Reveal>
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-semibold text-text mb-4">
-              Almost There
+              {isLaunch ? "Confirm your setup session" : "Almost There"}
             </h2>
-            <p className="text-text-muted text-sm mb-4">~2 minutes — helps Roger prep</p>
+            <p className="text-text-muted text-sm mb-4">
+              {isLaunch
+                ? `${durationMinutesLabel(durationMinutes)} · included with your purchase`
+                : "~2 minutes — helps Roger prep"}
+            </p>
             <div className="border border-border inline-block px-6 py-3 mb-6">
               <p className="text-text font-medium">Selected Time:</p>
               <p className="text-text-muted text-[15px]">{selectedSlotFormatted}</p>
@@ -566,13 +756,18 @@ export function CalendarBookingFlow() {
                 type="email"
                 id="customerEmail"
                 required
+                readOnly={emailLocked}
                 value={formData.customerEmail}
                 onChange={(e) => {
+                  if (emailLocked) return;
                   setFormData({ ...formData, customerEmail: e.target.value });
                   setValidationErrors({ ...validationErrors, customerEmail: "" });
                 }}
-                className={`w-full border ${validationErrors.customerEmail ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
+                className={`w-full border ${validationErrors.customerEmail ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted ${emailLocked ? "bg-bg-subtle" : "bg-transparent"}`}
               />
+              {emailLocked && (
+                <p className="text-text-muted text-xs mt-1">This is the email from your purchase.</p>
+              )}
               {validationErrors.customerEmail && (
                 <p className="text-red-500 text-sm mt-1">{validationErrors.customerEmail}</p>
               )}
@@ -580,12 +775,12 @@ export function CalendarBookingFlow() {
 
             <div>
               <label htmlFor="customerCompany" className="block text-text font-medium mb-2">
-                Company *
+                {isLaunch ? "Company" : "Company *"}
               </label>
               <input
                 type="text"
                 id="customerCompany"
-                required
+                required={!isLaunch}
                 value={formData.customerCompany}
                 onChange={(e) => {
                   setFormData({ ...formData, customerCompany: e.target.value });
@@ -598,6 +793,7 @@ export function CalendarBookingFlow() {
               )}
             </div>
 
+            {!isLaunch && (
             <div>
               <label htmlFor="serviceInterest" className="block text-text font-medium mb-2">
                 Service Interest *
@@ -624,8 +820,9 @@ export function CalendarBookingFlow() {
                 <p className="text-red-500 text-sm mt-1">{validationErrors.serviceInterest}</p>
               )}
             </div>
+            )}
 
-            {branchQuestions && (
+            {!isLaunch && branchQuestions && (
               <div className="border border-border p-6 bg-bg-subtle">
                 <h3 className="text-text font-medium mb-4 text-sm uppercase tracking-wider">
                   Service-Specific Questions (Required)
@@ -662,21 +859,25 @@ export function CalendarBookingFlow() {
 
             <div>
               <label htmlFor="notes" className="block text-text font-medium mb-2">
-                What's the #1 problem or decision you want help with on this call? *
+                {isLaunch
+                  ? "Anything Roger should know before the setup session?"
+                  : "What's the #1 problem or decision you want help with on this call? *"}
               </label>
               <p className="text-text-muted text-sm mb-2">
-                (40-500 characters)
+                {isLaunch ? "Optional, up to 500 characters" : "(40-500 characters)"}
               </p>
               <textarea
                 id="notes"
                 rows={4}
-                required
+                required={!isLaunch}
                 value={formData.notes}
                 onChange={(e) => {
                   setFormData({ ...formData, notes: e.target.value });
                   setValidationErrors({ ...validationErrors, notes: "" });
                 }}
-                placeholder="Example: We're growing fast and our current tools don't talk to each other. Need help deciding whether to integrate or rebuild..."
+                placeholder={isLaunch
+                  ? "Example: We use QuickBooks and a shared inbox. Please start with invoice reminders."
+                  : "Example: We're growing fast and our current tools don't talk to each other. Need help deciding whether to integrate or rebuild..."}
                 className={`w-full border ${validationErrors.notes ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent resize-none`}
               />
               <div className="flex justify-between items-center mt-1">
@@ -692,7 +893,7 @@ export function CalendarBookingFlow() {
 
             <div>
               <label htmlFor="platformPref" className="block text-text font-medium mb-2">
-                Video Platform Preference *
+                {isLaunch ? "Where should we meet? *" : "Video Platform Preference *"}
               </label>
               <select
                 id="platformPref"
@@ -704,14 +905,51 @@ export function CalendarBookingFlow() {
                 }}
                 className={`w-full border ${validationErrors.platformPref ? "border-red-500" : "border-border"} px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent`}
               >
-                <option value="Zoom">Zoom</option>
-                <option value="Microsoft Teams">Microsoft Teams</option>
+                {isLaunch ? (
+                  LAUNCH_SETUP_PLATFORMS.map((platform) => (
+                    <option key={platform} value={platform}>
+                      {platform}
+                    </option>
+                  ))
+                ) : (
+                  <>
+                    <option value="Zoom">Zoom</option>
+                    <option value="Microsoft Teams">Microsoft Teams</option>
+                  </>
+                )}
               </select>
+              {isLaunch && (
+                <p className="text-text-muted text-xs mt-1">
+                  In person means the Woodstock, GA area. Roger confirms the meeting place by email or phone. We don&apos;t publish a street address, and we don&apos;t text.
+                </p>
+              )}
               {validationErrors.platformPref && (
                 <p className="text-red-500 text-sm mt-1">{validationErrors.platformPref}</p>
               )}
             </div>
 
+            {isLaunch && (
+              <div>
+                <label htmlFor="customerPhone" className="block text-text font-medium mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="customerPhone"
+                  value={formData.customerPhone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, customerPhone: e.target.value })
+                  }
+                  placeholder="(555) 123-4567"
+                  className="w-full border border-border px-4 py-3 text-text focus:outline-none focus:border-text-muted bg-transparent"
+                />
+                <p className="text-text-muted text-xs mt-1">
+                  Optional — for a scheduling call only. We email or call; we don&apos;t text.
+                </p>
+              </div>
+            )}
+
+            {!isLaunch && (
             <div className="border-t border-border pt-6">
               <h3 className="text-text font-medium mb-4 text-sm uppercase tracking-wider">
                 Optional Information
@@ -784,6 +1022,7 @@ export function CalendarBookingFlow() {
                 </div>
               </div>
             </div>
+            )}
 
             <div className="hidden" aria-hidden="true">
               <label htmlFor="website">Website (leave blank)</label>
@@ -802,30 +1041,46 @@ export function CalendarBookingFlow() {
 
             <div className="pt-4">
               <div className="mb-6 p-4 bg-bg-subtle border border-border text-sm text-text-muted leading-relaxed">
-                <p>
-                  By continuing, you agree to our{" "}
-                  <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a href="/strategy-call-policy" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
-                    Strategy Call Policy
-                  </a>
-                  , and you acknowledge our{" "}
-                  <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
-                    Privacy Policy
-                  </a>
-                  . The $99 fee is prepaid and is not credited toward discovery or other project work, with one exception: if you purchase AI Teammate Launch within 30 days of your call, the $99 comes off. Cancel 24+ hours ahead for a full refund. Late cancellations and no-shows aren't refundable.
-                </p>
+                {isLaunch ? (
+                  <p>
+                    By confirming, you agree to our{" "}
+                    <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
+                      Terms of Service
+                    </a>{" "}
+                    and acknowledge our{" "}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
+                      Privacy Policy
+                    </a>
+                    . This setup session is included with your AI Teammate Launch. We email or call; we don&apos;t text.
+                  </p>
+                ) : (
+                  <p>
+                    By continuing, you agree to our{" "}
+                    <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
+                      Terms of Service
+                    </a>{" "}
+                    and{" "}
+                    <a href="/strategy-call-policy" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
+                      Strategy Call Policy
+                    </a>
+                    , and you acknowledge our{" "}
+                    <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-text hover:underline font-medium">
+                      Privacy Policy
+                    </a>
+                    . The $99 fee is prepaid and is not credited toward discovery or other project work, with one exception: if you purchase AI Teammate Launch within 30 days of your call, the $99 comes off. Cancel 24+ hours ahead for a full refund. Late cancellations and no-shows aren&apos;t refundable.
+                  </p>
+                )}
               </div>
               <button
                 type="submit"
                 className="w-full bg-cta text-cta-text px-8 py-4 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
               >
-                Continue to Payment ($99)
+                {isLaunch ? "Confirm setup session" : "Continue to Payment ($99)"}
               </button>
               <p className="text-sm text-text-muted text-center mt-4">
-                You'll be redirected to Stripe to complete your payment securely. CerpaMedia never sees your full card number.
+                {isLaunch
+                  ? "No additional payment. Roger will email you the meeting details."
+                  : "You'll be redirected to Stripe to complete your payment securely. CerpaMedia never sees your full card number."}
               </p>
             </div>
           </form>
