@@ -119,7 +119,7 @@ export default async function Home() {
                 What changes for your business
               </h2>
               <p className="text-lg text-text-muted max-w-2xl mx-auto leading-relaxed">
-                Practical tech for small businesses that need less friction — not more software
+                Practical tech for growing businesses that need less friction — not more software
               </p>
             </div>
           </Reveal>

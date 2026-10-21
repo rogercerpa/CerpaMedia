@@ -123,7 +123,7 @@ export default function InsightForm({ initialData, mode }: InsightFormProps) {
           value={formData.title}
           onChange={(e) => handleTitleChange(e.target.value)}
           className="w-full px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-          placeholder="e.g., How AI is Transforming Small Business Operations"
+          placeholder="e.g., How AI is Changing Day-to-Day Operations"
         />
       </div>
 
@@ -143,7 +143,7 @@ export default function InsightForm({ initialData, mode }: InsightFormProps) {
             value={formData.slug}
             onChange={(e) => handleSlugChange(e.target.value)}
             className="flex-1 px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-gray-900 focus:border-transparent font-mono text-sm"
-            placeholder="how-ai-is-transforming-small-business"
+            placeholder="how-ai-is-changing-day-to-day-operations"
           />
         </div>
         <p className="mt-1 text-xs text-gray-500">
@@ -209,10 +209,10 @@ export default function InsightForm({ initialData, mode }: InsightFormProps) {
             setFormData((prev) => ({ ...prev, tags: e.target.value }))
           }
           className="w-full px-4 py-2 border border-gray-300 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-          placeholder="AI, automation, SMB, technology (comma-separated)"
+          placeholder="AI, automation, operations, technology (comma-separated)"
         />
         <p className="mt-1 text-xs text-gray-500">
-          Comma-separated tags. Example: AI, automation, SMB
+          Comma-separated tags. Example: AI, automation, operations
         </p>
       </div>
 

@@ -2,11 +2,11 @@
  * Type definitions and helpers for Insight drafts
  * 
  * This module provides the interface between Consult-Secretary AI and the admin CMS
- * for drafting AI/tech insights with SMB business angles.
+ * for drafting AI/tech insights with practical angles for owner-led businesses.
  * 
  * Consult-Secretary will:
  * - Research latest AI/tech news
- * - Draft posts with SMB business-use angles
+ * - Draft posts with practical angles for owner-led businesses
  * - Suggest how CerpaMedia services help
  * - Format as InsightDraft
  * 

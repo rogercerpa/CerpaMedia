@@ -8,8 +8,8 @@ import AnalyticsGate from "@/components/AnalyticsGate";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "CerpaMedia - Technology Services for Small Business",
-  description: "Strategic web development, AI integration, and automation consulting for small businesses. Expert guidance to help your business operate more efficiently.",
+  title: "CerpaMedia - Technology Services for Business Owners",
+  description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },

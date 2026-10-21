@@ -39,7 +39,7 @@ export default function ConsultPage() {
                 $99 · 30–45 minutes on Zoom or Teams
               </p>
               <p className="text-lg text-text-muted mb-6 max-w-2xl mx-auto leading-relaxed">
-                For small-business owners stuck with weak sites, scattered tools, or "we should automate this" — and no clear plan.
+                For business owners stuck with weak sites, scattered tools, or "we should automate this" — and no clear plan.
               </p>
               <p className="text-[15px] text-text-muted mb-12 max-w-2xl mx-auto leading-relaxed">
                 Pay securely → Roger contacts you to schedule → after the call, get a written summary within 24–48 hours with <strong className="text-text">3–5 opportunities</strong> and <strong className="text-text">one recommended next step</strong>.

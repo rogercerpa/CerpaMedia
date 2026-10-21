@@ -70,7 +70,7 @@ export default async function AITeammateLaunchPage() {
                 <p className="text-[13px] text-text-muted mb-6">{spotLine}</p>
               ) : null}
               <p className="text-lg text-text-muted mb-6 max-w-2xl mx-auto leading-relaxed">
-                For small business owners (usually solo or teams of 1–4) ready to hand real work to AI — without DIY guesswork or wasted tool subscriptions.
+                Best fit: owner-led teams where a few people handle the repetitive work, ready to hand that work to AI — without DIY guesswork or wasted tool subscriptions.
               </p>
               <p className="text-[15px] text-text-muted mb-12 max-w-2xl mx-auto leading-relaxed">
                 You own the tool accounts and pay vendors directly. We pick the right platform, launch 2 teammates from a starter menu, set approval rules, and guarantee free fixes if your first teammate isn't saving at least 3 hours a week (60-day window).

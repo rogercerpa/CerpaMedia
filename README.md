@@ -1,10 +1,10 @@
-# CerpaMedia - Small Business Technology Services
+# CerpaMedia - Technology Services for Business Owners
 
 A professional marketing website for CerpaMedia, built with Next.js 15, TypeScript, and Tailwind CSS.
 
 ## Overview
 
-CerpaMedia helps small businesses integrate and use technology to operate more efficiently. This site showcases our services and provides a contact form for inquiries.
+CerpaMedia helps business owners integrate and use technology to operate more efficiently. This site showcases our services and provides a contact form for inquiries.
 
 ## Features
 
