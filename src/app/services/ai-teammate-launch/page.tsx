@@ -26,10 +26,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function AITeammateLaunchPage() {
-  // TODO: Replace mailto with Stripe Payment Link when ready
+  const foundingSpotUrl = "https://buy.stripe.com/7sY7sM3Ts2iofl9cXL4Vy01";
   const checkoutEmail = "cerpamedia@gmail.com";
   const checkoutSubject = "AI Teammate Launch";
-  
+
   return (
     <div>
       <section className="bg-bg py-24 md:py-32 lg:py-40">
@@ -51,7 +51,13 @@ export default function AITeammateLaunchPage() {
               <p className="text-[15px] text-text-muted mb-12 max-w-2xl mx-auto leading-relaxed">
                 You own the tool accounts and pay vendors directly. We pick the right platform, launch 2 teammates from a starter menu, set approval rules, and guarantee free fixes if your first teammate isn't saving at least 3 hours a week (60-day window).
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a
+                  href={foundingSpotUrl}
+                  className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5 text-center"
+                >
+                  Reserve my founding spot — $799
+                </a>
                 <a
                   href={`mailto:${checkoutEmail}?subject=${encodeURIComponent(checkoutSubject)}`}
                   className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
@@ -60,7 +66,7 @@ export default function AITeammateLaunchPage() {
                 </a>
               </div>
               <p className="text-[13px] text-text-muted mt-6">
-                The $99 is credited toward this if purchased within 30 days. After you reach out, Roger contacts you by email or call to schedule.
+                After checkout, Roger emails you within 1 business day to send the intake form and schedule your setup session.
               </p>
             </div>
           </Reveal>
@@ -487,7 +493,7 @@ export default function AITeammateLaunchPage() {
               First 5 clients only. 4 launch slots per month.
             </p>
             <p className="text-[15px] text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
-              After you reach out, Roger contacts you by email or call to schedule the intake form and setup session. You own the accounts, we set up the teammates, and if your first teammate isn't saving at least 3 hours a week, we keep fixing it free (60-day window).
+              After checkout, Roger emails you within 1 business day to send the intake form and schedule your setup session. You own the accounts, we set up the teammates, and if your first teammate isn't saving at least 3 hours a week, we keep fixing it free (60-day window).
             </p>
             <div className="flex flex-col gap-4 items-center">
               <Link
