@@ -108,7 +108,7 @@ export default async function LaunchSetupPage({
               : " Fill out a short intake, then pick a setup time."}
           </p>
           <p className="text-[15px] text-text-muted mt-4 max-w-2xl mx-auto leading-relaxed">
-            Zoom, Microsoft Teams, or in person in the Woodstock, GA area. We email or call; we don&apos;t text, and we don&apos;t publish a street address.
+            Your setup session can be on Zoom, Microsoft Teams, or in person in the Woodstock, GA area.
           </p>
         </div>
       </section>
