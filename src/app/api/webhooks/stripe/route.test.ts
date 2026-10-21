@@ -41,6 +41,8 @@ const originalEnv = {
   CONTACT_TO_EMAIL: process.env.CONTACT_TO_EMAIL,
   CONTACT_FROM_EMAIL: process.env.CONTACT_FROM_EMAIL,
   NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
+  ATL_INTAKE_FORM_URL: process.env.ATL_INTAKE_FORM_URL,
+  EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO,
 };
 
 beforeEach(() => {
@@ -58,6 +60,8 @@ beforeEach(() => {
   process.env.CONTACT_TO_EMAIL = "cerpamedia@gmail.com";
   delete process.env.CONTACT_FROM_EMAIL;
   process.env.NEXT_PUBLIC_BASE_URL = "https://cerpamedia.com";
+  process.env.ATL_INTAKE_FORM_URL = "https://docs.google.com/forms/d/e/example/viewform";
+  delete process.env.EMAIL_REPLY_TO;
 });
 
 afterEach(() => {
@@ -67,10 +71,12 @@ afterEach(() => {
   restore("CONTACT_TO_EMAIL", originalEnv.CONTACT_TO_EMAIL);
   restore("CONTACT_FROM_EMAIL", originalEnv.CONTACT_FROM_EMAIL);
   restore("NEXT_PUBLIC_BASE_URL", originalEnv.NEXT_PUBLIC_BASE_URL);
+  restore("ATL_INTAKE_FORM_URL", originalEnv.ATL_INTAKE_FORM_URL);
+  restore("EMAIL_REPLY_TO", originalEnv.EMAIL_REPLY_TO);
 });
 
 describe("Stripe webhook launch purchases", () => {
-  it("builds one admin email for a founding payment link and stores the purchase", async () => {
+  it("emails the buyer and Roger for a founding payment link and stores the purchase", async () => {
     prismaMock.launchPurchase.findUnique.mockResolvedValue(null);
     prismaMock.launchPurchase.create.mockImplementation(async ({ data }) => ({
       id: "lp_1",
@@ -88,25 +94,40 @@ describe("Stripe webhook launch purchases", () => {
     }));
 
     expect(response.status).toBe(200);
-    expect(sendMock).toHaveBeenCalledTimes(1);
-    const email = sendMock.mock.calls[0][0];
-    expect(email.from).toBe("CerpaMedia <info@cerpamedia.com>");
-    expect(email.to).toBe("cerpamedia@gmail.com");
-    expect(email.to).not.toBe("avery@example.com");
-    expect(email.subject).toBe("New AI Teammate Launch purchase — founding $799");
-    expect(email.html).toContain("Avery Buyer");
-    expect(email.html).toContain("avery@example.com");
-    expect(email.html).toContain("+14045550199");
-    expect(email.html).toContain("$799");
-    expect(email.html).toContain("founding");
-    expect(email.html).toContain("FOUNDING10");
-    expect(email.html).toContain("cs_test_launch_1");
-    expect(email.html).toContain("https://dashboard.stripe.com/test/checkout/sessions/cs_test_launch_1");
-    expect(email.html).toContain("Send the intake form within 1 business day");
-    expect(email.html).toContain("https://cerpamedia.com/launch/setup/");
-    expect(email.text).toContain("Send the intake form within 1 business day");
-    expect(email.html).not.toMatch(/\$99/);
-    expect(email.text).not.toMatch(/\$99|sms|text message/i);
+    expect(sendMock).toHaveBeenCalledTimes(2);
+
+    const welcome = sendMock.mock.calls.map((call) => call[0]).find((email) => email.to === "avery@example.com");
+    const admin = sendMock.mock.calls.map((call) => call[0]).find((email) => email.to === "cerpamedia@gmail.com");
+    expect(welcome).toBeTruthy();
+    expect(admin).toBeTruthy();
+
+    expect(welcome.from).toBe("CerpaMedia <info@cerpamedia.com>");
+    expect(welcome.replyTo).toBe("cerpamedia@gmail.com");
+    expect(welcome.subject).toBe("You're in — next steps for your AI Teammate Launch");
+    expect(welcome.html).toContain("founding");
+    expect(welcome.html).toContain("$799");
+    expect(welcome.html).toContain("about 15 minutes");
+    expect(welcome.html).toContain("https://docs.google.com/forms/d/e/example/viewform");
+    expect(welcome.html).toContain("https://cerpamedia.com/launch/setup/");
+    expect(welcome.text).toContain("Reply to this email or call (943) 248-7410.");
+    expect(welcome.html).not.toMatch(/\$99|sms|text message/i);
+    expect(welcome.text).not.toMatch(/\$99|sms|text message/i);
+
+    expect(admin.from).toBe("CerpaMedia <info@cerpamedia.com>");
+    expect(admin.subject).toBe("New AI Teammate Launch purchase — founding $799");
+    expect(admin.html).toContain("Avery Buyer");
+    expect(admin.html).toContain("avery@example.com");
+    expect(admin.html).toContain("+14045550199");
+    expect(admin.html).toContain("$799");
+    expect(admin.html).toContain("founding");
+    expect(admin.html).toContain("FOUNDING10");
+    expect(admin.html).toContain("cs_test_launch_1");
+    expect(admin.html).toContain("https://dashboard.stripe.com/test/checkout/sessions/cs_test_launch_1");
+    expect(admin.html).toContain("Welcome email sent to avery@example.com.");
+    expect(admin.html).toContain("https://cerpamedia.com/launch/setup/");
+    expect(admin.html).not.toContain("sent by hand");
+    expect(admin.html).not.toMatch(/\$99/);
+    expect(admin.text).not.toMatch(/\$99|sms|text message/i);
 
     expect(prismaMock.launchPurchase.create).toHaveBeenCalledTimes(1);
     const stored = prismaMock.launchPurchase.create.mock.calls[0][0].data;
@@ -116,16 +137,7 @@ describe("Stripe webhook launch purchases", () => {
   });
 
   it("labels the regular payment link and does not email the buyer again on retry", async () => {
-    prismaMock.launchPurchase.findUnique.mockResolvedValueOnce(null).mockResolvedValueOnce({
-      id: "lp_2",
-      adminNotifiedAt: new Date("2026-10-21T12:00:00Z"),
-      bookingToken: "already-sent-token-already-sent-token-xyz",
-      buyerName: "Riley Client",
-      buyerEmail: "riley@example.com",
-      buyerPhone: null,
-      tier: "regular",
-      promoCode: null,
-    });
+    prismaMock.launchPurchase.findUnique.mockResolvedValueOnce(null);
     prismaMock.launchPurchase.create.mockImplementation(async ({ data }) => ({
       id: "lp_2",
       adminNotifiedAt: null,
@@ -144,15 +156,20 @@ describe("Stripe webhook launch purchases", () => {
       discounts: null,
     }));
     expect(first.status).toBe(200);
-    expect(sendMock.mock.calls[0][0].subject).toBe(
-      "New AI Teammate Launch purchase — regular $1,199"
-    );
-    expect(sendMock.mock.calls[0][0].html).toContain("None");
+    const admin = sendMock.mock.calls.map((call) => call[0]).find((email) => email.to === "cerpamedia@gmail.com");
+    const welcome = sendMock.mock.calls.map((call) => call[0]).find((email) => email.to === "riley@example.com");
+    expect(admin.subject).toBe("New AI Teammate Launch purchase — regular $1,199");
+    expect(admin.html).toContain("None");
+    expect(welcome.subject).toBe("You're in — next steps for your AI Teammate Launch");
+    expect(welcome.html).toContain("$1,199");
+    expect(welcome.html).toContain("regular");
 
     sendMock.mockClear();
     prismaMock.launchPurchase.findUnique.mockResolvedValue({
       id: "lp_2",
       adminNotifiedAt: new Date("2026-10-21T12:00:00Z"),
+      welcomeSentAt: new Date("2026-10-21T12:00:00Z"),
+      buyerEmail: "riley@example.com",
       bookingToken: "already-sent-token-already-sent-token-xyz",
       tier: "regular",
     });
@@ -209,6 +226,77 @@ describe("Stripe webhook launch purchases", () => {
       where: { id: "lp_3" },
       data: { notifyClaimedAt: null },
     });
+  });
+
+  it("tells Roger to send the intake link by hand when the form URL is missing", async () => {
+    delete process.env.ATL_INTAKE_FORM_URL;
+    prismaMock.launchPurchase.findUnique.mockResolvedValue(null);
+    prismaMock.launchPurchase.create.mockImplementation(async ({ data }) => ({
+      id: "lp_4",
+      adminNotifiedAt: null,
+      welcomeSentAt: null,
+      ...data,
+    }));
+    prismaMock.launchPurchase.updateMany.mockResolvedValue({ count: 1 });
+    prismaMock.launchPurchase.update.mockResolvedValue({});
+
+    const response = await postEvent(launchEvent({ id: "cs_test_no_intake" }));
+    expect(response.status).toBe(200);
+    const welcome = sendMock.mock.calls.map((call) => call[0]).find((email) => email.to === "avery@example.com");
+    const admin = sendMock.mock.calls.map((call) => call[0]).find((email) => email.to === "cerpamedia@gmail.com");
+    expect(welcome.html).not.toContain("Fill out the intake form");
+    expect(welcome.text).toContain("Reply to this email or call (943) 248-7410.");
+    expect(admin.html).toContain("The intake link must be sent by hand.");
+    expect(admin.text).toContain("Send the intake form within 1 business day.");
+  });
+
+  it("retries only the buyer welcome after the admin alert already went out", async () => {
+    prismaMock.launchPurchase.findUnique.mockResolvedValue(null);
+    prismaMock.launchPurchase.create.mockImplementation(async ({ data }) => ({
+      id: "lp_5",
+      adminNotifiedAt: null,
+      welcomeSentAt: null,
+      ...data,
+    }));
+    prismaMock.launchPurchase.updateMany.mockResolvedValue({ count: 1 });
+    prismaMock.launchPurchase.update.mockResolvedValue({});
+    sendMock.mockImplementation(async (payload: { to: string }) => {
+      if (payload.to === "avery@example.com") {
+        return { data: null, error: { message: "rejected" } };
+      }
+      return { data: { id: "email_admin" }, error: null };
+    });
+
+    const failed = await postEvent(launchEvent({ id: "cs_test_welcome_retry" }), "evt_welcome_fail");
+    expect(failed.status).toBe(500);
+    const admin = sendMock.mock.calls.map((call) => call[0]).find((email) => email.to === "cerpamedia@gmail.com");
+    expect(admin.html).toContain("Welcome email failed.");
+
+    sendMock.mockReset();
+    sendMock.mockResolvedValue({ data: { id: "email_welcome" }, error: null });
+    prismaMock.launchPurchase.findUnique.mockResolvedValue({
+      id: "lp_5",
+      adminNotifiedAt: new Date("2026-10-21T12:00:00Z"),
+      welcomeSentAt: null,
+      buyerName: "Avery Buyer",
+      buyerEmail: "avery@example.com",
+      buyerPhone: "+14045550199",
+      tier: "founding",
+      amountTotal: 79900,
+      currency: "usd",
+      promoCode: "FOUNDING10",
+      bookingToken: "retry-token-retry-token-retry-token-xyz",
+      bookingId: null,
+      livemode: false,
+      stripeSessionId: "cs_test_welcome_retry",
+      createdAt: new Date("2026-10-21T12:00:00Z"),
+    });
+
+    const retried = await postEvent(launchEvent({ id: "cs_test_welcome_retry" }), "evt_welcome_retry");
+    expect(retried.status).toBe(200);
+    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(sendMock.mock.calls[0][0].to).toBe("avery@example.com");
+    expect(sendMock.mock.calls[0][0].subject).toBe("You're in — next steps for your AI Teammate Launch");
   });
 });
 

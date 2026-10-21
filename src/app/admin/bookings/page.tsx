@@ -6,14 +6,21 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { isMissingRelationError } from "@/lib/db-errors";
 import { formatPurchaseAmount, stripeDashboardSessionUrl } from "@/lib/launch-checkout";
+import { getIntakeFormUrl } from "@/lib/intake-form-url";
 import {
   LAUNCH_SETUP_LABEL,
   LAUNCH_SETUP_SERVICE,
   launchSetupPath,
 } from "@/lib/launch-booking-shared";
+import { resendLaunchWelcomeAction } from "./resend-welcome";
 
-export default async function AdminBookingsPage() {
+export default async function AdminBookingsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ welcome?: string }>;
+}) {
   const email = await getAdminSession();
+  const params = await searchParams;
 
   if (!email) {
     redirect("/admin/login");
@@ -39,6 +46,8 @@ export default async function AdminBookingsPage() {
     livemode: boolean;
     createdAt: Date;
     adminNotifiedAt: Date | null;
+    welcomeSentAt: Date | null;
+    welcomeReminderSentAt: Date | null;
     booking: { id: string; startTime: Date; status: string; platformPref: string } | null;
   }> = [];
   let launchTableReady = true;
@@ -145,11 +154,28 @@ export default async function AdminBookingsPage() {
           </p>
         </div>
 
+        {params.welcome === "sent" ? (
+          <p className="mb-4 rounded border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900">
+            Welcome email sent.
+          </p>
+        ) : null}
+        {params.welcome === "failed" ? (
+          <p className="mb-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+            Welcome email could not be sent. Check Resend, then try again.
+          </p>
+        ) : null}
+        {params.welcome === "missing-email" ? (
+          <p className="mb-4 rounded border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            This purchase has no buyer email, so the welcome email cannot be sent.
+          </p>
+        ) : null}
+
         <LaunchClients
           ready={launchTableReady}
           purchases={launchPurchases}
           origin={origin}
           formatDateTime={formatDateTime}
+          intakeConfigured={Boolean(getIntakeFormUrl())}
         />
 
         {bookings.length === 0 ? (
@@ -281,6 +307,7 @@ function LaunchClients({
   purchases,
   origin,
   formatDateTime,
+  intakeConfigured,
 }: {
   ready: boolean;
   purchases: Array<{
@@ -296,16 +323,22 @@ function LaunchClients({
     bookingToken: string;
     livemode: boolean;
     createdAt: Date;
+    welcomeSentAt: Date | null;
+    welcomeReminderSentAt: Date | null;
     booking: { id: string; startTime: Date; status: string; platformPref: string } | null;
   }>;
   origin: string;
   formatDateTime: (date: Date) => string;
+  intakeConfigured: boolean;
 }) {
   return (
     <div className="mb-10">
       <h3 className="text-lg font-semibold text-gray-900 mb-1">AI Teammate Launch clients</h3>
       <p className="text-sm text-gray-600 mb-4">
         Purchases from the founding and regular payment links. Scheduling links stay off the public site.
+        {!intakeConfigured
+          ? " ATL_INTAKE_FORM_URL is not set, so welcome emails leave out the intake form. Send that link by hand."
+          : ""}
       </p>
       {!ready ? (
         <div className="bg-white shadow rounded-lg p-6 text-sm text-gray-600">
@@ -368,8 +401,28 @@ function LaunchClients({
                   </div>
                 </dl>
                 <p className="mt-4 text-sm text-gray-700">
-                  Next step: Send the intake form within 1 business day.
+                  {purchase.welcomeSentAt
+                    ? `Welcome email sent ${formatDateTime(purchase.welcomeSentAt)}.`
+                    : purchase.buyerEmail
+                      ? "Welcome email not sent yet."
+                      : "Welcome email not sent. This purchase has no buyer email."}
+                  {purchase.welcomeReminderSentAt
+                    ? ` Reminder sent ${formatDateTime(purchase.welcomeReminderSentAt)}.`
+                    : scheduled
+                      ? ""
+                      : " If they have not booked within 2 business days, one reminder goes out automatically."}
                 </p>
+                {purchase.buyerEmail ? (
+                  <form action={resendLaunchWelcomeAction} className="mt-3">
+                    <input type="hidden" name="purchaseId" value={purchase.id} />
+                    <button
+                      type="submit"
+                      className="border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50"
+                    >
+                      Resend welcome email
+                    </button>
+                  </form>
+                ) : null}
                 <p className="mt-2 text-sm break-all">
                   <a href={scheduleUrl} className="text-blue-600 hover:underline">
                     {scheduleUrl}

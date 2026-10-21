@@ -10,7 +10,11 @@ import {
   renderContactConfirmation,
   renderContactNotice,
   renderLaunchPurchaseNotice,
+  renderLaunchSetupReminder,
+  renderLaunchWelcome,
 } from "./messages";
+import { LAUNCH_WELCOME_CLOSING, LAUNCH_WELCOME_SUBJECT } from "./launch-welcome";
+import { LAUNCH_REMINDER_SUBJECT } from "./launch-setup-reminder";
 import { FOOTER_ADDRESS, SITE_URL } from "./theme";
 
 const RECEIVED = "Thursday, January 15, 2026 at 1:30 PM EST";
@@ -236,7 +240,7 @@ describe("branded email rendering", () => {
     expect(email.text).not.toMatch(/\$99|sms|text message/i);
   });
 
-  it("builds the admin-only launch purchase notice", async () => {
+  it("builds the admin launch purchase notice and records the welcome result", async () => {
     const email = await renderLaunchPurchaseNotice({
       buyerName: "Avery Buyer",
       buyerEmail: "avery@example.com",
@@ -247,6 +251,8 @@ describe("branded email rendering", () => {
       stripeSessionId: "cs_test_launch_1",
       dashboardUrl: "https://dashboard.stripe.com/test/checkout/sessions/cs_test_launch_1",
       schedulingUrl: "https://cerpamedia.com/launch/setup/token",
+      welcomeDelivery: "sent",
+      intakeConfigured: true,
     });
 
     expect(email.subject).toBe("New AI Teammate Launch purchase — founding $799");
@@ -258,9 +264,82 @@ describe("branded email rendering", () => {
     expect(email.html).toContain("cs_test_launch_1");
     expect(email.html).toContain("https://dashboard.stripe.com/test/checkout/sessions/cs_test_launch_1");
     expect(email.html).toContain("https://cerpamedia.com/launch/setup/token");
-    expect(email.html).toContain("Send the intake form within 1 business day");
-    expect(email.text).toContain("Send the intake form within 1 business day");
+    expect(email.html).toContain("Welcome email sent to avery@example.com.");
+    expect(email.text).toContain("Welcome email sent to avery@example.com.");
+    expect(email.html).not.toContain("sent by hand");
     expect(email.html).not.toMatch(/\$99/);
+
+    const failed = await renderLaunchPurchaseNotice({
+      buyerName: "Avery Buyer",
+      buyerEmail: "avery@example.com",
+      buyerPhone: "",
+      amountDisplay: "$799",
+      tier: "founding",
+      promoCode: "None",
+      stripeSessionId: "cs_test_launch_1",
+      dashboardUrl: "https://dashboard.stripe.com/test/checkout/sessions/cs_test_launch_1",
+      schedulingUrl: "https://cerpamedia.com/launch/setup/token",
+      welcomeDelivery: "failed",
+      intakeConfigured: false,
+    });
+    expect(failed.html).toContain("Welcome email failed.");
+    expect(failed.html).toContain("The intake link must be sent by hand.");
+    expect(failed.text).toContain("Send the intake form within 1 business day.");
+  });
+
+  it("builds the buyer welcome with the intake form and the private booking link", async () => {
+    const email = await renderLaunchWelcome({
+      buyerName: "Avery Buyer",
+      tier: "founding",
+      amountDisplay: "$799",
+      intakeFormUrl: "https://docs.google.com/forms/d/e/example/viewform",
+      schedulingUrl: "https://cerpamedia.com/launch/setup/token",
+    });
+
+    expect(email.subject).toBe(LAUNCH_WELCOME_SUBJECT);
+    expectBranded(email.html, email.text);
+    expect(email.html).toContain("Hi Avery");
+    expect(email.html).toContain("founding");
+    expect(email.html).toContain("$799");
+    expect(email.html).toContain("about 15 minutes");
+    expect(email.html).toContain("Fill out the intake form");
+    expect(email.html).toContain("https://docs.google.com/forms/d/e/example/viewform");
+    expect(email.html).toContain("Choose a date and time");
+    expect(email.html).toContain("https://cerpamedia.com/launch/setup/token");
+    expect(email.html).toContain("Roger will review your intake before the session.");
+    expect(email.text).toContain(LAUNCH_WELCOME_CLOSING);
+    expect(email.html).not.toMatch(/\$99|sms|text message/i);
+    expect(email.text).not.toMatch(/\$99|sms|text message/i);
+
+    const withoutIntake = await renderLaunchWelcome({
+      buyerName: "Riley Client",
+      tier: "regular",
+      amountDisplay: "$1,199",
+      intakeFormUrl: null,
+      schedulingUrl: "https://cerpamedia.com/launch/setup/token",
+    });
+    expect(withoutIntake.html).not.toContain("Fill out the intake form");
+    expect(withoutIntake.html).not.toContain("Step 1");
+    expect(withoutIntake.html).toContain("regular");
+    expect(withoutIntake.html).toContain("$1,199");
+    expect(withoutIntake.text).toContain(LAUNCH_WELCOME_CLOSING);
+  });
+
+  it("builds one gentle reminder with the same booking link", async () => {
+    const email = await renderLaunchSetupReminder({
+      buyerName: "Avery Buyer",
+      schedulingUrl: "https://cerpamedia.com/launch/setup/token",
+    });
+
+    expect(email.subject).toBe(LAUNCH_REMINDER_SUBJECT);
+    expectBranded(email.html, email.text);
+    expect(email.html).toContain("Hi Avery");
+    expect(email.html).toContain("still open");
+    expect(email.html).toContain("https://cerpamedia.com/launch/setup/token");
+    expect(email.html).toContain("Choose a date and time");
+    expect(email.text).toContain(LAUNCH_WELCOME_CLOSING);
+    expect(email.html).not.toMatch(/\$99|sms|text message|intake form/i);
+    expect(email.text).not.toMatch(/\$99|sms|text message/i);
   });
 
   it("renders the admin magic link in plain text and refuses a non-http link", async () => {

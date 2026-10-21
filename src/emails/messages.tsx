@@ -6,6 +6,16 @@ import { BookingNoticeEmail, type BookingNoticeProps } from "./booking-notice";
 import { ContactConfirmationEmail, type ContactConfirmationProps } from "./contact-confirmation";
 import { ContactNoticeEmail, type ContactNoticeProps } from "./contact-notice";
 import { LaunchPurchaseNoticeEmail, type LaunchPurchaseNoticeProps } from "./launch-purchase-notice";
+import {
+  LAUNCH_WELCOME_SUBJECT,
+  LaunchWelcomeEmail,
+  type LaunchWelcomeProps,
+} from "./launch-welcome";
+import {
+  LAUNCH_REMINDER_SUBJECT,
+  LaunchSetupReminderEmail,
+  type LaunchSetupReminderProps,
+} from "./launch-setup-reminder";
 import { firstNameFrom, oneLine } from "./format";
 import { getEmailReplyTo } from "@/lib/email";
 import { launchPurchaseSubject } from "@/lib/launch-checkout";
@@ -84,6 +94,18 @@ export async function renderLaunchPurchaseNotice(
     subject: launchPurchaseSubject(props.tier, props.amountDisplay),
     ...rendered,
   };
+}
+
+export async function renderLaunchWelcome(props: LaunchWelcomeProps): Promise<RenderedEmail> {
+  const rendered = await renderEmail(<LaunchWelcomeEmail {...props} />);
+  return { subject: LAUNCH_WELCOME_SUBJECT, ...rendered };
+}
+
+export async function renderLaunchSetupReminder(
+  props: LaunchSetupReminderProps
+): Promise<RenderedEmail> {
+  const rendered = await renderEmail(<LaunchSetupReminderEmail {...props} />);
+  return { subject: LAUNCH_REMINDER_SUBJECT, ...rendered };
 }
 
 export async function renderAdminMagicLink(props: AdminMagicLinkProps): Promise<RenderedEmail> {
