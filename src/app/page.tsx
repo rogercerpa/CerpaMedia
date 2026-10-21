@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
-import { getServiceBySlug, fallbackFeaturedService } from "@/lib/services";
 import { getHeroContent, getHowItWorksContent, getPublishedFaqs, getPublishedTestimonials } from "@/lib/content";
 import { getSeoMeta } from "@/lib/seo";
+import { getLaunchOffer } from "@/lib/get-launch-offer";
+import { launchHomeOfferText } from "@/lib/launch-offer";
 import type { Metadata } from "next";
+
+export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSeoMeta("/");
@@ -24,9 +27,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  // Fetch AI Teammate Launch service from DB with fallback
-  const featured = await getServiceBySlug("ai-teammate-launch") || fallbackFeaturedService;
-  
+  const launchOffer = await getLaunchOffer();
+
   // Fetch editable content
   const hero = await getHeroContent();
   const howItWorks = await getHowItWorksContent();
@@ -73,7 +75,7 @@ export default async function Home() {
               ) : null}
               <div className="mt-8 pt-6 border-t border-border max-w-2xl mx-auto">
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href="/services/ai-teammate-launch" className="text-text hover:underline font-medium">AI Teammate Launch</Link> — $799 founding rate for the first 5 clients.
+                  <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href="/services/ai-teammate-launch" className="text-text hover:underline font-medium">AI Teammate Launch</Link> — {launchHomeOfferText(launchOffer)}
                 </p>
               </div>
             </div>
