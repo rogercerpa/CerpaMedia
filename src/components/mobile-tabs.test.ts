@@ -4,7 +4,10 @@ import { activeMobileTab, MOBILE_TABS, shouldShowMobileTabBar } from "./mobile-t
 describe("mobile tab bar", () => {
   it("highlights nested routes on the matching tab", () => {
     expect(activeMobileTab("/")).toBe("home");
+    expect(activeMobileTab("/index")).toBe("home");
+    expect(activeMobileTab("/index/")).toBe("home");
     expect(activeMobileTab("/services")).toBe("services");
+    expect(activeMobileTab("/services/")).toBe("services");
     expect(activeMobileTab("/services/other")).toBe("services");
     expect(activeMobileTab("/services/ai-teammate-launch")).toBe("launch");
     expect(activeMobileTab("/services/ai-teammate-launch/details")).toBe("launch");

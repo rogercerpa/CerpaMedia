@@ -23,16 +23,26 @@ export function shouldShowMobileTabBar(pathname: string): boolean {
   return true;
 }
 
+/**
+ * Next prerenders `/` with canonical parts ["", "index"], so the first
+ * usePathname() value on a fresh load is `/index`, not `/`.
+ */
+function normalizePathname(pathname: string): string {
+  const trimmed = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  return trimmed === "/index" ? "/" : trimmed;
+}
+
 export function activeMobileTab(pathname: string): MobileTabId | null {
-  if (pathname === "/") return "home";
+  const path = normalizePathname(pathname);
+  if (path === "/") return "home";
   if (
-    pathname === "/services/ai-teammate-launch" ||
-    pathname.startsWith("/services/ai-teammate-launch/")
+    path === "/services/ai-teammate-launch" ||
+    path.startsWith("/services/ai-teammate-launch/")
   ) {
     return "launch";
   }
-  if (pathname === "/services" || pathname.startsWith("/services/")) return "services";
-  if (pathname === "/insights" || pathname.startsWith("/insights/")) return "insights";
+  if (path === "/services" || path.startsWith("/services/")) return "services";
+  if (path === "/insights" || path.startsWith("/insights/")) return "insights";
   return null;
 }
 
