@@ -1,11 +1,20 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import AnalyticsGate from "@/components/AnalyticsGate";
+import { MobileNavProvider } from "@/components/MobileNavProvider";
+import MobileTabBar, { MobileTabBarInset } from "@/components/MobileTabBar";
+import MobileMenuSheet from "@/components/MobileMenuSheet";
 
 const inter = Inter({ subsets: ["latin"] });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: "CerpaMedia - Technology Services for Business Owners",
@@ -26,11 +35,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navigation />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
+        <MobileNavProvider>
+          <MobileTabBarInset>
+            <Navigation />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+          </MobileTabBarInset>
+          <MobileMenuSheet />
+          <MobileTabBar />
+        </MobileNavProvider>
         <AnalyticsGate />
       </body>
     </html>
