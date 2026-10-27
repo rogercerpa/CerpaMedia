@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import AnalyticsGate from "@/components/AnalyticsGate";
 import { MobileNavProvider } from "@/components/MobileNavProvider";
 import MobileTabBar, { MobileTabBarInset } from "@/components/MobileTabBar";
+import MobileMenuSheet from "@/components/MobileMenuSheet";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,6 +43,7 @@ export default function RootLayout({
             </main>
             <Footer />
           </MobileTabBarInset>
+          <MobileMenuSheet />
           <MobileTabBar />
         </MobileNavProvider>
         <AnalyticsGate />

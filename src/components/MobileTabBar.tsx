@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useMobileNav } from "@/components/MobileNavProvider";
 import {
@@ -15,10 +16,17 @@ const itemClass =
 
 export function MobileTabBarInset({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { open } = useMobileNav();
+  const contentRef = useRef<HTMLDivElement>(null);
   const show = shouldShowMobileTabBar(pathname);
+
+  useEffect(() => {
+    if (contentRef.current) contentRef.current.inert = show && open;
+  }, [show, open]);
+
   return (
     <>
-      {children}
+      <div ref={contentRef}>{children}</div>
       {show ? (
         <div
           aria-hidden="true"
@@ -43,7 +51,7 @@ export default function MobileTabBar() {
   return (
     <nav
       aria-label="Mobile"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-cta pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-[60] border-t border-white/10 bg-cta pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       <ul className="mx-auto flex h-14 max-w-lg items-stretch">
         <li className="flex flex-1">
