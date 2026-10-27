@@ -3,8 +3,6 @@
  * menu only — it is an optional fifth destination Roger can add later, and
  * this bar does not carry a price button.
  */
-export const MOBILE_TAB_BAR_HEIGHT = "3.5rem";
-
 export const MOBILE_TABS = [
   { id: "home", label: "Home", href: "/" },
   { id: "services", label: "Services", href: "/services" },
@@ -38,8 +36,3 @@ export function activeMobileTab(pathname: string): MobileTabId | null {
   return null;
 }
 
-/** Bottom padding that keeps page content above the fixed bar and the iOS home indicator. */
-export function mobileTabBarInsetClass(pathname: string): string | undefined {
-  if (!shouldShowMobileTabBar(pathname)) return undefined;
-  return "pb-[calc(3.5rem+env(safe-area-inset-bottom))] md:pb-0";
-}

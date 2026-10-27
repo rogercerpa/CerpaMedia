@@ -6,7 +6,6 @@ import { useMobileNav } from "@/components/MobileNavProvider";
 import {
   MOBILE_TABS,
   activeMobileTab,
-  mobileTabBarInsetClass,
   shouldShowMobileTabBar,
   type MobileTabId,
 } from "@/components/mobile-tabs";
@@ -16,7 +15,21 @@ const itemClass =
 
 export function MobileTabBarInset({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  return <div className={mobileTabBarInsetClass(pathname)}>{children}</div>;
+  const show = shouldShowMobileTabBar(pathname);
+  return (
+    <>
+      {children}
+      {show ? (
+        <div
+          aria-hidden="true"
+          className="border-t border-transparent bg-charcoal pb-[env(safe-area-inset-bottom)] md:hidden"
+        >
+          <div className="h-14" />
+          <div className="h-px" />
+        </div>
+      ) : null}
+    </>
+  );
 }
 
 export default function MobileTabBar() {
