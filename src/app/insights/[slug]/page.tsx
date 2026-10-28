@@ -5,17 +5,21 @@ import { Reveal } from "@/components/Reveal";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { presentInsight } from "@/lib/reword-small-business";
+import { getCanonicalSlug, getOldSlug } from "@/lib/insight-slug-aliases";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
-export default async function InsightPostPage({
+export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
+  const canonicalSlug = getCanonicalSlug(slug);
 
-  const post = await prisma.insightPost.findUnique({
+  // Try new slug first, fall back to old slug if it exists
+  let post = await prisma.insightPost.findUnique({
     where: {
       slug,
       status: "published",
@@ -24,6 +28,78 @@ export default async function InsightPostPage({
       },
     },
   });
+
+  // Fallback: if new slug not found in DB, try old slug
+  if (!post) {
+    const oldSlug = getOldSlug(slug);
+    if (oldSlug) {
+      post = await prisma.insightPost.findUnique({
+        where: {
+          slug: oldSlug,
+          status: "published",
+          publishedAt: {
+            not: null,
+          },
+        },
+      });
+    }
+  }
+
+  if (!post) {
+    return {};
+  }
+
+  const article = presentInsight(post);
+
+  return {
+    title: article.title,
+    description: article.summary,
+    alternates: {
+      canonical: `https://cerpamedia.com/insights/${canonicalSlug}`,
+    },
+    openGraph: {
+      title: article.title,
+      description: article.summary,
+      url: `https://cerpamedia.com/insights/${canonicalSlug}`,
+      type: "article",
+      publishedTime: article.publishedAt?.toISOString(),
+    },
+  };
+}
+
+export default async function InsightPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+
+  // Try new slug first, fall back to old slug if it exists
+  let post = await prisma.insightPost.findUnique({
+    where: {
+      slug,
+      status: "published",
+      publishedAt: {
+        not: null,
+      },
+    },
+  });
+
+  // Fallback: if new slug not found in DB, try old slug
+  if (!post) {
+    const oldSlug = getOldSlug(slug);
+    if (oldSlug) {
+      post = await prisma.insightPost.findUnique({
+        where: {
+          slug: oldSlug,
+          status: "published",
+          publishedAt: {
+            not: null,
+          },
+        },
+      });
+    }
+  }
 
   if (!post) {
     notFound();

@@ -4,6 +4,8 @@
  * backup branch. Slugs and existing URLs are never rewritten.
  */
 
+import { INSIGHT_SLUG_ALIASES } from "./insight-slug-aliases";
+
 export type TextSwap = {
   from: string;
   to: string;
@@ -82,7 +84,7 @@ const seedTitle: TextSwap = {
 
 export const INSIGHT_PLANS: InsightPlan[] = [
   {
-    slug: "meta-muse-small-business-tools",
+    slug: "meta-muse-business-tools",
     title: [museTitle],
     summary: [
       {
@@ -104,7 +106,7 @@ export const INSIGHT_PLANS: InsightPlan[] = [
     tags: { "small-business": "owner-led" },
   },
   {
-    slug: "grok-team-bots-shared-ai-coworkers-smb",
+    slug: "grok-team-bots-shared-ai-coworkers",
     title: [teamBotsTitle],
     summary: [
       {
@@ -130,7 +132,7 @@ export const INSIGHT_PLANS: InsightPlan[] = [
     tags: { "SMB automation": "team automation" },
   },
   {
-    slug: "openai-dots-always-on-agents-smb",
+    slug: "openai-dots-always-on-agents",
     title: [],
     summary: [
       {
@@ -147,7 +149,7 @@ export const INSIGHT_PLANS: InsightPlan[] = [
     tags: { "SMB productivity": "operations" },
   },
   {
-    slug: "openai-smb-agentic-shift-sbdc-report",
+    slug: "openai-agentic-shift-sbdc-report",
     title: [reportTitle],
     summary: [
       {
@@ -181,7 +183,7 @@ export const INSIGHT_PLANS: InsightPlan[] = [
     tags: { SMB: "AI adoption" },
   },
   {
-    slug: "dots-vs-grok-bot-vs-muse-smb-ai-teammate",
+    slug: "dots-vs-grok-bot-vs-muse-ai-teammate",
     title: [compareTitle],
     summary: [
       {
@@ -221,17 +223,17 @@ export const INSIGHT_PLANS: InsightPlan[] = [
       },
       {
         from: "[Team Bots: Shared Grok Bot Coworkers for Small Business Teams](https://cerpamedia.com/insights/grok-team-bots-shared-ai-coworkers-smb)",
-        to: "[Team Bots: Shared Grok Bot Coworkers for Owner-Led Teams](https://cerpamedia.com/insights/grok-team-bots-shared-ai-coworkers-smb)",
+        to: "[Team Bots: Shared Grok Bot Coworkers for Owner-Led Teams](https://cerpamedia.com/insights/grok-team-bots-shared-ai-coworkers)",
       },
       {
         from: "[Meta's Muse agent now plugs into the tools small businesses already run](https://cerpamedia.com/insights/meta-muse-small-business-tools)",
-        to: "[Meta's Muse agent now plugs into the tools owners already run](https://cerpamedia.com/insights/meta-muse-small-business-tools)",
+        to: "[Meta's Muse agent now plugs into the tools owners already run](https://cerpamedia.com/insights/meta-muse-business-tools)",
       },
     ],
     tags: { SMB: "owner-led" },
   },
   {
-    slug: "small-business-ai-adoption-october-2026",
+    slug: "business-ai-adoption-october-2026",
     title: [adoptionTitle],
     summary: [
       {
@@ -272,7 +274,7 @@ export const INSIGHT_PLANS: InsightPlan[] = [
     tags: { "small business": "owner-led" },
   },
   {
-    slug: "openai-gpt-4o-gpt-4-1-api-shutdown-small-business",
+    slug: "openai-gpt-4o-gpt-4-1-api-shutdown",
     title: [],
     summary: [],
     body: [
@@ -454,7 +456,17 @@ export function presentInsight<T extends {
   body?: string;
   tags: string[];
 }>(post: T): T {
-  const plan = INSIGHT_PLANS.find((item) => item.slug === post.slug);
+  // Match plan by new slug or by old slug (if post still has old slug in DB)
+  let plan = INSIGHT_PLANS.find((item) => item.slug === post.slug);
+  
+  // Fallback: if post has old slug, try to find plan by new slug
+  if (!plan) {
+    const newSlug = INSIGHT_SLUG_ALIASES[post.slug];
+    if (newSlug) {
+      plan = INSIGHT_PLANS.find((item) => item.slug === newSlug);
+    }
+  }
+  
   if (!plan) return post;
 
   const next: T = {
