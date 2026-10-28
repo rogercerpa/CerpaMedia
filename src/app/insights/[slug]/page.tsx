@@ -5,8 +5,48 @@ import { Reveal } from "@/components/Reveal";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { presentInsight } from "@/lib/reword-small-business";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+
+  const post = await prisma.insightPost.findUnique({
+    where: {
+      slug,
+      status: "published",
+      publishedAt: {
+        not: null,
+      },
+    },
+  });
+
+  if (!post) {
+    return {};
+  }
+
+  const article = presentInsight(post);
+
+  return {
+    title: article.title,
+    description: article.summary,
+    alternates: {
+      canonical: `https://cerpamedia.com/insights/${slug}`,
+    },
+    openGraph: {
+      title: article.title,
+      description: article.summary,
+      url: `https://cerpamedia.com/insights/${slug}`,
+      type: "article",
+      publishedTime: article.publishedAt?.toISOString(),
+    },
+  };
+}
 
 export default async function InsightPostPage({
   params,

@@ -44,7 +44,7 @@ describe("reword small-business copy", () => {
   });
 
   it("leaves an existing URL in place and classifies it", () => {
-    const url = "https://cerpamedia.com/insights/meta-muse-small-business-tools";
+    const url = "https://example.com/guide/small-business-tips";
     const hits = findFraming(`Read ${url} today.`);
     expect(hits.length).toBeGreaterThan(0);
     expect(hits.every((hit) => hit.reason?.includes("URL"))).toBe(true);
@@ -94,14 +94,14 @@ describe("reword small-business copy", () => {
 
   it("presents stored copy without changing the slug", () => {
     const presented = presentInsight({
-      slug: "meta-muse-small-business-tools",
+      slug: "meta-muse-business-tools",
       title: "Meta's Muse agent now plugs into the tools small businesses already run",
       summary: "Meta expanded Muse for U.S. and Canada SMBs on Sep 29, 2026 — connectors to Shopify, QuickBooks, Slack, Stripe, and more, with owner approval before publish, send, or spend. Free tier plus $20/$100 plans.",
       body: "On September 29, 2026, Meta expanded its Muse AI agent for small businesses in the U.S. and Canada.",
       tags: ["ai", "small-business"],
     });
 
-    expect(presented.slug).toBe("meta-muse-small-business-tools");
+    expect(presented.slug).toBe("meta-muse-business-tools");
     expect(presented.title).toBe("Meta's Muse agent now plugs into the tools owners already run");
     expect(presented.tags).toEqual(["ai", "owner-led"]);
     expect(unhandledFraming(`${presented.title}\n${presented.summary}\n${presented.body}`)).toEqual([]);

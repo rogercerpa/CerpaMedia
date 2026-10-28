@@ -82,7 +82,7 @@ const seedTitle: TextSwap = {
 
 export const INSIGHT_PLANS: InsightPlan[] = [
   {
-    slug: "meta-muse-small-business-tools",
+    slug: "meta-muse-business-tools",
     title: [museTitle],
     summary: [
       {
@@ -104,7 +104,7 @@ export const INSIGHT_PLANS: InsightPlan[] = [
     tags: { "small-business": "owner-led" },
   },
   {
-    slug: "grok-team-bots-shared-ai-coworkers-smb",
+    slug: "grok-team-bots-shared-ai-coworkers",
     title: [teamBotsTitle],
     summary: [
       {
@@ -130,7 +130,7 @@ export const INSIGHT_PLANS: InsightPlan[] = [
     tags: { "SMB automation": "team automation" },
   },
   {
-    slug: "openai-dots-always-on-agents-smb",
+    slug: "openai-dots-always-on-agents",
     title: [],
     summary: [
       {
@@ -147,7 +147,7 @@ export const INSIGHT_PLANS: InsightPlan[] = [
     tags: { "SMB productivity": "operations" },
   },
   {
-    slug: "openai-smb-agentic-shift-sbdc-report",
+    slug: "openai-agentic-shift-sbdc-report",
     title: [reportTitle],
     summary: [
       {
@@ -181,7 +181,7 @@ export const INSIGHT_PLANS: InsightPlan[] = [
     tags: { SMB: "AI adoption" },
   },
   {
-    slug: "dots-vs-grok-bot-vs-muse-smb-ai-teammate",
+    slug: "dots-vs-grok-bot-vs-muse-ai-teammate",
     title: [compareTitle],
     summary: [
       {
@@ -221,17 +221,17 @@ export const INSIGHT_PLANS: InsightPlan[] = [
       },
       {
         from: "[Team Bots: Shared Grok Bot Coworkers for Small Business Teams](https://cerpamedia.com/insights/grok-team-bots-shared-ai-coworkers-smb)",
-        to: "[Team Bots: Shared Grok Bot Coworkers for Owner-Led Teams](https://cerpamedia.com/insights/grok-team-bots-shared-ai-coworkers-smb)",
+        to: "[Team Bots: Shared Grok Bot Coworkers for Owner-Led Teams](https://cerpamedia.com/insights/grok-team-bots-shared-ai-coworkers)",
       },
       {
         from: "[Meta's Muse agent now plugs into the tools small businesses already run](https://cerpamedia.com/insights/meta-muse-small-business-tools)",
-        to: "[Meta's Muse agent now plugs into the tools owners already run](https://cerpamedia.com/insights/meta-muse-small-business-tools)",
+        to: "[Meta's Muse agent now plugs into the tools owners already run](https://cerpamedia.com/insights/meta-muse-business-tools)",
       },
     ],
     tags: { SMB: "owner-led" },
   },
   {
-    slug: "small-business-ai-adoption-october-2026",
+    slug: "business-ai-adoption-october-2026",
     title: [adoptionTitle],
     summary: [
       {
@@ -272,7 +272,7 @@ export const INSIGHT_PLANS: InsightPlan[] = [
     tags: { "small business": "owner-led" },
   },
   {
-    slug: "openai-gpt-4o-gpt-4-1-api-shutdown-small-business",
+    slug: "openai-gpt-4o-gpt-4-1-api-shutdown",
     title: [],
     summary: [],
     body: [
