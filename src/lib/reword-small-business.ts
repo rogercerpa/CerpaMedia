@@ -4,6 +4,8 @@
  * backup branch. Slugs and existing URLs are never rewritten.
  */
 
+import { INSIGHT_SLUG_ALIASES } from "./insight-slug-aliases";
+
 export type TextSwap = {
   from: string;
   to: string;
@@ -454,7 +456,17 @@ export function presentInsight<T extends {
   body?: string;
   tags: string[];
 }>(post: T): T {
-  const plan = INSIGHT_PLANS.find((item) => item.slug === post.slug);
+  // Match plan by new slug or by old slug (if post still has old slug in DB)
+  let plan = INSIGHT_PLANS.find((item) => item.slug === post.slug);
+  
+  // Fallback: if post has old slug, try to find plan by new slug
+  if (!plan) {
+    const newSlug = INSIGHT_SLUG_ALIASES[post.slug];
+    if (newSlug) {
+      plan = INSIGHT_PLANS.find((item) => item.slug === newSlug);
+    }
+  }
+  
   if (!plan) return post;
 
   const next: T = {

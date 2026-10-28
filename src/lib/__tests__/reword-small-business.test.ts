@@ -110,6 +110,23 @@ describe("reword small-business copy", () => {
     expect(presentSeoText(SEO_TITLE.from, SEO_TITLE)).toBe(SEO_TITLE.to);
   });
 
+  it("presents stored copy with OLD slug (transition state fallback)", () => {
+    // During transition: DB still has old slug, but plan is keyed by new slug
+    const presented = presentInsight({
+      slug: "meta-muse-small-business-tools", // old slug still in DB
+      title: "Meta's Muse agent now plugs into the tools small businesses already run",
+      summary: "Meta expanded Muse for U.S. and Canada SMBs on Sep 29, 2026 — connectors to Shopify, QuickBooks, Slack, Stripe, and more, with owner approval before publish, send, or spend. Free tier plus $20/$100 plans.",
+      body: "On September 29, 2026, Meta expanded its Muse AI agent for small businesses in the U.S. and Canada.",
+      tags: ["ai", "small-business"],
+    });
+
+    // Should still find the plan and apply rewrites
+    expect(presented.slug).toBe("meta-muse-small-business-tools"); // slug unchanged
+    expect(presented.title).toBe("Meta's Muse agent now plugs into the tools owners already run");
+    expect(presented.tags).toEqual(["ai", "owner-led"]);
+    expect(unhandledFraming(`${presented.title}\n${presented.summary}\n${presented.body}`)).toEqual([]);
+  });
+
   it("does not include slug fields in the text swaps", () => {
     for (const plan of INSIGHT_PLANS) {
       const blob = JSON.stringify({
