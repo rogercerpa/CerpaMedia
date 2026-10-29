@@ -1,8 +1,6 @@
 import { Metadata } from "next";
 import { Reveal } from "@/components/Reveal";
 import { getSeoMeta } from "@/lib/seo";
-import { isFoundationsUiEnabled } from "@/lib/flags";
-import DraftPrivacySections from "@/components/DraftPrivacySections";
 
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await getSeoMeta("/privacy");
@@ -15,13 +13,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PrivacyPage() {
-  let showDraft = false;
-  try {
-    showDraft = await isFoundationsUiEnabled();
-  } catch {
-    showDraft = false;
-  }
-
   return (
     <div>
       <section className="bg-bg py-24 md:py-32">
@@ -32,7 +23,7 @@ export default async function PrivacyPage() {
                 Privacy Policy
               </h1>
               <p className="text-lg text-text-muted">
-                Effective: October 6, 2026 · Last updated: October 6, 2026
+                Effective: October 6, 2026 · Last updated: October 29, 2026
               </p>
             </div>
           </Reveal>
@@ -69,7 +60,7 @@ export default async function PrivacyPage() {
                   Like most websites, our hosting provider (<strong className="text-text">Vercel</strong>) automatically records basic technical data when you visit, including IP address, browser type, device information, pages requested, referring URL, and date/time. We use these logs to run, secure, and troubleshoot the Site.
                 </p>
                 <p className="text-text-muted leading-relaxed">
-                  We do <strong className="text-text">not</strong> currently use third-party analytics, advertising pixels, or tracking cookies. See Section 7.
+                  We use <strong className="text-text">Vercel Web Analytics</strong>, which does not use cookies. We also keep our own daily totals for guide reads, demo runs, email clicks, Strategy Call button clicks, contact form submissions, and Insights article reads. An article read is stored by its public slug only. Those counts have no page content, no email addresses, and no other personal information. We do <strong className="text-text">not</strong> use advertising pixels or tracking cookies for ads. Admin pages and automated visitors are left out of those counts.
                 </p>
               </div>
 
@@ -125,7 +116,7 @@ export default async function PrivacyPage() {
                       <tr>
                         <td className="border border-border px-4 py-2 text-text">Neon</td>
                         <td className="border border-border px-4 py-2 text-text-muted">Database hosting</td>
-                        <td className="border border-border px-4 py-2 text-text-muted">Contact form and booking records</td>
+                        <td className="border border-border px-4 py-2 text-text-muted">Contact form and booking records, plus aggregate daily counts</td>
                       </tr>
                       <tr>
                         <td className="border border-border px-4 py-2 text-text">Resend</td>
@@ -134,7 +125,7 @@ export default async function PrivacyPage() {
                       </tr>
                       <tr>
                         <td className="border border-border px-4 py-2 text-text">Vercel</td>
-                        <td className="border border-border px-4 py-2 text-text-muted">Website hosting and server logs</td>
+                        <td className="border border-border px-4 py-2 text-text-muted">Website hosting, server logs, and cookieless Web Analytics</td>
                         <td className="border border-border px-4 py-2 text-text-muted">Technical and log data; form submissions pass through it</td>
                       </tr>
                       <tr>
@@ -184,7 +175,7 @@ export default async function PrivacyPage() {
               <div>
                 <h2 className="text-3xl font-semibold text-text mb-4">7. Cookies and similar technologies</h2>
                 <p className="text-text-muted leading-relaxed">
-                  Today the Site uses only what it needs to work, such as basic technical functions of our hosting and booking flow. Stripe's checkout pages may set their own cookies for payment security and fraud prevention under Stripe's policies. <strong className="text-text">We do not currently use third-party analytics or advertising cookies.</strong> If we add them later, we will update this policy before they go live and, where required, ask for your consent first. You can block or delete cookies in your browser settings, but some features may stop working.
+                  Today the Site uses only what it needs to work, such as basic technical functions of our hosting and booking flow. Stripe's checkout pages may set their own cookies for payment security and fraud prevention under Stripe's policies. <strong className="text-text">Vercel Web Analytics does not use cookies.</strong> The daily totals in Section 1 are aggregate counts, not advertising cookies. We do <strong className="text-text">not</strong> use advertising pixels or tracking cookies for ads. You can block or delete cookies in your browser settings, but some features may stop working.
                 </p>
               </div>
 
@@ -240,7 +231,6 @@ export default async function PrivacyPage() {
                 </div>
               </div>
 
-              {showDraft ? <DraftPrivacySections /> : null}
             </div>
           </Reveal>
         </div>
