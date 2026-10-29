@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { InsightStrategyCallCopy } from "@/lib/insight-strategy-call";
+import { STRATEGY_CALL_BUTTON_LABEL, type InsightStrategyCallCopy } from "@/lib/insight-strategy-call";
 
 export default function InsightStrategyCallEditor({
   initial,
@@ -62,21 +62,14 @@ export default function InsightStrategyCallEditor({
           maxLength={400}
         />
         <p className="text-sm text-gray-500 mt-2">
-          Keep the 30-day AI Teammate Launch credit. The button always goes to /consult.
-          The founding spots line comes from Stripe and stays hidden when that count is unavailable.
+          Say the call fee counts toward an AI Teammate Launch. Don&apos;t name a price.
+          Founding spots stay on the AI Teammate Launch page.
         </p>
       </div>
       <div>
-        <label htmlFor="buttonLabel" className="block text-sm font-medium text-gray-900 mb-2">
-          Button label
-        </label>
-        <input
-          id="buttonLabel"
-          value={copy.buttonLabel}
-          onChange={(event) => setCopy({ ...copy, buttonLabel: event.target.value })}
-          className="w-full border border-gray-300 px-3 py-2 text-gray-900"
-          maxLength={80}
-        />
+        <p className="block text-sm font-medium text-gray-900 mb-2">Button</p>
+        <p className="text-sm text-gray-700">{STRATEGY_CALL_BUTTON_LABEL}</p>
+        <p className="text-sm text-gray-500 mt-2">This label is fixed and links to /consult.</p>
       </div>
       {message ? (
         <p className={message.type === "success" ? "text-sm text-green-700" : "text-sm text-red-700"}>

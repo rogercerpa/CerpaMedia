@@ -8,10 +8,15 @@ import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { presentInsight } from "@/lib/reword-small-business";
 import { getCanonicalSlug, getOldSlug } from "@/lib/insight-slug-aliases";
-import { getLaunchOffer } from "@/lib/get-launch-offer";
 import { getInsightStrategyCallCopy } from "@/lib/get-insight-strategy-call";
-import { isInBodyStrategyCallLink, reactNodeText } from "@/lib/insight-strategy-call";
-import { launchSpotLine } from "@/lib/launch-offer";
+import {
+  consultPath,
+  isInBodyStrategyCallLink,
+  presentInsightArticleBody,
+  reactNodeText,
+  STRATEGY_CALL_BUTTON_LABEL,
+} from "@/lib/insight-strategy-call";
+import { StrategyCallLink } from "@/components/StrategyCallLink";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -113,10 +118,8 @@ export default async function InsightPostPage({
 
   const article = presentInsight(post);
   const canonicalSlug = getCanonicalSlug(slug);
-  const [strategyCallCopy, launchOffer] = await Promise.all([
-    getInsightStrategyCallCopy(),
-    getLaunchOffer(),
-  ]);
+  const strategyCallCopy = await getInsightStrategyCallCopy();
+  const articleBody = presentInsightArticleBody(article.body);
 
   return (
     <div className="bg-bg">
@@ -202,8 +205,17 @@ export default async function InsightPostPage({
                     </li>
                   ),
                   a: ({ href, children }) => {
-                    if (isInBodyStrategyCallLink(href, reactNodeText(children))) {
-                      return <span>{children}</span>;
+                    if (consultPath(href)) {
+                      return (
+                        <StrategyCallLink
+                          href="/consult"
+                          className="text-text underline hover:text-text-muted transition-colors"
+                        >
+                          {isInBodyStrategyCallLink(href, reactNodeText(children))
+                            ? STRATEGY_CALL_BUTTON_LABEL
+                            : children}
+                        </StrategyCallLink>
+                      );
                     }
                     return (
                       <a
@@ -233,7 +245,7 @@ export default async function InsightPostPage({
                   ),
                 }}
               >
-                {article.body}
+                {articleBody}
               </ReactMarkdown>
             </article>
           </Reveal>
@@ -242,10 +254,7 @@ export default async function InsightPostPage({
 
       <section className="pb-16 md:pb-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <InsightStrategyCallBox
-            copy={strategyCallCopy}
-            spotLine={launchSpotLine(launchOffer)}
-          />
+          <InsightStrategyCallBox copy={strategyCallCopy} />
         </div>
       </section>
       <InsightReadTracker slug={canonicalSlug} />

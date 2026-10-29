@@ -3,8 +3,7 @@ import { Reveal } from "@/components/Reveal";
 import { StrategyCallLink } from "@/components/StrategyCallLink";
 import { getPublishedServices, getServiceBySlug, fallbackServices, fallbackFeaturedService } from "@/lib/services";
 import { getSeoMeta } from "@/lib/seo";
-import { getLaunchOffer } from "@/lib/get-launch-offer";
-import { launchServiceCard } from "@/lib/launch-offer";
+import { STRATEGY_CALL_BUTTON_LABEL } from "@/lib/insight-strategy-call";
 import type { Metadata } from "next";
 
 export const revalidate = 60;
@@ -37,14 +36,11 @@ export default async function ServicesPage() {
     ? dbServices.filter(s => !s.featured && s.slug !== "technology-strategy-call")
     : fallbackServices;
   
-  const launchOffer = await getLaunchOffer();
-  const launchCard = launchServiceCard(launchOffer);
-  const featuredBase = featuredService || fallbackFeaturedService;
-  const featured = {
-    ...featuredBase,
-    priceLabel: launchCard.priceLabel,
-    badgeText: launchCard.badgeText ?? undefined,
-  };
+  const featured = featuredService || fallbackFeaturedService;
+  const featuredBadge =
+    featured.badgeText && !/\$|spots left|founding/i.test(featured.badgeText)
+      ? featured.badgeText
+      : null;
 
   return (
     <div>
@@ -68,17 +64,14 @@ export default async function ServicesPage() {
           <Reveal delay={100}>
             <div className="border-2 border-cta p-8 md:p-10 mb-8 bg-bg">
               <div className="mb-6">
-                {featured.badgeText && (
+                {featuredBadge && (
                   <div className="inline-block border border-border px-3 py-1 mb-4">
-                    <span className="text-[11px] font-medium text-text uppercase tracking-wider">{featured.badgeText}</span>
+                    <span className="text-[11px] font-medium text-text uppercase tracking-wider">{featuredBadge}</span>
                   </div>
                 )}
                 <h2 className="text-3xl md:text-4xl font-semibold text-text mb-4 tracking-tight">
                   {featured.title}
                 </h2>
-                <p className="text-xl font-medium text-text mb-3">
-                  {featured.priceLabel}
-                </p>
                 <p className="text-[15px] text-text-muted leading-relaxed mb-4">
                   {featured.description}
                 </p>
@@ -103,10 +96,10 @@ export default async function ServicesPage() {
                     Stuck without a plan?
                   </h2>
                   <p className="text-[15px] text-white/90 leading-relaxed mb-3">
-                    Pay $99 for a 30–45 min call with Roger. Get 3–5 opportunities and a written summary within 24–48 hours.
+                    Book your strategy call today. It&apos;s a 30–45 min call with Roger, with 3–5 opportunities and a written summary within 24–48 hours.
                   </p>
                   <p className="text-[13px] text-white/70 leading-relaxed">
-                    Prepaid standalone — not credited toward discovery or other work. Exception: credited toward <Link href="/services/ai-teammate-launch" className="hover:underline text-white/90">AI Teammate Launch</Link> if purchased within 30 days.
+                    Your call fee counts toward <Link href="/services/ai-teammate-launch" className="hover:underline text-white/90">AI Teammate Launch</Link> if you purchase it within 30 days.
                   </p>
                 </div>
                 <div className="flex-shrink-0">
@@ -114,7 +107,7 @@ export default async function ServicesPage() {
                     href="/consult"
                     className="inline-block bg-white text-charcoal px-8 py-3 text-[15px] font-medium hover:bg-gray-100 transition-all duration-200 hover:-translate-y-0.5"
                   >
-                    Pay $99 — Book Call
+                    {STRATEGY_CALL_BUTTON_LABEL}
                   </StrategyCallLink>
                 </div>
               </div>

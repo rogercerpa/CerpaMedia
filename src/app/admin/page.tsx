@@ -122,7 +122,7 @@ export default async function AdminDashboard() {
               Insights Strategy Call
             </h3>
             <p className="text-gray-600 text-sm">
-              Edit the $99 box at the end of each Insights article
+              Edit the strategy call box at the end of each Insights article
             </p>
           </Link>
 
