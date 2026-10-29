@@ -3,7 +3,7 @@ import { Reveal } from "@/components/Reveal";
 import { StrategyCallLink } from "@/components/StrategyCallLink";
 import { getPublishedServices, getServiceBySlug, fallbackServices, fallbackFeaturedService } from "@/lib/services";
 import { getSeoMeta } from "@/lib/seo";
-import { STRATEGY_CALL_BUTTON_LABEL } from "@/lib/insight-strategy-call";
+import { STRATEGY_CALL_BUTTON_LABEL, STRATEGY_CALL_LEAD } from "@/lib/insight-strategy-call";
 import type { Metadata } from "next";
 
 export const revalidate = 60;
@@ -96,13 +96,14 @@ export default async function ServicesPage() {
                     Stuck without a plan?
                   </h2>
                   <p className="text-[15px] text-white/90 leading-relaxed mb-3">
-                    Book your strategy call today. It&apos;s a 30–45 min call with Roger, with 3–5 opportunities and a written summary within 24–48 hours.
+                    It&apos;s a 30–45 min call with Roger, with 3–5 opportunities and a written summary within 24–48 hours.
                   </p>
                   <p className="text-[13px] text-white/70 leading-relaxed">
                     Your call fee counts toward <Link href="/services/ai-teammate-launch" className="hover:underline text-white/90">AI Teammate Launch</Link> if you purchase it within 30 days.
                   </p>
                 </div>
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 text-center md:text-left">
+                  <p className="text-[15px] text-white mb-3">{STRATEGY_CALL_LEAD}</p>
                   <StrategyCallLink
                     href="/consult"
                     className="inline-block bg-white text-charcoal px-8 py-3 text-[15px] font-medium hover:bg-gray-100 transition-all duration-200 hover:-translate-y-0.5"

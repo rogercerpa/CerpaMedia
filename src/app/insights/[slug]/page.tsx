@@ -14,7 +14,7 @@ import {
   isInBodyStrategyCallLink,
   presentInsightArticleBody,
   reactNodeText,
-  STRATEGY_CALL_BUTTON_LABEL,
+  STRATEGY_CALL_INLINE_LABEL,
 } from "@/lib/insight-strategy-call";
 import { StrategyCallLink } from "@/components/StrategyCallLink";
 import type { Metadata } from "next";
@@ -212,7 +212,7 @@ export default async function InsightPostPage({
                           className="text-text underline hover:text-text-muted transition-colors"
                         >
                           {isInBodyStrategyCallLink(href, reactNodeText(children))
-                            ? STRATEGY_CALL_BUTTON_LABEL
+                            ? STRATEGY_CALL_INLINE_LABEL
                             : children}
                         </StrategyCallLink>
                       );

@@ -224,7 +224,7 @@ export default async function Home() {
                   <strong className="text-text">Outcome:</strong> fewer manual loops, fewer mistakes, and you're not the bottleneck.
                 </p>
                 <p className="text-[15px] text-text leading-relaxed">
-                  Want it set up right? We&apos;ll map your process, build the flows, and hand you the keys — <StrategyCallLink href="/consult" className="underline hover:text-text-muted">book your strategy call today</StrategyCallLink>.
+                  Want it set up right? We&apos;ll map your process, build the flows, and hand you the keys — <StrategyCallLink href="/consult" className="underline hover:text-text-muted">book a call</StrategyCallLink>.
                 </p>
               </div>
 
@@ -237,7 +237,7 @@ export default async function Home() {
                   <strong className="text-text">Outcome:</strong> new hires onboard faster, answers live in one place, and you're not re-explaining the same process every week.
                 </p>
                 <p className="text-[15px] text-text leading-relaxed">
-                  Or let us structure it for you — from templates to integrations. <StrategyCallLink href="/consult" className="underline hover:text-text-muted">Book your strategy call today</StrategyCallLink>.
+                  Or let us structure it for you — from templates to integrations. <StrategyCallLink href="/consult" className="underline hover:text-text-muted">book a call</StrategyCallLink>.
                 </p>
               </div>
 
@@ -265,7 +265,7 @@ export default async function Home() {
           <Reveal delay={300}>
             <div className="text-center">
               <p className="text-[15px] text-text-muted mb-6 max-w-2xl mx-auto leading-relaxed">
-                Want buyer&apos;s guidance on what to pick? Check Insights for landscape comparisons. Ready to implement? <StrategyCallLink href="/consult" className="underline hover:text-text-muted">Book your strategy call today</StrategyCallLink> and we&apos;ll map your next step.
+                Want buyer&apos;s guidance on what to pick? Check Insights for landscape comparisons. Ready to implement? <StrategyCallLink href="/consult" className="underline hover:text-text-muted">book a call</StrategyCallLink> and we&apos;ll map your next step.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link
@@ -355,15 +355,16 @@ export default async function Home() {
             <h2 className="text-4xl md:text-5xl font-semibold text-text mb-6 tracking-tight">
               Ready for a clear next step?
             </h2>
-            <p className="text-lg text-text-muted mb-10 leading-relaxed">
-              Book your strategy call today. Roger schedules with you, and you get a written summary within 24–48 hours of the call.
+            <p className="text-lg text-text-muted mb-4 leading-relaxed">
+              Roger schedules with you, and you get a written summary within 24–48 hours of the call.
             </p>
+            <p className="text-lg text-text mb-6 leading-relaxed">Book your strategy call today.</p>
             <div className="flex flex-col gap-4 items-center">
               <StrategyCallLink
                 href="/consult"
                 className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
               >
-                Book your strategy call today
+                {STRATEGY_CALL_BUTTON_LABEL}
               </StrategyCallLink>
               <p className="text-sm text-text-muted">
                 Prefer email? <a href="mailto:cerpamedia@gmail.com" className="hover:text-text underline">cerpamedia@gmail.com</a> · <a href="tel:+19432487410" className="hover:text-text underline">(943) 248-7410</a>

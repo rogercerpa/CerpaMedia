@@ -33,7 +33,8 @@ describe("insight strategy call box", () => {
 
     expect(html.match(/<a\b/g)).toHaveLength(1);
     expect(html).toContain('href="/consult"');
-    expect(html).toContain("Book your strategy call today");
+    expect(html).toContain(">Book a call</a>");
+    expect(html).toContain("Book your strategy call today.");
     expect(html).toContain("Leave with a 1-page AI teammate plan for your business");
     expect(html).toContain("Your call fee counts toward an AI Teammate Launch");
     expect(html).not.toMatch(/\$\s*\d/);
@@ -60,7 +61,7 @@ describe("insight strategy call box", () => {
     ).toEqual({
       headline: "Leave with a plan",
       creditLine: DEFAULT_INSIGHT_STRATEGY_CALL.creditLine,
-      buttonLabel: "Book your strategy call today",
+      buttonLabel: "Book a call",
     });
 
     const rejected = validateInsightStrategyCallCopy({
@@ -105,7 +106,7 @@ describe("insight strategy call box", () => {
 
     expect(body).not.toMatch(/\$99|\$799/);
     expect(body).toContain("[strategy call](https://cerpamedia.com/consult)");
-    expect(body).toContain("[book your strategy call today](https://cerpamedia.com/consult)");
+    expect(body).toContain("[book a call](https://cerpamedia.com/consult)");
     expect(body).toContain("[AI Teammate Launch](/services/ai-teammate-launch)");
     expect(body).toContain("Free tier plus $20/$100 plans.");
     expect(body).not.toMatch(/small business|\bSMB\b/i);

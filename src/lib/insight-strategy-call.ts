@@ -1,6 +1,8 @@
 export const INSIGHT_STRATEGY_CALL_KEY = "insight-strategy-call";
 export const STRATEGY_CALL_HREF = "/consult";
-export const STRATEGY_CALL_BUTTON_LABEL = "Book your strategy call today";
+export const STRATEGY_CALL_BUTTON_LABEL = "Book a call";
+export const STRATEGY_CALL_LEAD = "Book your strategy call today.";
+export const STRATEGY_CALL_INLINE_LABEL = "book a call";
 
 export type InsightStrategyCallCopy = {
   headline: string;
@@ -132,11 +134,11 @@ export function isInBodyStrategyCallLink(href: string | undefined, text: string)
 export function presentInsightArticleBody(body: string): string {
   let text = body.replace(
     /book a \$99 Technology Strategy Call at \[([^\]]*)\]\(([^)]+)\)/gi,
-    "[book your strategy call today]($2)"
+    "[book a call]($2)"
   );
   text = text.replace(
     /book a \[\$99 Strategy Call\]\(([^)]+)\)/gi,
-    "[book your strategy call today]($1)"
+    "[book a call]($1)"
   );
   text = text.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (full, label: string, href: string) => {
     if (!OFFER_PRICE.test(label)) return full;

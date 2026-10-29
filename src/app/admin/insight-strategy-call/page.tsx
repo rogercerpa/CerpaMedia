@@ -36,7 +36,7 @@ export default async function InsightStrategyCallPage() {
           <p className="text-sm text-gray-600">
             This box appears once, after the body of every Insights article. Write for business
             owners and their teams. Don&apos;t say small business or SMB, don&apos;t name a price, and
-            don&apos;t add a street address. The button always says &quot;Book your strategy call today&quot;
+            don&apos;t add a street address. The button always says &quot;Book a call&quot;
             and opens the existing booking page.
           </p>
         </div>
