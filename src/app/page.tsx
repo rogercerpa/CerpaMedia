@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
+import { StrategyCallLink } from "@/components/StrategyCallLink";
 import { getHeroContent, getHowItWorksContent, getPublishedFaqs, getPublishedTestimonials } from "@/lib/content";
 import { getSeoMeta } from "@/lib/seo";
-import { getLaunchOffer } from "@/lib/get-launch-offer";
-import { launchHomeOfferText } from "@/lib/launch-offer";
+import { isInBodyStrategyCallLink, STRATEGY_CALL_BUTTON_LABEL } from "@/lib/insight-strategy-call";
 import type { Metadata } from "next";
 
 export const revalidate = 60;
@@ -27,8 +27,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const launchOffer = await getLaunchOffer();
-
   // Fetch editable content
   const hero = await getHeroContent();
   const howItWorks = await getHowItWorksContent();
@@ -56,26 +54,44 @@ export default async function Home() {
               {hasPrimaryCta || hasSecondaryCta ? (
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   {hasPrimaryCta ? (
-                    <Link
-                      href={hero.primaryCtaUrl}
-                      className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
-                    >
-                      {hero.primaryCtaLabel}
-                    </Link>
+                    isInBodyStrategyCallLink(hero.primaryCtaUrl, hero.primaryCtaLabel) ? (
+                      <StrategyCallLink
+                        href={hero.primaryCtaUrl}
+                        className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                      >
+                        {STRATEGY_CALL_BUTTON_LABEL}
+                      </StrategyCallLink>
+                    ) : (
+                      <Link
+                        href={hero.primaryCtaUrl}
+                        className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                      >
+                        {hero.primaryCtaLabel}
+                      </Link>
+                    )
                   ) : null}
                   {hasSecondaryCta ? (
-                    <a
-                      href={hero.secondaryCtaUrl}
-                      className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
-                    >
-                      {hero.secondaryCtaLabel}
-                    </a>
+                    isInBodyStrategyCallLink(hero.secondaryCtaUrl, hero.secondaryCtaLabel) ? (
+                      <StrategyCallLink
+                        href={hero.secondaryCtaUrl}
+                        className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
+                      >
+                        {STRATEGY_CALL_BUTTON_LABEL}
+                      </StrategyCallLink>
+                    ) : (
+                      <a
+                        href={hero.secondaryCtaUrl}
+                        className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
+                      >
+                        {hero.secondaryCtaLabel}
+                      </a>
+                    )
                   ) : null}
                 </div>
               ) : null}
               <div className="mt-8 pt-6 border-t border-border max-w-2xl mx-auto">
                 <p className="text-[15px] text-text-muted leading-relaxed">
-                  <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href="/services/ai-teammate-launch" className="text-text hover:underline font-medium">AI Teammate Launch</Link> — {launchHomeOfferText(launchOffer)}
+                  <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href="/services/ai-teammate-launch" className="text-text hover:underline font-medium">AI Teammate Launch</Link>
                 </p>
               </div>
             </div>
@@ -208,7 +224,7 @@ export default async function Home() {
                   <strong className="text-text">Outcome:</strong> fewer manual loops, fewer mistakes, and you're not the bottleneck.
                 </p>
                 <p className="text-[15px] text-text leading-relaxed">
-                  Want it set up right? We'll map your process, build the flows, and hand you the keys — book the $99 Strategy Call to start.
+                  Want it set up right? We&apos;ll map your process, build the flows, and hand you the keys — <StrategyCallLink href="/consult" className="underline hover:text-text-muted">book a call</StrategyCallLink>.
                 </p>
               </div>
 
@@ -221,7 +237,7 @@ export default async function Home() {
                   <strong className="text-text">Outcome:</strong> new hires onboard faster, answers live in one place, and you're not re-explaining the same process every week.
                 </p>
                 <p className="text-[15px] text-text leading-relaxed">
-                  Or let us structure it for you — from templates to integrations. Start with the Strategy Call.
+                  Or let us structure it for you — from templates to integrations. <StrategyCallLink href="/consult" className="underline hover:text-text-muted">book a call</StrategyCallLink>.
                 </p>
               </div>
 
@@ -249,7 +265,7 @@ export default async function Home() {
           <Reveal delay={300}>
             <div className="text-center">
               <p className="text-[15px] text-text-muted mb-6 max-w-2xl mx-auto leading-relaxed">
-                Want buyer's guidance on what to pick? Check Insights for landscape comparisons. Ready to implement? Book the Strategy Call and we'll map your next step.
+                Want buyer&apos;s guidance on what to pick? Check Insights for landscape comparisons. Ready to implement? <StrategyCallLink href="/consult" className="underline hover:text-text-muted">book a call</StrategyCallLink> and we&apos;ll map your next step.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
                 <Link
@@ -339,16 +355,17 @@ export default async function Home() {
             <h2 className="text-4xl md:text-5xl font-semibold text-text mb-6 tracking-tight">
               Ready for a clear next step?
             </h2>
-            <p className="text-lg text-text-muted mb-10 leading-relaxed">
-              Book the $99 Technology Strategy Call. Pay first, Roger schedules with you, and you get a written summary within 24–48 hours of the call.
+            <p className="text-lg text-text-muted mb-4 leading-relaxed">
+              Roger schedules with you, and you get a written summary within 24–48 hours of the call.
             </p>
+            <p className="text-lg text-text mb-6 leading-relaxed">Book your strategy call today.</p>
             <div className="flex flex-col gap-4 items-center">
-              <Link
+              <StrategyCallLink
                 href="/consult"
                 className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
               >
-                Book the $99 Strategy Call
-              </Link>
+                {STRATEGY_CALL_BUTTON_LABEL}
+              </StrategyCallLink>
               <p className="text-sm text-text-muted">
                 Prefer email? <a href="mailto:cerpamedia@gmail.com" className="hover:text-text underline">cerpamedia@gmail.com</a> · <a href="tel:+19432487410" className="hover:text-text underline">(943) 248-7410</a>
               </p>

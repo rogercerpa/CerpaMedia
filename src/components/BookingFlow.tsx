@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Reveal } from "./Reveal";
+import { trackStrategyCallClick } from "./track-client-event";
 
 interface TimeSlot {
   start: string;
@@ -635,6 +636,9 @@ export function BookingFlow() {
               <button
                 type="submit"
                 className="w-full bg-cta text-cta-text px-8 py-4 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                onClick={() => {
+                  trackStrategyCallClick();
+                }}
               >
                 Continue to Payment ($99)
               </button>

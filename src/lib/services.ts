@@ -240,7 +240,8 @@ export const fallbackServices: ServiceCard[] = [
 
 /**
  * Fallback featured card for AI Teammate Launch.
- * Public pages replace priceLabel and badgeText with the live Stripe founding-link offer.
+ * The services index does not render priceLabel or a founding-spots badge.
+ * Prices and the spots count stay on the Launch page.
  */
 export const fallbackFeaturedService: ServiceCard = {
   slug: "ai-teammate-launch",

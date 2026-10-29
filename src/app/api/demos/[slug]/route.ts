@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPublicDemoPayload } from "@/lib/demo";
 import { checkRateLimit } from "@/lib/security";
 import { incrementAnalyticsEvent } from "@/lib/analytics";
+import { trackContextFromHeaders } from "@/lib/analytics-events";
 
 export async function GET(
   request: NextRequest,
@@ -29,7 +30,10 @@ export async function GET(
   }
 
   try {
-    await incrementAnalyticsEvent("demo_run");
+    await incrementAnalyticsEvent(
+      "demo_run",
+      trackContextFromHeaders(request.headers, `/try/${slug}`)
+    );
   } catch {
     // ignore count failures
   }

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const sendMock = vi.hoisted(() => vi.fn());
+const recordTrackedEvent = vi.hoisted(() => vi.fn());
 const headerState = vi.hoisted(() => ({ ip: "203.0.113.10" }));
 
 vi.mock("resend", () => ({
@@ -11,8 +12,18 @@ vi.mock("resend", () => ({
 
 vi.mock("next/headers", () => ({
   headers: async () => ({
-    get: (name: string) => (name === "x-forwarded-for" ? headerState.ip : null),
+    get: (name: string) => {
+      if (name === "x-forwarded-for") return headerState.ip;
+      if (name === "user-agent") {
+        return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36";
+      }
+      return null;
+    },
   }),
+}));
+
+vi.mock("@/lib/analytics", () => ({
+  recordTrackedEvent,
 }));
 
 import { submitContactForm } from "./contact";
@@ -41,6 +52,8 @@ function validSubmission(overrides: Record<string, string> = {}) {
 beforeEach(() => {
   sendMock.mockReset();
   sendMock.mockResolvedValue({ data: { id: "email_1" }, error: null });
+  recordTrackedEvent.mockReset();
+  recordTrackedEvent.mockResolvedValue({ ok: true });
   headerState.ip = `203.0.113.${ipOctet++}`;
   process.env.RESEND_API_KEY = "re_test_key";
   process.env.CONTACT_TO_EMAIL = "cerpamedia@gmail.com";
@@ -90,6 +103,9 @@ describe("submitContactForm emails", () => {
     expect(confirmation.html).toContain("We need help sorting out our tools");
     expect(confirmation.html).not.toMatch(/sms|text message|\$99/i);
     expect(confirmation.text).toContain("Roger Cerpa, CerpaMedia");
+    expect(recordTrackedEvent).toHaveBeenCalledTimes(1);
+    expect(recordTrackedEvent.mock.calls[0][0]).toBe("contact_submit");
+    expect(recordTrackedEvent.mock.calls[0][1]).toMatchObject({ path: "/contact" });
   });
 
   it("uses configured from, reply-to, and recipient addresses", async () => {
@@ -149,6 +165,7 @@ describe("submitContactForm emails", () => {
       const result = await submitContactForm(submission);
       expect(result.success).toBe(false);
       expect(sendMock).not.toHaveBeenCalled();
+      expect(recordTrackedEvent).not.toHaveBeenCalled();
     }
   });
 
@@ -157,6 +174,7 @@ describe("submitContactForm emails", () => {
     const result = await submitContactForm(validSubmission());
     expect(result.success).toBe(false);
     expect(sendMock).not.toHaveBeenCalled();
+    expect(recordTrackedEvent).not.toHaveBeenCalled();
   });
 
   it("does not send a confirmation when the notice to Roger fails", async () => {
@@ -167,6 +185,7 @@ describe("submitContactForm emails", () => {
 
     expect(result.success).toBe(false);
     expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(recordTrackedEvent).not.toHaveBeenCalled();
     errorSpy.mockRestore();
   });
 
@@ -208,6 +227,7 @@ describe("submitContactForm emails", () => {
     const blocked = await submitContactForm(validSubmission());
     expect(blocked.success).toBe(false);
     expect(sendMock).not.toHaveBeenCalled();
+    expect(recordTrackedEvent).toHaveBeenCalledTimes(3);
   });
 });
 

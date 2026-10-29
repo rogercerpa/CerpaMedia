@@ -280,6 +280,8 @@ describe('getAvailableSlots', () => {
   it('ensures calendar dates match slot dates in YYYY-MM-DD format', async () => {
     // This test verifies the fix for the off-by-one calendar bug
     // Slot times in UTC should map to the correct calendar date in ET
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date("2026-10-24T12:00:00Z"));
     const startDate = new Date('2026-10-25T00:00:00Z');
     const endDate = new Date('2026-10-26T00:00:00Z');
 
