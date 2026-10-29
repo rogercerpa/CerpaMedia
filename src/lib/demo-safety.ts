@@ -37,6 +37,7 @@ export const ANALYTICS_EVENTS = [
   "demo_run",
   "email_click",
   "cta_99_click",
+  "contact_submit",
 ] as const;
 
 export type AnalyticsEventName = (typeof ANALYTICS_EVENTS)[number];

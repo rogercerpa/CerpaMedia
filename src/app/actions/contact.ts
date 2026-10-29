@@ -13,6 +13,8 @@ import {
   looksLikeSpam,
   emailLooksGenerated,
 } from "@/lib/security";
+import { recordTrackedEvent } from "@/lib/analytics";
+import { trackContextFromHeaders } from "@/lib/analytics-events";
 
 interface ContactFormData {
   name: string;
@@ -199,6 +201,12 @@ export async function submitContactForm(formData: ContactFormData) {
     }
   } catch (error) {
     console.error("Failed to send contact confirmation email:", error);
+  }
+
+  try {
+    await recordTrackedEvent("contact_submit", trackContextFromHeaders(headersList, "/contact"));
+  } catch (error) {
+    console.error("Failed to record contact analytics:", error);
   }
 
   return {

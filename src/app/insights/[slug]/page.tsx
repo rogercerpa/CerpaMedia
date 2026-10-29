@@ -2,10 +2,16 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
+import { InsightReadTracker } from "@/components/InsightReadTracker";
+import { InsightStrategyCallBox } from "@/components/InsightStrategyCallBox";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import { presentInsight } from "@/lib/reword-small-business";
 import { getCanonicalSlug, getOldSlug } from "@/lib/insight-slug-aliases";
+import { getLaunchOffer } from "@/lib/get-launch-offer";
+import { getInsightStrategyCallCopy } from "@/lib/get-insight-strategy-call";
+import { isInBodyStrategyCallLink, reactNodeText } from "@/lib/insight-strategy-call";
+import { launchSpotLine } from "@/lib/launch-offer";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -106,6 +112,11 @@ export default async function InsightPostPage({
   }
 
   const article = presentInsight(post);
+  const canonicalSlug = getCanonicalSlug(slug);
+  const [strategyCallCopy, launchOffer] = await Promise.all([
+    getInsightStrategyCallCopy(),
+    getLaunchOffer(),
+  ]);
 
   return (
     <div className="bg-bg">
@@ -190,16 +201,21 @@ export default async function InsightPostPage({
                       {children}
                     </li>
                   ),
-                  a: ({ href, children }) => (
-                    <a
-                      href={href}
-                      className="text-text underline hover:text-text-muted transition-colors"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {children}
-                    </a>
-                  ),
+                  a: ({ href, children }) => {
+                    if (isInBodyStrategyCallLink(href, reactNodeText(children))) {
+                      return <span>{children}</span>;
+                    }
+                    return (
+                      <a
+                        href={href}
+                        className="text-text underline hover:text-text-muted transition-colors"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {children}
+                      </a>
+                    );
+                  },
                   blockquote: ({ children }) => (
                     <blockquote className="border-l-4 border-border pl-4 italic text-text-muted my-4">
                       {children}
@@ -224,20 +240,15 @@ export default async function InsightPostPage({
         </div>
       </section>
 
-      <section className="pb-12 md:pb-16">
+      <section className="pb-16 md:pb-24">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-[15px] text-text-muted leading-relaxed">
-            Want a second opinion on your setup?{" "}
-            <Link
-              href="/consult"
-              className="text-text underline hover:text-text-muted transition-colors"
-            >
-              Book a Technology Strategy Call
-            </Link>
-            .
-          </p>
+          <InsightStrategyCallBox
+            copy={strategyCallCopy}
+            spotLine={launchSpotLine(launchOffer)}
+          />
         </div>
       </section>
+      <InsightReadTracker slug={canonicalSlug} />
     </div>
   );
 }

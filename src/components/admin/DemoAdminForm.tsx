@@ -146,7 +146,7 @@ export default function DemoAdminForm({
             onChange={(e) => setAnalyticsEnabled(e.target.checked)}
             disabled={!isOwner}
           />
-          Enable Vercel Web Analytics script (OFF by default so live head tags stay unchanged)
+          Enable analytics: Vercel Web Analytics, plus daily counts for $99 clicks, contact submissions, and Insights reads (OFF by default so the live head stays unchanged until this is on)
         </label>
         <label className="flex items-center gap-2 text-sm">
           <input

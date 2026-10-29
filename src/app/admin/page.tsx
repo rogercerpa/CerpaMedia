@@ -98,6 +98,35 @@ export default async function AdminDashboard() {
           </Link>
 
           <Link
+            href="/admin/insight-strategy-call"
+            className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6"
+          >
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
+                <svg
+                  className="w-6 h-6 text-primary-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Insights Strategy Call
+            </h3>
+            <p className="text-gray-600 text-sm">
+              Edit the $99 box at the end of each Insights article
+            </p>
+          </Link>
+
+          <Link
             href="/admin/faqs"
             className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-6"
           >

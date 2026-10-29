@@ -8,6 +8,7 @@ import {
   type BookingKind,
 } from "@/lib/launch-booking-shared";
 import { LAUNCH_INTAKE_CONFIRMATION } from "@/lib/launch-intake";
+import { trackStrategyCallClick } from "./track-client-event";
 
 // Convert a Date to YYYY-MM-DD using its local date components (no timezone conversion)
 export function toLocalDateKey(date: Date): string {
@@ -1074,6 +1075,9 @@ export function CalendarBookingFlow({
               <button
                 type="submit"
                 className="w-full bg-cta text-cta-text px-8 py-4 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                onClick={() => {
+                  if (!isLaunch) trackStrategyCallClick();
+                }}
               >
                 {isLaunch ? "Confirm setup session" : "Continue to Payment ($99)"}
               </button>

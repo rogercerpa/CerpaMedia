@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
+import { StrategyCallLink } from "@/components/StrategyCallLink";
 import { getPublishedServices, getServiceBySlug, fallbackServices, fallbackFeaturedService } from "@/lib/services";
 import { getSeoMeta } from "@/lib/seo";
 import { getLaunchOffer } from "@/lib/get-launch-offer";
@@ -109,12 +110,12 @@ export default async function ServicesPage() {
                   </p>
                 </div>
                 <div className="flex-shrink-0">
-                  <Link
+                  <StrategyCallLink
                     href="/consult"
                     className="inline-block bg-white text-charcoal px-8 py-3 text-[15px] font-medium hover:bg-gray-100 transition-all duration-200 hover:-translate-y-0.5"
                   >
                     Pay $99 — Book Call
-                  </Link>
+                  </StrategyCallLink>
                 </div>
               </div>
             </div>

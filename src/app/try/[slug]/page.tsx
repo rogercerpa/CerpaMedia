@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { getPublicDemoPayload } from "@/lib/demo";
 import DemoPlayer from "@/components/DemoPlayer";
 import { incrementAnalyticsEvent } from "@/lib/analytics";
+import { trackContextFromHeaders } from "@/lib/analytics-events";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +16,11 @@ export default async function PublicDemoPage({
   const payload = await getPublicDemoPayload(slug);
   if (!payload) notFound();
   try {
-    await incrementAnalyticsEvent("demo_run");
+    const requestHeaders = await headers();
+    await incrementAnalyticsEvent(
+      "demo_run",
+      trackContextFromHeaders(requestHeaders, `/try/${slug}`)
+    );
   } catch {
     // Counts are best-effort and must never break the public demo.
   }

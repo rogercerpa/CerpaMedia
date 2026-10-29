@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
+import { StrategyCallLink } from "@/components/StrategyCallLink";
 import { getHeroContent, getHowItWorksContent, getPublishedFaqs, getPublishedTestimonials } from "@/lib/content";
 import { getSeoMeta } from "@/lib/seo";
 import { getLaunchOffer } from "@/lib/get-launch-offer";
 import { launchHomeOfferText } from "@/lib/launch-offer";
+import { isInBodyStrategyCallLink } from "@/lib/insight-strategy-call";
 import type { Metadata } from "next";
 
 export const revalidate = 60;
@@ -56,20 +58,38 @@ export default async function Home() {
               {hasPrimaryCta || hasSecondaryCta ? (
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   {hasPrimaryCta ? (
-                    <Link
-                      href={hero.primaryCtaUrl}
-                      className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
-                    >
-                      {hero.primaryCtaLabel}
-                    </Link>
+                    isInBodyStrategyCallLink(hero.primaryCtaUrl, hero.primaryCtaLabel) ? (
+                      <StrategyCallLink
+                        href={hero.primaryCtaUrl}
+                        className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                      >
+                        {hero.primaryCtaLabel}
+                      </StrategyCallLink>
+                    ) : (
+                      <Link
+                        href={hero.primaryCtaUrl}
+                        className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                      >
+                        {hero.primaryCtaLabel}
+                      </Link>
+                    )
                   ) : null}
                   {hasSecondaryCta ? (
-                    <a
-                      href={hero.secondaryCtaUrl}
-                      className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
-                    >
-                      {hero.secondaryCtaLabel}
-                    </a>
+                    isInBodyStrategyCallLink(hero.secondaryCtaUrl, hero.secondaryCtaLabel) ? (
+                      <StrategyCallLink
+                        href={hero.secondaryCtaUrl}
+                        className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
+                      >
+                        {hero.secondaryCtaLabel}
+                      </StrategyCallLink>
+                    ) : (
+                      <a
+                        href={hero.secondaryCtaUrl}
+                        className="inline-block text-text-muted px-8 py-3.5 text-[15px] font-medium hover:text-text transition-colors"
+                      >
+                        {hero.secondaryCtaLabel}
+                      </a>
+                    )
                   ) : null}
                 </div>
               ) : null}
@@ -343,12 +363,12 @@ export default async function Home() {
               Book the $99 Technology Strategy Call. Pay first, Roger schedules with you, and you get a written summary within 24–48 hours of the call.
             </p>
             <div className="flex flex-col gap-4 items-center">
-              <Link
+              <StrategyCallLink
                 href="/consult"
                 className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
               >
                 Book the $99 Strategy Call
-              </Link>
+              </StrategyCallLink>
               <p className="text-sm text-text-muted">
                 Prefer email? <a href="mailto:cerpamedia@gmail.com" className="hover:text-text underline">cerpamedia@gmail.com</a> · <a href="tel:+19432487410" className="hover:text-text underline">(943) 248-7410</a>
               </p>

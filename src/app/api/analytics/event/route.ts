@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { incrementAnalyticsEvent } from "@/lib/analytics";
+import { recordTrackedEvent } from "@/lib/analytics";
+import {
+  resolveClientAnalyticsEvent,
+  safeAnalyticsPath,
+  trackContextFromHeaders,
+} from "@/lib/analytics-events";
 import { checkRateLimit } from "@/lib/security";
 
 export async function POST(request: NextRequest) {
@@ -15,15 +20,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
-  let eventName = "";
+  let body: { event?: unknown; slug?: unknown; path?: unknown };
   try {
-    const body = await request.json();
-    eventName = typeof body?.event === "string" ? body.event : "";
+    body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid payload." }, { status: 400 });
   }
 
-  const result = await incrementAnalyticsEvent(eventName);
+  const eventName = resolveClientAnalyticsEvent(body);
+  if (!eventName) {
+    return NextResponse.json({ error: "Unknown event." }, { status: 400 });
+  }
+
+  const context = trackContextFromHeaders(request.headers, safeAnalyticsPath(body.path));
+  const result = await recordTrackedEvent(eventName, context);
   if (!result.ok) {
     return NextResponse.json({ error: result.error }, { status: result.status });
   }
