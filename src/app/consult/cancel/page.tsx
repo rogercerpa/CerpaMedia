@@ -1,5 +1,14 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
+import { pageSocialMetadata, ROUTE_SEO } from "@/lib/seo-copy";
+
+const cancelSeo = ROUTE_SEO["/consult/cancel"];
+
+export const metadata = pageSocialMetadata({
+  title: cancelSeo.title,
+  description: cancelSeo.description,
+  path: "/consult/cancel",
+});
 
 export default function BookingCancelPage() {
   return (

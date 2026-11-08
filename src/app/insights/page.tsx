@@ -2,28 +2,15 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { format } from "date-fns";
-import { getSeoMeta } from "@/lib/seo";
+import { publicPageMetadata } from "@/lib/seo";
 import { presentInsight } from "@/lib/reword-small-business";
+import { conciseText } from "@/lib/seo-copy";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getSeoMeta("/insights");
-  
-  // Only override if there's a DB value, otherwise use layout default
-  if (!seo.title && !seo.description) {
-    return {};
-  }
-  
-  const metadata: Metadata = {};
-  if (seo.title) metadata.title = seo.title;
-  if (seo.description) metadata.description = seo.description;
-  if (seo.ogImageUrl) {
-    metadata.openGraph = { images: [seo.ogImageUrl] };
-  }
-  
-  return metadata;
+  return publicPageMetadata("/insights");
 }
 
 export default async function InsightsPage() {
@@ -94,7 +81,7 @@ export default async function InsightsPage() {
                       </h2>
                     </Link>
                     <p className="text-[15px] text-text-muted leading-relaxed mb-4">
-                      {post.summary}
+                      {conciseText(post.summary, 160)}
                     </p>
                     {post.tags && post.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-4">

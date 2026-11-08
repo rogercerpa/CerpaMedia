@@ -1,16 +1,10 @@
 import { Metadata } from "next";
 import { Reveal } from "@/components/Reveal";
 import Link from "next/link";
-import { getSeoMeta } from "@/lib/seo";
+import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getSeoMeta("/terms");
-  
-  return {
-    title: seo.title || "Terms of Service - CerpaMedia",
-    description: seo.description || "CerpaMedia Terms of Service - Your agreement for using our Site and booking the Technology Strategy Call.",
-    ...(seo.ogImageUrl && { openGraph: { images: [seo.ogImageUrl] } }),
-  };
+  return publicPageMetadata("/terms");
 }
 
 export default function TermsPage() {

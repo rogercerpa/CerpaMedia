@@ -18,6 +18,7 @@ import {
 } from "@/lib/insight-strategy-call";
 import { StrategyCallLink } from "@/components/StrategyCallLink";
 import type { Metadata } from "next";
+import { pageSocialMetadata } from "@/lib/seo-copy";
 
 export const dynamic = "force-dynamic";
 
@@ -61,21 +62,18 @@ export async function generateMetadata({
   }
 
   const article = presentInsight(post);
+  const canonical = `https://cerpamedia.com/insights/${canonicalSlug}`;
 
-  return {
+  return pageSocialMetadata({
     title: article.title,
     description: article.summary,
-    alternates: {
-      canonical: `https://cerpamedia.com/insights/${canonicalSlug}`,
-    },
-    openGraph: {
-      title: article.title,
-      description: article.summary,
-      url: `https://cerpamedia.com/insights/${canonicalSlug}`,
-      type: "article",
-      publishedTime: article.publishedAt?.toISOString(),
-    },
-  };
+    path: `/insights/${canonicalSlug}`,
+    imagePath: `/insights/${canonicalSlug}/opengraph-image`,
+    imageAlt: article.title,
+    type: "article",
+    publishedTime: article.publishedAt?.toISOString(),
+    canonical,
+  });
 }
 
 export default async function InsightPostPage({

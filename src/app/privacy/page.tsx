@@ -1,15 +1,9 @@
 import { Metadata } from "next";
 import { Reveal } from "@/components/Reveal";
-import { getSeoMeta } from "@/lib/seo";
+import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getSeoMeta("/privacy");
-  
-  return {
-    title: seo.title || "Privacy Policy - CerpaMedia",
-    description: seo.description || "CerpaMedia Privacy Policy - How we collect, use, and protect your personal information.",
-    ...(seo.ogImageUrl && { openGraph: { images: [seo.ogImageUrl] } }),
-  };
+  return publicPageMetadata("/privacy");
 }
 
 export default async function PrivacyPage() {
@@ -168,7 +162,7 @@ export default async function PrivacyPage() {
               <div>
                 <h2 className="text-3xl font-semibold text-text mb-4">6. Security</h2>
                 <p className="text-text-muted leading-relaxed">
-                  We use reasonable safeguards for a small business. Data travels over encrypted HTTPS connections. We use reputable cloud providers, limit who can access the data, and protect accounts with strong passwords and multi-factor authentication where available. No website or system is 100% secure, so we can't guarantee absolute security. If a breach affects your personal information, we will notify you as required by law.
+                  We use reasonable safeguards. Data travels over encrypted HTTPS connections. We use reputable cloud providers, limit who can access the data, and protect accounts with strong passwords and multi-factor authentication where available. No website or system is 100% secure, so we can't guarantee absolute security. If a breach affects your personal information, we will notify you as required by law.
                 </p>
               </div>
 

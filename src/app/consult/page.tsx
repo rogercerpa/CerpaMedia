@@ -1,25 +1,11 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { CalendarBookingFlow } from "@/components/CalendarBookingFlow";
-import { getSeoMeta } from "@/lib/seo";
+import { publicPageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getSeoMeta("/consult");
-  
-  // Only override if there's a DB value, otherwise use layout default
-  if (!seo.title && !seo.description) {
-    return {};
-  }
-  
-  const metadata: Metadata = {};
-  if (seo.title) metadata.title = seo.title;
-  if (seo.description) metadata.description = seo.description;
-  if (seo.ogImageUrl) {
-    metadata.openGraph = { images: [seo.ogImageUrl] };
-  }
-  
-  return metadata;
+  return publicPageMetadata("/consult");
 }
 
 export default function ConsultPage() {

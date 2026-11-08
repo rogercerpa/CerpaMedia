@@ -1,16 +1,10 @@
 import { Metadata } from "next";
 import { Reveal } from "@/components/Reveal";
 import Link from "next/link";
-import { getSeoMeta } from "@/lib/seo";
+import { publicPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getSeoMeta("/strategy-call-policy");
-  
-  return {
-    title: seo.title || "Strategy Call Policy - CerpaMedia",
-    description: seo.description || "Technology Strategy Call refund, cancellation, reschedule and no-show policy.",
-    ...(seo.ogImageUrl && { openGraph: { images: [seo.ogImageUrl] } }),
-  };
+  return publicPageMetadata("/strategy-call-policy");
 }
 
 export default function StrategyCallPolicyPage() {
