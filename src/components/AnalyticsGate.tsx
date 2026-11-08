@@ -1,5 +1,5 @@
-import { Analytics } from "@vercel/analytics/react";
 import { isAnalyticsEnabled } from "@/lib/flags";
+import VercelAnalytics from "@/components/VercelAnalytics";
 
 export default async function AnalyticsGate() {
   try {
@@ -7,7 +7,7 @@ export default async function AnalyticsGate() {
     if (!enabled) {
       return null;
     }
-    return <Analytics />;
+    return <VercelAnalytics />;
   } catch {
     return null;
   }

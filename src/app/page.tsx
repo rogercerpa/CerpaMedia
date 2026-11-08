@@ -2,28 +2,14 @@ import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { StrategyCallLink } from "@/components/StrategyCallLink";
 import { getHeroContent, getHowItWorksContent, getPublishedFaqs, getPublishedTestimonials } from "@/lib/content";
-import { getSeoMeta } from "@/lib/seo";
+import { publicPageMetadata } from "@/lib/seo";
 import { isInBodyStrategyCallLink, STRATEGY_CALL_BUTTON_LABEL } from "@/lib/insight-strategy-call";
 import type { Metadata } from "next";
 
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await getSeoMeta("/");
-  
-  // Only override if there's a DB value, otherwise use layout default
-  if (!seo.title && !seo.description) {
-    return {};
-  }
-  
-  const metadata: Metadata = {};
-  if (seo.title) metadata.title = seo.title;
-  if (seo.description) metadata.description = seo.description;
-  if (seo.ogImageUrl) {
-    metadata.openGraph = { images: [seo.ogImageUrl] };
-  }
-  
-  return metadata;
+  return publicPageMetadata("/");
 }
 
 export default async function Home() {
@@ -34,25 +20,35 @@ export default async function Home() {
   const testimonials = await getPublishedTestimonials();
   const hasPrimaryCta = Boolean(hero.primaryCtaLabel?.trim() && hero.primaryCtaUrl?.trim());
   const hasSecondaryCta = Boolean(hero.secondaryCtaLabel?.trim() && hero.secondaryCtaUrl?.trim());
+  const showDefaultBookCall = !hasPrimaryCta;
   
   return (
     <div>
-      <section className="bg-bg py-24 md:py-32 lg:py-40">
+      <section className="bg-bg pt-8 pb-12 md:py-16 lg:py-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal>
             <div className="text-center">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
                 {hero.headline}
               </h1>
-              <p className={`text-xl md:text-2xl text-text-muted max-w-3xl mx-auto leading-relaxed${hasPrimaryCta || hasSecondaryCta ? " mb-12" : ""}`}>
+              <p className={`text-lg md:text-xl lg:text-2xl text-text-muted max-w-3xl mx-auto leading-relaxed${hasPrimaryCta || hasSecondaryCta || showDefaultBookCall ? " mb-8 md:mb-10" : ""}`}>
                 {hero.subheadline.split("you own the accounts and code.").map((part, i, arr) => 
                   i === arr.length - 1 ? part : (
                     <span key={i}>{part}<strong className="text-text">you own the accounts and code.</strong></span>
                   )
                 )}
               </p>
-              {hasPrimaryCta || hasSecondaryCta ? (
+              {hasPrimaryCta || hasSecondaryCta || showDefaultBookCall ? (
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  {showDefaultBookCall ? (
+                    <StrategyCallLink
+                      href="/consult"
+                      heroCta
+                      className="inline-block bg-cta text-cta-text px-8 py-3.5 text-[15px] font-medium hover:bg-cta-hover transition-all duration-200 hover:-translate-y-0.5"
+                    >
+                      {STRATEGY_CALL_BUTTON_LABEL}
+                    </StrategyCallLink>
+                  ) : null}
                   {hasPrimaryCta ? (
                     isInBodyStrategyCallLink(hero.primaryCtaUrl, hero.primaryCtaLabel) ? (
                       <StrategyCallLink

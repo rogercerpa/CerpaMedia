@@ -3,6 +3,7 @@ import { Reveal } from "@/components/Reveal";
 import { StrategyCallLink } from "@/components/StrategyCallLink";
 import type { Metadata } from "next";
 import { getSeoMeta } from "@/lib/seo";
+import { isSharedSeoTitle, pageSocialMetadata, ROUTE_SEO } from "@/lib/seo-copy";
 import { getLaunchOffer } from "@/lib/get-launch-offer";
 import {
   launchBadge,
@@ -22,23 +23,17 @@ export async function generateMetadata(): Promise<Metadata> {
     getLaunchOffer(),
   ]);
   
-  const title = seo.title || "AI Teammate Launch - CerpaMedia";
+  const fallback = ROUTE_SEO["/services/ai-teammate-launch"];
+  const title = seo.title && !isSharedSeoTitle(seo.title) ? seo.title : fallback.title;
   const description = launchPageDescription(offer, seo.description);
-  
-  return {
+
+  return pageSocialMetadata({
     title,
     description,
-    alternates: {
-      canonical: "https://cerpamedia.com/services/ai-teammate-launch",
-    },
-    openGraph: {
-      title,
-      description,
-      url: "https://cerpamedia.com/services/ai-teammate-launch",
-      type: "website",
-      ...(seo.ogImageUrl && { images: [seo.ogImageUrl] }),
-    },
-  };
+    path: "/services/ai-teammate-launch",
+    ogImageUrl: seo.ogImageUrl,
+    canonical: "https://cerpamedia.com/services/ai-teammate-launch",
+  });
 }
 
 export default async function AITeammateLaunchPage() {

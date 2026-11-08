@@ -1,5 +1,14 @@
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
+import { pageSocialMetadata, ROUTE_SEO } from "@/lib/seo-copy";
+
+const successSeo = ROUTE_SEO["/consult/success"];
+
+export const metadata = pageSocialMetadata({
+  title: successSeo.title,
+  description: successSeo.description,
+  path: "/consult/success",
+});
 
 export default function BookingSuccessPage() {
   return (

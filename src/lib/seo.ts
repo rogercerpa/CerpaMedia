@@ -1,52 +1,21 @@
 import { prisma } from "./prisma";
 import type { Metadata } from "next";
-import { fallbackLaunchOffer, launchMetaDescription } from "./launch-offer";
 import { presentSeoText, SEO_DESCRIPTION, SEO_TITLE } from "./reword-small-business";
+import {
+  pageSocialMetadata,
+  publicSeoForPath,
+  ROUTE_SEO,
+  type SeoMetaData,
+} from "./seo-copy";
 
-export interface SeoMetaData {
-  title?: string;
-  description?: string;
-  ogImageUrl?: string;
-}
+export type { SeoMetaData } from "./seo-copy";
 
-export const defaultSeoMeta: Record<string, SeoMetaData> = {
-  "/": {
-    title: "CerpaMedia - Technology Services for Business Owners",
-    description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
-  },
-  "/services": {
-    title: "CerpaMedia - Technology Services for Business Owners",
-    description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
-  },
-  "/consult": {
-    title: "CerpaMedia - Technology Services for Business Owners",
-    description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
-  },
-  "/services/ai-teammate-launch": {
-    title: "AI Teammate Launch - CerpaMedia",
-    description: launchMetaDescription(fallbackLaunchOffer()),
-  },
-  "/insights": {
-    title: "CerpaMedia - Technology Services for Business Owners",
-    description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
-  },
-  "/contact": {
-    title: "CerpaMedia - Technology Services for Business Owners",
-    description: "Web development, AI integration, and automation consulting for business owners. A clear plan, practical tools, and systems that run with less friction.",
-  },
-  "/privacy": {
-    title: "Privacy Policy - CerpaMedia",
-    description: "CerpaMedia Privacy Policy - How we collect, use, and protect your personal information.",
-  },
-  "/terms": {
-    title: "Terms of Service - CerpaMedia",
-    description: "CerpaMedia Terms of Service - Your agreement for using our Site and booking the Technology Strategy Call.",
-  },
-  "/strategy-call-policy": {
-    title: "Strategy Call Policy - CerpaMedia",
-    description: "Technology Strategy Call refund, cancellation, reschedule and no-show policy.",
-  },
-};
+export const defaultSeoMeta: Record<string, SeoMetaData> = Object.fromEntries(
+  Object.entries(ROUTE_SEO).map(([path, seo]) => [
+    path,
+    { title: seo.title, description: seo.description },
+  ])
+);
 
 export async function getSeoMeta(path: string): Promise<SeoMetaData> {
   try {
@@ -92,4 +61,18 @@ export async function buildMetadata(path: string, overrides?: Metadata): Promise
   }
 
   return metadata;
+}
+
+export async function publicPageMetadata(path: string, extra?: Metadata): Promise<Metadata> {
+  const stored = await getSeoMeta(path);
+  const seo = publicSeoForPath(path, stored);
+  return {
+    ...pageSocialMetadata({
+      title: seo.title || ROUTE_SEO[path]?.title || "CerpaMedia",
+      description: seo.description || ROUTE_SEO[path]?.description || "",
+      path,
+      ogImageUrl: seo.ogImageUrl,
+    }),
+    ...extra,
+  };
 }

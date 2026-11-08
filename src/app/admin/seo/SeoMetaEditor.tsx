@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { isSharedSeoDescription, isSharedSeoTitle, publicSeoForPath } from "@/lib/seo-copy";
 
 interface PageMeta {
   path: string;
@@ -66,6 +67,13 @@ export default function SeoMetaEditor({ pages, seoMetaMap }: Props) {
         const titleLen = meta.title.length;
         const descLen = meta.description.length;
         const isExpanded = expanded === page.path;
+        const published = publicSeoForPath(page.path, {
+          title: meta.title,
+          description: meta.description,
+          ogImageUrl: meta.ogImageUrl,
+        });
+        const usesRouteDefault =
+          isSharedSeoTitle(meta.title) || isSharedSeoDescription(meta.description) || !meta.title || !meta.description;
 
         return (
           <div key={page.path} className="border-b border-gray-200 last:border-b-0">
@@ -149,16 +157,21 @@ export default function SeoMetaEditor({ pages, seoMetaMap }: Props) {
                   </div>
 
                   <div className="bg-gray-50 border border-gray-200 rounded p-4">
-                    <p className="text-xs text-gray-600 mb-2 font-medium">Google Preview:</p>
+                    <p className="text-xs text-gray-600 mb-2 font-medium">Public page preview:</p>
                     <div className="space-y-1">
                       <p className="text-lg text-blue-700 hover:underline">
-                        {meta.title || "No title set"}
+                        {published.title || "No title set"}
                       </p>
-                      <p className="text-xs text-green-700">cerpamedia.com{page.path}</p>
+                      <p className="text-xs text-green-700">cerpamedia.com{page.path === "/" ? "" : page.path}</p>
                       <p className="text-sm text-gray-600">
-                        {meta.description || "No description set"}
+                        {published.description || "No description set"}
                       </p>
                     </div>
+                    {usesRouteDefault ? (
+                      <p className="text-xs text-gray-500 mt-3">
+                        A blank field, or the old shared site title and description, is replaced by this route&apos;s own wording. Save a different title or description to override it. The database row is not changed until you save.
+                      </p>
+                    ) : null}
                   </div>
 
                   <div className="flex justify-end">
