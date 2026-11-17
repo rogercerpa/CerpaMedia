@@ -1,5 +1,8 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
+import { presentInsightArticleBody } from "@/lib/insight-strategy-call";
 
 vi.mock("next/link", () => ({
   default: ({
@@ -199,4 +202,123 @@ describe("Insight markdown existing syntax", () => {
     expect(html).toContain(">Launch</a>");
     expect(html).not.toContain("<table");
   });
+});
+
+const draftDir = path.join(process.cwd(), "src/components/fixtures/insight-drafts");
+
+function draftBody(name: string) {
+  return readFileSync(path.join(draftDir, name), "utf8");
+}
+
+function asHtmlText(value: string) {
+  return value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll("'", "&#x27;").replaceAll('"', "&quot;");
+}
+
+describe("upcoming Insights draft pricing tables", () => {
+  const drafts = [
+    {
+      file: "grok-bot.md",
+      columns: 5,
+      rows: 7,
+      headers: ["Plan", "Price", "Includes Grok Bot?", "What you get", "Who it's for"],
+      prices: [
+        "$0",
+        "$8/mo or $80/yr",
+        "$30/mo or $300/yr",
+        "$100/mo or $1,000/yr",
+        "$200/mo or $2,000/yr",
+        "$30 / $100 / $200 per seat",
+      ],
+      strong: ["Premium", "$30/mo or $300/yr", "Yes", "New AI users."],
+      links: ["https://x.ai/bot", "https://docs.x.ai/x-subscription/pricing"],
+    },
+    {
+      file: "openai-dots.md",
+      columns: 5,
+      rows: 7,
+      headers: ["Plan", "Price", "Dot included?", "What you get", "Who it's for"],
+      prices: [
+        "$100/mo (monthly only)",
+        "$200/mo",
+        "$500/mo",
+        "$25/user/mo, or $20/user/mo billed annually",
+        "$125/user/mo, or $100/user/mo billed annually",
+      ],
+      strong: [
+        "Pro 100",
+        "$100/mo (monthly only)",
+        "Yes",
+        "A solo owner starting with dots",
+        "Business, Premium seat",
+        "$125/user/mo, or $100/user/mo billed annually",
+        "Teams.",
+      ],
+      links: ["https://openai.com/index/introducing-dots/", "https://chatgpt.com/pricing/"],
+    },
+    {
+      file: "meta-muse.md",
+      columns: 4,
+      rows: 3,
+      headers: ["Plan", "Price", "Weekly usage", "Who it's for"],
+      prices: ["$0", "$20/mo", "$100/mo"],
+      strong: ["Free", "$0", "Everyone starting out."],
+      links: ["https://muse.ai", "https://www.meta.com/help/subscriptions/1021145227643680/"],
+    },
+    {
+      file: "claude-duet.md",
+      columns: 5,
+      rows: 5,
+      headers: ["Plan", "Price", "Duet?", "What you get", "Who it's for"],
+      prices: [
+        "$0",
+        "$20/mo, or $200/yr billed up front (about $17/mo)",
+        "$100/mo (monthly billing)",
+        "$200/mo (monthly billing)",
+        "$100/mo in API credits",
+        "$200/mo in API credits",
+      ],
+      strong: [
+        "Pro",
+        "$20/mo, or $200/yr billed up front (about $17/mo)",
+        "Yes (waitlist, US)",
+        "Owners starting with one or two Duet routines",
+      ],
+      links: ["https://claude.com/product/claude-duet", "https://claude.com/pricing"],
+    },
+  ];
+
+  it.each(drafts)(
+    "$file renders one pricing table with bold cells, prices, and body links",
+    (draft) => {
+      const source = draftBody(draft.file);
+      const body = presentInsightArticleBody(source);
+      expect(body).toBe(source);
+
+      const html = renderMarkdown(body);
+      const table = html.match(
+        /<div[^>]*aria-label="Scrollable table"[^>]*>\s*<table[\s\S]*?<\/table>\s*<\/div>/
+      );
+
+      expect(table).not.toBeNull();
+      expect(html.match(/<table\b/g)).toHaveLength(1);
+      expect(html.match(/<th\b/g)).toHaveLength(draft.columns);
+      expect(html.match(/<td\b/g)).toHaveLength(draft.columns * draft.rows);
+      expect(table?.[0]).toContain("overflow-x-auto");
+      expect(html).not.toContain("|---|");
+      expect(html).not.toContain("| Plan |");
+
+      for (const header of draft.headers) {
+        expect(html).toContain(`>${asHtmlText(header)}<`);
+      }
+      for (const price of draft.prices) {
+        expect(html).toContain(asHtmlText(price));
+      }
+      for (const label of draft.strong) {
+        expect(html).toContain(`<strong>${asHtmlText(label)}</strong>`);
+      }
+      for (const href of draft.links) {
+        expect(html).toContain(`href="${href}"`);
+      }
+    }
+  );
 });
