@@ -71,7 +71,12 @@ describe("Insight markdown tables", () => {
     expect(html).toContain('scope="col"');
     expect(html).toContain("[&amp;_strong]:font-semibold");
     expect(html).toContain("[&amp;_strong]:text-text");
-    expect(html).toContain('<h2 class="text-2xl font-semibold text-text mb-3 mt-8 first:mt-0">');
+    expect(html).toContain(
+      '<h2 class="max-w-3xl text-2xl font-semibold text-text mb-3 mt-8 first:mt-0">'
+    );
+    expect(wrapper?.[0]).toContain("xl:overflow-x-visible");
+    expect(wrapper?.[0]).toContain("xl:w-full");
+    expect(wrapper?.[0]).toContain("xl:table-fixed");
   });
 
   it("honors column alignment and escaped pipes", () => {
@@ -158,31 +163,31 @@ describe("Insight markdown existing syntax", () => {
     );
 
     expect(html).toContain(
-      '<h1 class="text-3xl font-semibold text-text mb-4 mt-8 first:mt-0">Heading one</h1>'
+      '<h1 class="max-w-3xl text-3xl font-semibold text-text mb-4 mt-8 first:mt-0">Heading one</h1>'
     );
     expect(html).toContain(
-      '<h2 class="text-2xl font-semibold text-text mb-3 mt-8 first:mt-0">Heading two</h2>'
+      '<h2 class="max-w-3xl text-2xl font-semibold text-text mb-3 mt-8 first:mt-0">Heading two</h2>'
     );
     expect(html).toContain(
-      '<h3 class="text-xl font-semibold text-text mb-2 mt-6 first:mt-0">Heading three</h3>'
+      '<h3 class="max-w-3xl text-xl font-semibold text-text mb-2 mt-6 first:mt-0">Heading three</h3>'
     );
     expect(html).toContain(
-      '<p class="text-[15px] text-text-muted leading-relaxed mb-4">A paragraph with <strong>bold</strong>, <em>italic</em>, and a <a href="https://example.com/docs" class="text-text underline hover:text-text-muted transition-colors" target="_blank" rel="noopener noreferrer">docs link</a>.</p>'
+      '<p class="max-w-3xl text-[15px] text-text-muted leading-relaxed mb-4">A paragraph with <strong>bold</strong>, <em>italic</em>, and a <a href="https://example.com/docs" class="text-text underline hover:text-text-muted transition-colors" target="_blank" rel="noopener noreferrer">docs link</a>.</p>'
     );
     expect(html).toContain(
-      '<ul class="list-disc list-inside mb-4 space-y-2 text-[15px] text-text-muted">'
+      '<ul class="max-w-3xl list-disc list-inside mb-4 space-y-2 text-[15px] text-text-muted">'
     );
     expect(html).toContain(
       '<li class="text-[15px] text-text-muted leading-relaxed">first item</li>'
     );
     expect(html).toContain(">second item</li>");
     expect(html).toContain(
-      '<ol class="list-decimal list-inside mb-4 space-y-2 text-[15px] text-text-muted">'
+      '<ol class="max-w-3xl list-decimal list-inside mb-4 space-y-2 text-[15px] text-text-muted">'
     );
     expect(html).toContain(">step one</li>");
     expect(html).toContain(">step two</li>");
     expect(html).toContain(
-      '<blockquote class="border-l-4 border-border pl-4 italic text-text-muted my-4">'
+      '<blockquote class="max-w-3xl border-l-4 border-border pl-4 italic text-text-muted my-4">'
     );
     expect(html).toContain("a quoted line");
     expect(html).toContain("Use a pipe | between words.");
