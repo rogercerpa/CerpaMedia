@@ -115,47 +115,49 @@ export default async function InsightPostPage({
   return (
     <div className="bg-bg">
       <section className="py-12 md:py-16 border-b border-border">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal>
-            <div className="mb-6">
-              <Link
-                href="/insights"
-                className="inline-flex items-center text-sm text-text-muted hover:text-text transition-colors"
-              >
-                ← Back to Insights
-              </Link>
-            </div>
-            <div>
-              {article.publishedAt && (
-                <time className="text-sm text-text-muted block mb-3">
-                  {format(new Date(article.publishedAt), "MMMM d, yyyy")}
-                </time>
-              )}
-              <h1 className="text-4xl md:text-5xl font-semibold text-text mb-4 tracking-tight leading-tight">
-                {article.title}
-              </h1>
-              <p className="text-lg text-text-muted leading-relaxed">
-                {article.summary}
-              </p>
-            </div>
-            {article.tags && article.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-6">
-                {article.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-block text-xs px-2 py-1 border border-border text-text-muted"
-                  >
-                    {tag}
-                  </span>
-                ))}
+            <div className="max-w-3xl">
+              <div className="mb-6">
+                <Link
+                  href="/insights"
+                  className="inline-flex items-center text-sm text-text-muted hover:text-text transition-colors"
+                >
+                  ← Back to Insights
+                </Link>
               </div>
-            )}
+              <div>
+                {article.publishedAt && (
+                  <time className="text-sm text-text-muted block mb-3">
+                    {format(new Date(article.publishedAt), "MMMM d, yyyy")}
+                  </time>
+                )}
+                <h1 className="text-4xl md:text-5xl font-semibold text-text mb-4 tracking-tight leading-tight">
+                  {article.title}
+                </h1>
+                <p className="text-lg text-text-muted leading-relaxed">
+                  {article.summary}
+                </p>
+              </div>
+              {article.tags && article.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-6">
+                  {article.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-block text-xs px-2 py-1 border border-border text-text-muted"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
           </Reveal>
         </div>
       </section>
 
       <section className="py-12 md:py-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal delay={100}>
             <article className="prose prose-slate max-w-none">
               <InsightMarkdown>{articleBody}</InsightMarkdown>
@@ -165,8 +167,10 @@ export default async function InsightPostPage({
       </section>
 
       <section className="pb-16 md:pb-24">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <InsightStrategyCallBox copy={strategyCallCopy} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-3xl">
+            <InsightStrategyCallBox copy={strategyCallCopy} />
+          </div>
         </div>
       </section>
       <InsightReadTracker slug={canonicalSlug} />

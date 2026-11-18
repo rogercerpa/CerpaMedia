@@ -9,8 +9,17 @@ import {
 } from "@/lib/insight-strategy-call";
 import remarkGfmTable from "@/lib/remark-gfm-table";
 
+// Paragraphs stay on the article's reading measure. From the xl breakpoint
+// (1280px) the table uses the wider page rail instead, so laptop widths
+// don't have to scroll a pricing table sideways.
+const reading = "max-w-3xl";
+
 function cellFrame(children: ReactNode) {
-  return <div className="min-w-[7.5rem] max-w-[18rem] break-words">{children}</div>;
+  return (
+    <div className="min-w-[7.5rem] max-w-[18rem] break-words xl:min-w-0 xl:max-w-none">
+      {children}
+    </div>
+  );
 }
 
 type CellProps = ComponentProps<"td"> & ExtraProps;
@@ -18,22 +27,22 @@ type HeaderProps = ComponentProps<"th"> & ExtraProps;
 
 const components: Components = {
   h1: ({ children }) => (
-    <h1 className="text-3xl font-semibold text-text mb-4 mt-8 first:mt-0">{children}</h1>
+    <h1 className={`${reading} text-3xl font-semibold text-text mb-4 mt-8 first:mt-0`}>{children}</h1>
   ),
   h2: ({ children }) => (
-    <h2 className="text-2xl font-semibold text-text mb-3 mt-8 first:mt-0">{children}</h2>
+    <h2 className={`${reading} text-2xl font-semibold text-text mb-3 mt-8 first:mt-0`}>{children}</h2>
   ),
   h3: ({ children }) => (
-    <h3 className="text-xl font-semibold text-text mb-2 mt-6 first:mt-0">{children}</h3>
+    <h3 className={`${reading} text-xl font-semibold text-text mb-2 mt-6 first:mt-0`}>{children}</h3>
   ),
   p: ({ children }) => (
-    <p className="text-[15px] text-text-muted leading-relaxed mb-4">{children}</p>
+    <p className={`${reading} text-[15px] text-text-muted leading-relaxed mb-4`}>{children}</p>
   ),
   ul: ({ children }) => (
-    <ul className="list-disc list-inside mb-4 space-y-2 text-[15px] text-text-muted">{children}</ul>
+    <ul className={`${reading} list-disc list-inside mb-4 space-y-2 text-[15px] text-text-muted`}>{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal list-inside mb-4 space-y-2 text-[15px] text-text-muted">
+    <ol className={`${reading} list-decimal list-inside mb-4 space-y-2 text-[15px] text-text-muted`}>
       {children}
     </ol>
   ),
@@ -65,7 +74,7 @@ const components: Components = {
     );
   },
   blockquote: ({ children }) => (
-    <blockquote className="border-l-4 border-border pl-4 italic text-text-muted my-4">
+    <blockquote className={`${reading} border-l-4 border-border pl-4 italic text-text-muted my-4`}>
       {children}
     </blockquote>
   ),
@@ -73,7 +82,7 @@ const components: Components = {
     <code className="bg-bg-subtle px-1.5 py-0.5 text-sm text-text font-mono">{children}</code>
   ),
   pre: ({ children }) => (
-    <pre className="bg-bg-subtle p-4 overflow-x-auto mb-4 text-sm">{children}</pre>
+    <pre className={`${reading} bg-bg-subtle p-4 overflow-x-auto mb-4 text-sm`}>{children}</pre>
   ),
   // `text-left` overrides the browser's centered headers. A GFM alignment
   // marker arrives as `style.textAlign` and overrides that default.
@@ -82,9 +91,9 @@ const components: Components = {
       tabIndex={0}
       role="region"
       aria-label="Scrollable table"
-      className="my-6 max-w-full overflow-x-auto [scrollbar-width:thin] [scrollbar-color:#a3a3a3_transparent] focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text"
+      className="my-6 max-w-full overflow-x-auto xl:overflow-x-visible [scrollbar-width:thin] [scrollbar-color:#a3a3a3_transparent] focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text"
     >
-      <table className="w-max min-w-full border-collapse border border-border text-left text-[14px]">
+      <table className="w-max min-w-full border-collapse border border-border text-left text-[14px] xl:w-full xl:table-fixed">
         {children}
       </table>
     </div>
