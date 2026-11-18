@@ -117,7 +117,7 @@ export default async function InsightPostPage({
       <section className="py-12 md:py-16 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal>
-            <div className="max-w-3xl">
+            <div className="max-w-3xl xl:mx-auto">
               <div className="mb-6">
                 <Link
                   href="/insights"
@@ -168,7 +168,7 @@ export default async function InsightPostPage({
 
       <section className="pb-16 md:pb-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl xl:mx-auto">
             <InsightStrategyCallBox copy={strategyCallCopy} />
           </div>
         </div>

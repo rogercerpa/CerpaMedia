@@ -9,10 +9,10 @@ import {
 } from "@/lib/insight-strategy-call";
 import remarkGfmTable from "@/lib/remark-gfm-table";
 
-// Paragraphs stay on the article's reading measure. From the xl breakpoint
-// (1280px) the table uses the wider page rail instead, so laptop widths
-// don't have to scroll a pricing table sideways.
-const reading = "max-w-3xl";
+// Paragraphs stay on the article's reading measure and, from 1280px up,
+// sit in the center of the page. Tables use the wider centered rail
+// instead, so they extend evenly past the text and do not scroll sideways.
+const reading = "max-w-3xl xl:mx-auto";
 
 function cellFrame(children: ReactNode) {
   return (
