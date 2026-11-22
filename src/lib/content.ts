@@ -1,14 +1,12 @@
 import { prisma } from "./prisma";
-import { presentHeroSubheadline } from "./reword-small-business";
+import { resolveHeroContent, type HeroContent } from "./hero-content";
 
-export interface HeroContent {
-  headline: string;
-  subheadline: string;
-  primaryCtaLabel: string;
-  primaryCtaUrl: string;
-  secondaryCtaLabel: string;
-  secondaryCtaUrl: string;
-}
+export type { HeroContent, HeroPair } from "./hero-content";
+export {
+  DEFAULT_HERO_PAIRS,
+  LEGACY_HERO_HEADLINE,
+  resolveHeroContent,
+} from "./hero-content";
 
 export interface HowItWorksStep {
   title: string;
@@ -35,15 +33,6 @@ export interface Testimonial {
   sortOrder: number;
 }
 
-const fallbackHero: HeroContent = {
-  headline: "Stop losing hours to tools that don't talk to each other.",
-  subheadline: "CerpaMedia helps business owners get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and you own the accounts and code.",
-  primaryCtaLabel: "",
-  primaryCtaUrl: "",
-  secondaryCtaLabel: "",
-  secondaryCtaUrl: "",
-};
-
 const fallbackHowItWorks: HowItWorksContent = {
   steps: [
     {
@@ -68,17 +57,13 @@ export async function getHeroContent(): Promise<HeroContent> {
     });
 
     if (!content) {
-      return fallbackHero;
+      return resolveHeroContent(null);
     }
 
-    const hero = content.value as unknown as HeroContent;
-    return {
-      ...hero,
-      subheadline: presentHeroSubheadline(hero.subheadline),
-    };
+    return resolveHeroContent(content.value);
   } catch (error) {
     console.error("Failed to fetch hero content from DB:", error);
-    return fallbackHero;
+    return resolveHeroContent(null);
   }
 }
 

@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { DEFAULT_HERO_PAIRS } from "../src/lib/hero-content";
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -341,14 +342,22 @@ AI automation isn't about replacing your team — it's about freeing them from t
 
   // Seed home page content (hero, how-it-works)
   // Extracted from current page.tsx to ensure visual parity
+  // `update` stays empty so seeding never rewrites an existing row.
+  // Production's current row has no `pairs` list; the public page uses the
+  // built-in lines for that shape without a database write.
+  const firstHeroPair = DEFAULT_HERO_PAIRS[0];
   await prisma.siteContent.upsert({
     where: { key: "home-hero" },
     update: {},
     create: {
       key: "home-hero",
       value: {
-        headline: "Stop losing hours to tools that don't talk to each other.",
-        subheadline: "CerpaMedia helps business owners get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and you own the accounts and code.",
+        pairs: DEFAULT_HERO_PAIRS.map((pair) => ({
+          headline: pair.headline,
+          subheadline: pair.subheadline,
+        })),
+        headline: firstHeroPair.headline,
+        subheadline: firstHeroPair.subheadline,
         primaryCtaLabel: "",
         primaryCtaUrl: "",
         secondaryCtaLabel: "",
