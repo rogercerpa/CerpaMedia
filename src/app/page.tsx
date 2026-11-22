@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeroRotator } from "@/components/HeroRotator";
 import { Reveal } from "@/components/Reveal";
 import { StrategyCallLink } from "@/components/StrategyCallLink";
 import { getHeroContent, getHowItWorksContent, getPublishedFaqs, getPublishedTestimonials } from "@/lib/content";
@@ -28,16 +29,7 @@ export default async function Home() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <Reveal>
             <div className="text-center">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold mb-6 text-text tracking-tight leading-[1.1]">
-                {hero.headline}
-              </h1>
-              <p className={`text-lg md:text-xl lg:text-2xl text-text-muted max-w-3xl mx-auto leading-relaxed${hasPrimaryCta || hasSecondaryCta || showDefaultBookCall ? " mb-8 md:mb-10" : ""}`}>
-                {hero.subheadline.split("you own the accounts and code.").map((part, i, arr) => 
-                  i === arr.length - 1 ? part : (
-                    <span key={i}>{part}<strong className="text-text">you own the accounts and code.</strong></span>
-                  )
-                )}
-              </p>
+              <HeroRotator pairs={hero.pairs}>
               {hasPrimaryCta || hasSecondaryCta || showDefaultBookCall ? (
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   {showDefaultBookCall ? (
@@ -90,6 +82,7 @@ export default async function Home() {
                   <strong className="text-text">New:</strong> Get two AI teammates working in 14 days. <Link href="/services/ai-teammate-launch" className="text-text hover:underline font-medium">AI Teammate Launch</Link>
                 </p>
               </div>
+              </HeroRotator>
             </div>
           </Reveal>
         </div>

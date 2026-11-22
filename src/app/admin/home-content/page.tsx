@@ -43,8 +43,9 @@ export default async function HomeContentPage() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <p className="text-sm text-gray-600 mb-4">
-            Edit the hero and "How we work" sections on the home page.
-            Changes appear immediately on the public site.
+            Edit the rotating hero lines and the &quot;How we work&quot; section.
+            The first hero line is the page heading. Changes appear on the
+            public site after you save.
           </p>
         </div>
 

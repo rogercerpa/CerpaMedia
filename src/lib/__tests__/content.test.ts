@@ -6,6 +6,7 @@ import {
   getPublishedFaqs,
   getPublishedTestimonials,
 } from '@/lib/content';
+import { DEFAULT_HERO_PAIRS } from '@/lib/hero-content';
 
 vi.mock('@/lib/prisma', () => ({
   prisma: {
@@ -27,13 +28,17 @@ describe('Content Queries', () => {
   });
 
   describe('getHeroContent', () => {
-    it('should return hero content from DB', async () => {
+    it('should return a saved rotating list from the DB', async () => {
       const mockContent = {
         id: '1',
         key: 'home-hero',
         value: {
-          headline: 'Test Headline',
-          subheadline: 'Test Subheadline',
+          headline: 'Ignored once pairs exist',
+          subheadline: 'Also ignored',
+          pairs: [
+            { headline: 'Test Headline', subheadline: 'Test Subheadline' },
+            { headline: 'Second', subheadline: 'Second line' },
+          ],
           primaryCtaLabel: 'Primary CTA',
           primaryCtaUrl: '/test',
           secondaryCtaLabel: 'Secondary CTA',
@@ -48,7 +53,60 @@ describe('Content Queries', () => {
       const result = await getHeroContent();
 
       expect(result.headline).toBe('Test Headline');
+      expect(result.subheadline).toBe('Test Subheadline');
+      expect(result.pairs).toHaveLength(2);
       expect(result.primaryCtaLabel).toBe('Primary CTA');
+    });
+
+    it('should use the built-in pairs when the stored row is the old single headline', async () => {
+      vi.mocked(prisma.siteContent.findUnique).mockResolvedValue({
+        id: '1',
+        key: 'home-hero',
+        value: {
+          headline: "Stop losing hours to tools that don't talk to each other.",
+          subheadline:
+            "CerpaMedia helps business owners get practical web apps, AI, and automation — with a clear plan first, fixed scope when you build, and you own the accounts and code.",
+          primaryCtaLabel: 'Keep me',
+          primaryCtaUrl: '/consult',
+          secondaryCtaLabel: '',
+          secondaryCtaUrl: '',
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any);
+
+      const result = await getHeroContent();
+
+      expect(result.headline).toBe(DEFAULT_HERO_PAIRS[0].headline);
+      expect(result.pairs.map((pair) => pair.headline)).toEqual(
+        DEFAULT_HERO_PAIRS.map((pair) => pair.headline),
+      );
+      expect(result.primaryCtaLabel).toBe('Keep me');
+      expect(result.primaryCtaUrl).toBe('/consult');
+    });
+
+    it('should ignore a customized single headline when no rotating list is saved', async () => {
+      vi.mocked(prisma.siteContent.findUnique).mockResolvedValue({
+        id: '1',
+        key: 'home-hero',
+        value: {
+          headline: 'A headline someone wrote in the old editor',
+          subheadline: 'And their supporting line.',
+          primaryCtaLabel: 'Talk',
+          primaryCtaUrl: '/contact',
+          secondaryCtaLabel: '',
+          secondaryCtaUrl: '',
+        },
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any);
+
+      const result = await getHeroContent();
+
+      expect(result.headline).toBe(DEFAULT_HERO_PAIRS[0].headline);
+      expect(result.pairs).toHaveLength(DEFAULT_HERO_PAIRS.length);
+      expect(result.primaryCtaLabel).toBe('Talk');
+      expect(result.primaryCtaUrl).toBe('/contact');
     });
 
     it('should return fallback on DB error', async () => {
@@ -56,7 +114,8 @@ describe('Content Queries', () => {
 
       const result = await getHeroContent();
 
-      expect(result.headline).toBe("Stop losing hours to tools that don't talk to each other.");
+      expect(result.headline).toBe(DEFAULT_HERO_PAIRS[0].headline);
+      expect(result.pairs).toHaveLength(DEFAULT_HERO_PAIRS.length);
     });
 
     it('should return fallback if content not found', async () => {
@@ -64,7 +123,8 @@ describe('Content Queries', () => {
 
       const result = await getHeroContent();
 
-      expect(result.headline).toBe("Stop losing hours to tools that don't talk to each other.");
+      expect(result.headline).toBe(DEFAULT_HERO_PAIRS[0].headline);
+      expect(result.pairs).toHaveLength(DEFAULT_HERO_PAIRS.length);
       expect(result.primaryCtaLabel).toBe("");
       expect(result.primaryCtaUrl).toBe("");
       expect(result.secondaryCtaLabel).toBe("");
