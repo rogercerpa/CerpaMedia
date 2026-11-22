@@ -1,79 +1,30 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
-import { getDatabaseHost } from "@/lib/availability";
 
 /**
- * Health check endpoint for booking system database tables
- * Returns existence status for each table without requiring secrets
+ * Booking database health check.
+ * Returns only ok or degraded. No hostnames, errors, or table names.
  */
-export async function GET() {
-  const tables = {
-    availabilityRule: false,
-    blockedDate: false,
-    dateAvailability: false,
-    booking: false,
-    bookingSettings: false,
-  };
-
-  const dbHost = getDatabaseHost();
-
-  // Check AvailabilityRule table
+async function relationOk(check: () => Promise<unknown>): Promise<boolean> {
   try {
-    await prisma.availabilityRule.findMany({ take: 1 });
-    tables.availabilityRule = true;
-  } catch (error) {
-    // Table doesn't exist or query failed
-    tables.availabilityRule = false;
-  }
-
-  // Check BlockedDate table
-  try {
-    await prisma.blockedDate.findMany({ take: 1 });
-    tables.blockedDate = true;
-  } catch (error) {
-    tables.blockedDate = false;
-  }
-
-  // Check DateAvailability table
-  try {
-    await prisma.dateAvailability.findMany({ take: 1 });
-    tables.dateAvailability = true;
-  } catch (error) {
-    tables.dateAvailability = false;
-  }
-
-  // Check Booking table
-  try {
-    await prisma.booking.findMany({ take: 1 });
-    tables.booking = true;
-  } catch (error) {
-    tables.booking = false;
-  }
-
-  // Check BookingSettings table
-  try {
-    await prisma.bookingSettings.findMany({ take: 1 });
-    tables.bookingSettings = true;
-  } catch (error) {
-    tables.bookingSettings = false;
-  }
-
-  let launchPurchase = false;
-  try {
-    await prisma.launchPurchase.findMany({ take: 1 });
-    launchPurchase = true;
+    await check();
+    return true;
   } catch {
-    launchPurchase = false;
+    return false;
   }
+}
 
-  const allTablesExist = Object.values(tables).every((exists) => exists);
+export async function GET() {
+  const checks = await Promise.all([
+    relationOk(() => prisma.availabilityRule.findMany({ take: 1 })),
+    relationOk(() => prisma.blockedDate.findMany({ take: 1 })),
+    relationOk(() => prisma.dateAvailability.findMany({ take: 1 })),
+    relationOk(() => prisma.booking.findMany({ take: 1 })),
+    relationOk(() => prisma.bookingSettings.findMany({ take: 1 })),
+    relationOk(() => prisma.launchPurchase.findMany({ take: 1 })),
+  ]);
 
   return NextResponse.json({
-    ok: allTablesExist,
-    tables,
-    launchPurchase,
-    dbHost,
-    timestamp: new Date().toISOString(),
+    status: checks.every(Boolean) ? "ok" : "degraded",
   });
 }

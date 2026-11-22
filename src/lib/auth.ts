@@ -3,10 +3,22 @@ import { cookies } from "next/headers";
 import { prisma } from "./prisma";
 import { OWNER_EMAIL, resolveRole, type AdminRole } from "./roles";
 
-const AUTH_SECRET = process.env.AUTH_SECRET || "default-secret-change-in-production";
 const ADMIN_EMAIL = OWNER_EMAIL;
 
-const secret = new TextEncoder().encode(AUTH_SECRET);
+export class AuthSecretMissingError extends Error {
+  constructor() {
+    super("AUTH_SECRET is not set. Refusing to sign or verify admin sessions.");
+    this.name = "AuthSecretMissingError";
+  }
+}
+
+function authSecretKey(): Uint8Array {
+  const value = process.env.AUTH_SECRET?.trim();
+  if (!value) {
+    throw new AuthSecretMissingError();
+  }
+  return new TextEncoder().encode(value);
+}
 
 export type AdminActor = {
   email: string;
@@ -87,12 +99,13 @@ export async function verifyMagicLinkToken(token: string): Promise<string | null
 }
 
 export async function createAdminSession(email: string): Promise<string> {
+  const key = authSecretKey();
   const normalized = email.toLowerCase();
   const token = await new SignJWT({ email: normalized })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime("7d")
-    .sign(secret);
+    .sign(key);
 
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
@@ -108,8 +121,9 @@ export async function createAdminSession(email: string): Promise<string> {
 }
 
 export async function verifyAdminSession(token: string): Promise<string | null> {
+  const key = authSecretKey();
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, key);
     const email = payload.email as string;
 
     if (!email || !(await isAllowedAdminEmail(email))) {
