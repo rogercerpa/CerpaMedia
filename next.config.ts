@@ -1,9 +1,15 @@
 import type { NextConfig } from "next";
 import { INSIGHT_SLUG_ALIASES } from "./src/lib/insight-slug-aliases";
+import { securityHeaders } from "./src/lib/security-headers";
 
 const nextConfig: NextConfig = {
+  poweredByHeader: false,
   async headers() {
     return [
+      {
+        source: "/(.*)",
+        headers: securityHeaders(),
+      },
       {
         source: "/launch/:path*",
         headers: [
